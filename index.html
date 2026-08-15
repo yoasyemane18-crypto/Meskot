@@ -1601,16 +1601,10 @@ function renderRequestsTab(){
   const uids = Array.from(incomingReq.keys());
   if(uids.length === 0){ list.innerHTML=''; emptyEl.textContent = t('noRequests'); emptyEl.style.display='block'; return; }
   emptyEl.style.display = 'none';
-  Promise.all(uids.map(uid => getDoc(doc(db, 'users', uid))))
-  .then(snaps => {
-    const rows = snaps.filter(s => s.exists()).map(s => personRowHTML({ uid: s.id, ...s.data() }));
-    list.innerHTML = rows.join('');
-    if (rows.length === 0) { toast('Requests found but sender profile missing: ' + uids.join(', ')); }
-  })
-  .catch(err => {
-    console.error('renderRequestsTab failed:', err);
-    toast('Error loading requests: ' + err.message);
+  Promise.all(uids.map(uid => getDoc(doc(db,'users',uid)))).then(snaps => {
+    list.innerHTML = snaps.filter(s=>s.exists()).map(s => personRowHTML({ uid:s.id, ...s.data() })).join('');
   });
+}
 
 function renderMyFriendsTab(){
   const list = document.getElementById('peopleList');
