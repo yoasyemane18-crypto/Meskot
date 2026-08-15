@@ -495,6 +495,27 @@
     background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;
     font-size:11px;border:2px solid var(--card);
   }
+
+  /* ===== phase 9: editing posts / comments / messages ===== */
+  .mini-edit-btn{background:none;border:none;font-size:12px;padding:2px 4px;opacity:.6;vertical-align:middle;}
+  .mini-edit-btn:hover{opacity:1;}
+  .mini-delete-btn{opacity:.5;}
+  .mini-delete-btn:hover{opacity:1;}
+  .post-head{position:relative;}
+  .post-head .mini-edit-btn{margin-left:auto;font-size:15px;}
+  .post-edit-form{padding:0 16px 12px;}
+  .post-edit-form textarea{
+    width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-family:inherit;
+    font-size:14px;color:var(--ink);resize:vertical;
+  }
+  .post-edit-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;}
+  .comment-edit-form{display:flex;gap:6px;margin-top:4px;}
+  .comment-edit-form input{flex:1;border:1px solid var(--line);border-radius:14px;padding:6px 12px;font-size:12.5px;font-family:inherit;}
+  .comment-edit-form button{background:var(--ink);color:#fff;border:none;border-radius:14px;padding:6px 12px;font-size:11.5px;font-weight:600;}
+  .bubble-edit-form{display:flex;gap:6px;margin-top:4px;}
+  .bubble-edit-form input{flex:1;border:1px solid var(--line);border-radius:14px;padding:6px 12px;font-size:13px;font-family:inherit;}
+  .bubble-edit-form button{background:var(--ink);color:#fff;border:none;border-radius:14px;padding:6px 12px;font-size:11.5px;font-weight:600;}
+  .msg-edit-btn{margin-left:4px;}
 </style></head>
 <body>
 
@@ -535,6 +556,9 @@
   </button>
   <button class="inav-btn" data-view="notifications" onclick="navigateNotifications()" title="Notifications">
     <span class="inav-icon-wrap"><span class="inav-icon">🔔</span><span class="inav-badge" id="bellBadge" style="display:none;">0</span></span>
+  </button>
+  <button class="inav-btn" data-view="userdash" onclick="navigateUserDashboard()" title="Dashboard">
+    <span class="inav-icon-wrap"><span class="inav-icon">📊</span></span>
   </button>
   <button class="inav-btn" id="navAdminIcon" data-view="admin" onclick="navigateAdmin()" title="Admin" style="display:none;">
     <span class="inav-icon-wrap"><span class="inav-icon">🛡️</span></span>
@@ -737,6 +761,18 @@
       <div id="notifEmpty" class="empty-small" style="display:none;" data-t="noNotifs">No notifications yet.</div>
     </div>
 
+    <!-- MY DASHBOARD -->
+    <div id="userDashboardView" class="view-panel">
+      <button class="back-link" onclick="navigateFeed()">← <span data-t="backToFeed">Back to feed</span></button>
+      <div class="profile-header">
+        <div class="avatar" id="userDashAvatar"></div>
+        <h2 id="userDashName"></h2>
+        <p id="userDashSub"></p>
+      </div>
+      <h2 class="section-title" data-t="myDashboard">Dashboard</h2>
+      <div class="stat-grid" id="userDashStatGrid"></div>
+    </div>
+
     <!-- ADMIN DASHBOARD -->
     <div id="adminView" class="view-panel">
       <button class="back-link" onclick="navigateFeed()">← <span data-t="backToFeed">Back to feed</span></button>
@@ -904,7 +940,7 @@ const dict = {
     notifLikeSuffix:"liked your post", notifCommentSuffix:"commented on your post",
     notifReqSuffix:"sent you a friend request", notifAcceptSuffix:"accepted your friend request",
     notifMsgSuffix:"sent you a message", notifReactSuffix:"reacted to your post",
-    navAdmin:"Admin", adminDashboard:"Admin Dashboard", tabOverview:"Overview", tabUsers:"Users",
+    navAdmin:"Admin", adminDashboard:"Admin Dashboard", myDashboard:"Dashboard", tabOverview:"Overview", tabUsers:"Users",
     tabPosts:"Posts", tabGroupsAdmin:"Groups", statUsers:"Users", statPosts:"Posts", statGroupPosts:"Group posts",
     statGroupsAdmin:"Groups", statAlbums:"Albums", suspend:"Suspend", unsuspend:"Unsuspend",
     makeAdmin:"Make admin", removeAdmin:"Remove admin", deletePost:"Delete", deleteGroup:"Delete",
@@ -948,7 +984,7 @@ const dict = {
     notifLikeSuffix:"ልጥፍዎን ወድዷል", notifCommentSuffix:"በልጥፍዎ ላይ አስተያየት ሰጥቷል",
     notifReqSuffix:"የጓደኝነት ጥያቄ ልኮልዎታል", notifAcceptSuffix:"የጓደኝነት ጥያቄዎን ተቀብሏል",
     notifMsgSuffix:"መልእክት ልኮልዎታል", notifReactSuffix:"በልጥፍዎ ላይ ምላሽ ሰጥቷል",
-    navAdmin:"አስተዳደር", adminDashboard:"የአስተዳደር ዳሽቦርድ", tabOverview:"አጠቃላይ እይታ", tabUsers:"ተጠቃሚዎች",
+    navAdmin:"አስተዳደር", adminDashboard:"የአስተዳደር ዳሽቦርድ", myDashboard:"ዳሽቦርድ", tabOverview:"አጠቃላይ እይታ", tabUsers:"ተጠቃሚዎች",
     tabPosts:"ልጥፎች", tabGroupsAdmin:"ቡድኖች", statUsers:"ተጠቃሚዎች", statPosts:"ልጥፎች", statGroupPosts:"የቡድን ልጥፎች",
     statGroupsAdmin:"ቡድኖች", statAlbums:"አልበሞች", suspend:"አግድ", unsuspend:"እገዳ አንሳ",
     makeAdmin:"አስተዳዳሪ አድርግ", removeAdmin:"አስተዳዳሪነት አንሳ", deletePost:"ሰርዝ", deleteGroup:"ሰርዝ",
@@ -1289,17 +1325,29 @@ function renderPost(id, p, col){
   const btnIcon = myReaction ? REACTIONS[myReaction].emoji : '👍';
   const btnClass = myReaction ? `liked react-${myReaction}` : '';
   const pickerBtns = REACTION_ORDER.map(k => `<button title="${t(REACTIONS[k].labelKey)}" onclick="event.stopPropagation();setReaction('${id}','${col}','${k}')">${REACTIONS[k].emoji}</button>`).join('');
+  postTextCache[col+'-'+id] = p.text || '';
+  const isMine = currentUser && p.uid === currentUser.uid;
+  const editBtn = isMine ? `<button class="mini-edit-btn" onclick="event.stopPropagation();toggleEditPost('${id}','${col}')" title="Edit">✏️</button>` : '';
+  const deleteBtn = isMine ? `<button class="mini-edit-btn mini-delete-btn" onclick="event.stopPropagation();deleteOwnPost('${id}','${col}')" title="Delete">🗑️</button>` : '';
   return `
     <div class="post" id="post-${col}-${id}">
       <div class="post-arch"></div>
-      <div class="post-head clickable-id" onclick="navigateProfile('${p.uid}')">
-        <div class="avatar">${avatarHTML(p.authorPhoto, p.authorName)}</div>
-        <div class="who">
+      <div class="post-head">
+        <div class="avatar clickable-id" onclick="navigateProfile('${p.uid}')">${avatarHTML(p.authorPhoto, p.authorName)}</div>
+        <div class="who clickable-id" onclick="navigateProfile('${p.uid}')">
           <div class="name">${escapeHtml(p.authorName||'User')}</div>
-          <div class="time">${timeAgo(p.createdAt)}</div>
+          <div class="time">${timeAgo(p.createdAt)}${p.editedAt ? ' · edited' : ''}</div>
+        </div>
+        ${editBtn}${deleteBtn}
+      </div>
+      ${p.text ? `<div class="post-body" id="postBody-${col}-${id}">${escapeHtml(p.text)}</div>` : `<div class="post-body" id="postBody-${col}-${id}" style="display:none;"></div>`}
+      <div class="post-edit-form" id="postEditForm-${col}-${id}" style="display:none;">
+        <textarea id="postEditInput-${col}-${id}" rows="3"></textarea>
+        <div class="post-edit-actions">
+          <button class="btn ghost" onclick="toggleEditPost('${id}','${col}')">${t('cancel')}</button>
+          <button class="btn gold" onclick="savePostEdit('${id}','${col}')">${t('save')}</button>
         </div>
       </div>
-      ${p.text ? `<div class="post-body">${escapeHtml(p.text)}</div>` : ''}
       ${postMediaGridHTML(media)}
       ${summary.total > 0 ? `<div class="post-reactions-line"><span class="reaction-icons">${summary.top.map(k=>`<span>${REACTIONS[k].emoji}</span>`).join('')}</span> ${summary.total} ${t('likesLabel')}</div>` : ''}
       <div class="post-actions">
@@ -1323,6 +1371,44 @@ function renderPost(id, p, col){
       </div>
     </div>`;
 }
+window.toggleEditPost = function(id, col){
+  const bodyEl = document.getElementById(`postBody-${col}-${id}`);
+  const formEl = document.getElementById(`postEditForm-${col}-${id}`);
+  if(!formEl) return;
+  const opening = formEl.style.display === 'none';
+  if(opening){
+    if(bodyEl) bodyEl.style.display = 'none';
+    formEl.style.display = 'block';
+    const ta = document.getElementById(`postEditInput-${col}-${id}`);
+    ta.value = postTextCache[col+'-'+id] || '';
+    ta.focus();
+  } else {
+    formEl.style.display = 'none';
+    if(bodyEl && bodyEl.textContent.trim()) bodyEl.style.display = 'block';
+  }
+};
+window.savePostEdit = async function(id, col){
+  const ta = document.getElementById(`postEditInput-${col}-${id}`);
+  const newText = ta.value.trim();
+  if(!newText) return toast(t('fillFields'));
+  try{
+    await updateDoc(doc(db, col, id), { text: newText, editedAt: serverTimestamp() });
+    postTextCache[col+'-'+id] = newText;
+    const bodyEl = document.getElementById(`postBody-${col}-${id}`);
+    if(bodyEl){ bodyEl.textContent = newText; bodyEl.style.display = 'block'; }
+    document.getElementById(`postEditForm-${col}-${id}`).style.display = 'none';
+    toast(t('profileSaved'));
+  }catch(e){ toast(e.message); }
+};
+window.deleteOwnPost = async function(id, col){
+  if(!confirm(t('confirmDeletePost'))) return;
+  try{
+    await deleteDoc(doc(db, col, id));
+    const el = document.getElementById(`post-${col}-${id}`);
+    if(el) el.remove();
+    toast('Deleted');
+  }catch(e){ toast(e.message); }
+};
 function postMediaGridHTML(media){
   if(!media || !media.length) return '';
   const n = media.length === 1 ? '1' : (media.length === 2 ? '2' : (media.length === 3 ? '3' : '4+'));
@@ -1338,6 +1424,8 @@ function escapeHtml(s){
 }
 
 // ===== reactions interaction =====
+let postTextCache = {};
+let commentTextCache = {};
 let pressTimers = {};
 let pickerHideTimers = {};
 let longPressFired = {};
@@ -1451,13 +1539,62 @@ function listenComments(postId, col){
     if(!list) return;
     list.innerHTML = snap.docs.map(d => {
       const c = d.data();
+      const cid = d.id;
+      commentTextCache[key+'-'+cid] = c.text || '';
+      const isMine = currentUser && c.uid === currentUser.uid;
+      const editBtn = isMine ? `<button class="mini-edit-btn" onclick="toggleEditComment('${postId}','${col}','${cid}')" title="Edit">✏️</button>` : '';
+      const deleteBtn = isMine ? `<button class="mini-edit-btn mini-delete-btn" onclick="deleteOwnComment('${postId}','${col}','${cid}')" title="Delete">🗑️</button>` : '';
       return `<div class="comment-row">
         <div class="avatar" style="width:28px;height:28px;font-size:11px;">${avatarHTML(c.authorPhoto,c.authorName)}</div>
-        <div class="comment-bubble"><div class="cname">${escapeHtml(c.authorName||'User')}</div>${escapeHtml(c.text)}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="comment-bubble" id="commentBubble-${key}-${cid}">
+            <div class="cname">${escapeHtml(c.authorName||'User')} ${editBtn}${deleteBtn}</div>
+            <span id="commentText-${key}-${cid}">${escapeHtml(c.text)}</span>${c.editedAt ? ' <span style="font-size:10.5px;color:var(--muted);">· edited</span>' : ''}
+          </div>
+          <div class="comment-edit-form" id="commentEditForm-${key}-${cid}" style="display:none;">
+            <input type="text" id="commentEditInput-${key}-${cid}">
+            <button onclick="saveCommentEdit('${postId}','${col}','${cid}')">${t('save')}</button>
+          </div>
+        </div>
       </div>`;
     }).join('');
   });
 }
+window.toggleEditComment = function(postId, col, cid){
+  const key = col+'-'+postId;
+  const bubbleEl = document.getElementById(`commentBubble-${key}-${cid}`);
+  const formEl = document.getElementById(`commentEditForm-${key}-${cid}`);
+  if(!formEl) return;
+  const opening = formEl.style.display === 'none';
+  if(opening){
+    bubbleEl.style.display = 'none';
+    formEl.style.display = 'flex';
+    const inp = document.getElementById(`commentEditInput-${key}-${cid}`);
+    inp.value = commentTextCache[key+'-'+cid] || '';
+    inp.focus();
+  } else {
+    formEl.style.display = 'none';
+    bubbleEl.style.display = 'block';
+  }
+};
+window.saveCommentEdit = async function(postId, col, cid){
+  const key = col+'-'+postId;
+  const inp = document.getElementById(`commentEditInput-${key}-${cid}`);
+  const newText = inp.value.trim();
+  if(!newText) return toast(t('fillFields'));
+  try{
+    await updateDoc(doc(db,col,postId,'comments',cid), { text:newText, editedAt: serverTimestamp() });
+    toast(t('profileSaved'));
+  }catch(e){ toast(e.message); }
+};
+window.deleteOwnComment = async function(postId, col, cid){
+  if(!confirm(t('confirmDeletePost'))) return;
+  try{
+    await deleteDoc(doc(db,col,postId,'comments',cid));
+    await updateDoc(doc(db,col,postId), { commentCount: increment(-1) });
+    toast('Deleted');
+  }catch(e){ toast(e.message); }
+};
 window.submitComment = async function(postId, col){
   col = col || 'posts';
   const key = col+'-'+postId;
@@ -1564,7 +1701,7 @@ function setView(id){
     feedView:'feed', friendsView:'friends', messagesView:'messages',
     groupsView:'groups', groupPageView:'groups',
     photosView:'photos', albumView:'photos',
-    notificationsView:'notifications', adminView:'admin'
+    notificationsView:'notifications', userDashboardView:'userdash', adminView:'admin'
   };
   const activeTab = tabMap[id] || null;
   document.querySelectorAll('.inav-btn').forEach(btn => {
@@ -1864,13 +2001,58 @@ window.openChat = async function(otherUid){
     if(snap.empty){ box.innerHTML = `<div class="empty-small">${t('startedChat')}</div>`; return; }
     box.innerHTML = snap.docs.map(d => {
       const m = d.data();
+      const mid = d.id;
       const mine = m.from === currentUser.uid;
+      msgTextCache[mid] = m.text || '';
+      const editBtn = mine ? `<button class="mini-edit-btn msg-edit-btn" onclick="toggleEditMessage('${mid}')" title="Edit">✏️</button>` : '';
+      const deleteBtn = mine ? `<button class="mini-edit-btn msg-edit-btn mini-delete-btn" onclick="deleteOwnMessage('${mid}')" title="Delete">🗑️</button>` : '';
       return `<div class="bubble-row ${mine?'mine':''}">
-        <div><div class="bubble">${escapeHtml(m.text)}</div><span class="bubble-time">${timeAgo(m.createdAt)}</span></div>
+        <div>
+          <div class="bubble" id="bubbleText-${mid}">${escapeHtml(m.text)}</div>
+          <div class="bubble-edit-form" id="bubbleEditForm-${mid}" style="display:none;">
+            <input type="text" id="bubbleEditInput-${mid}" onkeydown="if(event.key==='Enter')saveMessageEdit('${mid}')">
+            <button onclick="saveMessageEdit('${mid}')">${t('save')}</button>
+          </div>
+          <span class="bubble-time">${timeAgo(m.createdAt)}${m.editedAt ? ' · edited' : ''} ${editBtn}${deleteBtn}</span>
+        </div>
       </div>`;
     }).join('');
     box.scrollTop = box.scrollHeight;
   });
+};
+let msgTextCache = {};
+window.toggleEditMessage = function(mid){
+  const bubbleEl = document.getElementById(`bubbleText-${mid}`);
+  const formEl = document.getElementById(`bubbleEditForm-${mid}`);
+  if(!formEl) return;
+  const opening = formEl.style.display === 'none';
+  if(opening){
+    bubbleEl.style.display = 'none';
+    formEl.style.display = 'flex';
+    const inp = document.getElementById(`bubbleEditInput-${mid}`);
+    inp.value = msgTextCache[mid] || '';
+    inp.focus();
+  } else {
+    formEl.style.display = 'none';
+    bubbleEl.style.display = 'block';
+  }
+};
+window.saveMessageEdit = async function(mid){
+  const inp = document.getElementById(`bubbleEditInput-${mid}`);
+  const newText = inp.value.trim();
+  if(!newText || !activeConvoId) return;
+  try{
+    await updateDoc(doc(db,'conversations',activeConvoId,'messages',mid), { text:newText, editedAt: serverTimestamp() });
+    toast(t('profileSaved'));
+  }catch(e){ toast(e.message); }
+};
+window.deleteOwnMessage = async function(mid){
+  if(!activeConvoId) return;
+  if(!confirm(t('confirmDeletePost'))) return;
+  try{
+    await deleteDoc(doc(db,'conversations',activeConvoId,'messages',mid));
+    toast('Deleted');
+  }catch(e){ toast(e.message); }
 };
 
 window.closeChat = function(){
@@ -2338,6 +2520,39 @@ async function addNotification(toUid, type, data){
   }catch(e){ console.error(e); }
 }
 
+// ================= PHASE 8: My Dashboard (per-user, non-admin) =================
+window.navigateUserDashboard = function(){
+  if(!currentUser) return;
+  setView('userDashboardView');
+  document.getElementById('userDashAvatar').innerHTML = avatarHTML(currentProfile.photoURL, currentProfile.displayName);
+  document.getElementById('userDashName').textContent = currentProfile.displayName || 'User';
+  document.getElementById('userDashSub').textContent = `${myFriends.size} ${t('friendsLabel')}`;
+  loadUserDashboard();
+};
+
+async function loadUserDashboard(){
+  const grid = document.getElementById('userDashStatGrid');
+  grid.innerHTML = `<div class="loading">${t('loadingFeed')}</div>`;
+  try{
+    const q = query(collection(db,'posts'), where('uid','==',currentUser.uid));
+    const snap = await getDocs(q);
+    let totalReactions = 0, totalComments = 0;
+    snap.docs.forEach(d => {
+      const p = d.data();
+      totalReactions += Object.keys(getReactionMap(p)).length;
+      totalComments += p.commentCount || 0;
+    });
+    grid.innerHTML = `
+      <div class="stat-card"><div class="num">${snap.size}</div><div class="lbl">${t('statPosts')}</div></div>
+      <div class="stat-card"><div class="num">${myFriends.size}</div><div class="lbl">${t('friendsLabel')}</div></div>
+      <div class="stat-card"><div class="num">${totalReactions}</div><div class="lbl">${t('likesLabel')}</div></div>
+      <div class="stat-card"><div class="num">${totalComments}</div><div class="lbl">${t('comment')}</div></div>
+    `;
+  }catch(e){
+    grid.innerHTML = `<div class="empty-small">${e.message}</div>`;
+  }
+}
+
 // ================= PHASE 7: Admin Dashboard =================
 let currentAdminTab = 'overview';
 
@@ -2392,7 +2607,7 @@ window.renderAdminUsers = async function(){
         <div class="sub">${escapeHtml(u.bio||'')}</div>
       </div>
       <div class="actions">
-        <button class="fbtn subtle" onclick="adminToggleSuspend('${u.uid}',${!!u.suspended})">${t(u.suspended?'unsuspend':'suspend')}</button>
+      <button class="fbtn subtle" onclick="adminToggleSuspend('${u.uid}',${!!u.suspended})">${t(u.suspended?'unsuspend':'suspend')}</button>
         <button class="fbtn subtle" onclick="adminToggleAdmin('${u.uid}',${!!u.isAdmin})">${u.isAdmin?t('removeAdmin'):t('makeAdmin')}</button>
       </div>
     </div>`).join('');
