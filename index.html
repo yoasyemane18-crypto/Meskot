@@ -4,10 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meskot · መስኮት</title>
-<!-- Firebase App (Core) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<!-- Firestore Database -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -469,6 +465,36 @@
     transition:transform .1s;
   }
   .react-picker button:hover{transform:scale(1.35) translateY(-4px);background:var(--paper-2);}
+
+  /* ===== phase 8: FB-style Friends / Messages / Notifications ===== */
+  .fb-section-label{font-weight:700;font-size:15px;margin:2px 0 14px;}
+  .fb-req-card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 16px;
+    margin-bottom:12px;box-shadow:var(--shadow);text-align:center;
+  }
+  .fb-req-card .avatar{width:96px;height:96px;font-size:32px;margin:0 auto 12px;}
+  .fb-req-card .name{font-weight:700;font-size:15.5px;margin-bottom:2px;}
+  .fb-req-card .sub{font-size:12px;color:var(--muted);margin-bottom:14px;min-height:14px;}
+  .fb-req-actions{display:flex;flex-direction:column;gap:8px;}
+  .fb-req-actions button{width:100%;padding:11px;border-radius:8px;font-weight:700;font-size:14px;border:none;}
+  .fb-req-actions .confirm-btn{background:var(--gold);color:#fff;}
+  .fb-req-actions .delete-btn{background:var(--paper-2);color:var(--ink);}
+
+  .story-strip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 14px;margin-bottom:14px;border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch;}
+  .story-strip::-webkit-scrollbar{display:none;}
+  .story-avatar-item{flex-shrink:0;text-align:center;width:58px;cursor:pointer;}
+  .story-avatar-item .avatar{width:56px;height:56px;font-size:18px;margin:0 auto 5px;position:relative;}
+  .story-avatar-item .online-dot{position:absolute;bottom:1px;right:1px;width:13px;height:13px;border-radius:50%;background:#31A24C;border:2px solid var(--card);}
+  .story-avatar-item .sname{font-size:10.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .story-empty{font-size:12px;color:var(--muted);padding:6px 2px 14px;border-bottom:1px solid var(--line);margin-bottom:14px;}
+
+  .notif-avatar-wrap{position:relative;width:44px;height:44px;flex-shrink:0;}
+  .notif-avatar-wrap .avatar{width:44px;height:44px;font-size:16px;}
+  .notif-avatar-wrap .type-badge{
+    position:absolute;bottom:-3px;right:-3px;width:20px;height:20px;border-radius:50%;
+    background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:11px;border:2px solid var(--card);
+  }
 </style></head>
 <body>
 
@@ -555,8 +581,6 @@
     </div>
   </div>
 </div>
-<div id="participantList"></div>
-<button onclick="loadParticipants()">Refresh</button>
 
 <!-- MAIN APP -->
 <div id="app" class="app">
@@ -607,6 +631,7 @@
       <div class="search-row" id="discoverSearchRow">
         <input type="text" id="peopleSearch" data-tph="searchPeople" placeholder="Search people…" oninput="renderDiscover()">
       </div>
+      <div id="peopleSectionLabel" class="fb-section-label" style="display:none;"></div>
       <div id="peopleList" class="people-list"></div>
       <div id="peopleEmpty" class="empty-small" style="display:none;" data-t="noPeople">Nothing here yet.</div>
     </div>
@@ -628,6 +653,7 @@
     <div id="messagesView" class="view-panel">
       <div id="convoListPanel">
         <h2 class="section-title" data-t="navMessages">Messages</h2>
+        <div id="msgStoryStrip"></div>
         <div id="convoList" class="people-list"></div>
         <div id="convoEmpty" class="empty-small" style="display:none;" data-t="noConvos">No conversations yet — message a friend from their profile.</div>
       </div>
@@ -1057,7 +1083,14 @@ if (configured) {
     currentUser = user;
     if(user){
       const snap = await getDoc(doc(db,'users',user.uid));
-      currentProfile = snap.exists() ? snap.data() : { displayName:user.displayName||'User', bio:'', photoURL:'' };
+      if(!snap.exists()){
+        // Self-healing: create a profile doc if one is missing (e.g. account created outside the signup form)
+        const fallbackProfile = { displayName:user.displayName||'User', bio:'', photoURL:'', createdAt: serverTimestamp() };
+        try{ await setDoc(doc(db,'users',user.uid), fallbackProfile); }catch(e){ console.error('Could not create missing profile doc:', e); }
+        currentProfile = { displayName:user.displayName||'User', bio:'', photoURL:'' };
+      } else {
+        currentProfile = snap.data();
+      }
       if(currentProfile.suspended){
         suspendedFlag = true;
         await signOut(auth);
@@ -1504,6 +1537,7 @@ window.navigateMessages = function(){
   setView('messagesView');
   document.getElementById('convoListPanel').style.display = 'block';
   document.getElementById('chatPanel').style.display = 'none';
+  renderMsgStoryStrip();
   renderConvoList();
 };
 window.navigateProfile = function(uid){
@@ -1544,6 +1578,16 @@ window.switchFriendsTab = function(tab){
   document.getElementById('tabRequests').classList.toggle('active', tab==='requests');
   document.getElementById('tabMyFriends').classList.toggle('active', tab==='mine');
   document.getElementById('discoverSearchRow').style.display = tab==='discover' ? 'block' : 'none';
+  const label = document.getElementById('peopleSectionLabel');
+  if(tab==='requests'){
+    label.textContent = `${t('tabRequests')} (${incomingReq.size})`;
+    label.style.display = 'block';
+  } else if(tab==='mine'){
+    label.textContent = `${t('tabMyFriends')} (${myFriends.size})`;
+    label.style.display = 'block';
+  } else {
+    label.style.display = 'none';
+  }
   if(tab==='discover') renderDiscover();
   else if(tab==='requests') renderRequestsTab();
   else renderMyFriendsTab();
@@ -1584,6 +1628,18 @@ function personRowHTML(u){
   </div>`;
 }
 
+function personRequestCardHTML(u){
+  return `<div class="fb-req-card">
+    <div class="avatar clickable-id" onclick="navigateProfile('${u.uid}')">${avatarHTML(u.photoURL,u.displayName)}</div>
+    <div class="name clickable-id" onclick="navigateProfile('${u.uid}')">${escapeHtml(u.displayName||'User')}</div>
+    <div class="sub">${escapeHtml(u.bio||'')}</div>
+    <div class="fb-req-actions">
+      <button class="confirm-btn" onclick="acceptRequest('${u.uid}')">${t('accept')}</button>
+      <button class="delete-btn" onclick="declineRequestFrom('${u.uid}')">${t('decline')}</button>
+    </div>
+  </div>`;
+}
+
 window.renderDiscover = async function(){
   const list = document.getElementById('peopleList');
   const emptyEl = document.getElementById('peopleEmpty');
@@ -1598,19 +1654,22 @@ window.renderDiscover = async function(){
 function renderRequestsTab(){
   const list = document.getElementById('peopleList');
   const emptyEl = document.getElementById('peopleEmpty');
+  const label = document.getElementById('peopleSectionLabel');
   const uids = Array.from(incomingReq.keys());
+  if(label){ label.textContent = `${t('tabRequests')} (${uids.length})`; label.style.display = 'block'; }
   if(uids.length === 0){ list.innerHTML=''; emptyEl.textContent = t('noRequests'); emptyEl.style.display='block'; return; }
   emptyEl.style.display = 'none';
   Promise.all(uids.map(uid => getDoc(doc(db, 'users', uid))))
-  .then(snaps => {
-    const rows = snaps.filter(s => s.exists()).map(s => personRowHTML({ uid: s.id, ...s.data() }));
-    list.innerHTML = rows.join('');
-    if (rows.length === 0) { toast('Requests found but sender profile missing: ' + uids.join(', ')); }
-  })
-  .catch(err => {
-    console.error('renderRequestsTab failed:', err);
-    toast('Error loading requests: ' + err.message);
-  });
+    .then(snaps => {
+      const rows = snaps.filter(s => s.exists()).map(s => personRequestCardHTML({ uid: s.id, ...s.data() }));
+      list.innerHTML = rows.join('');
+      if (rows.length === 0) { toast('Requests found but sender profile missing: ' + uids.join(', ')); }
+    })
+    .catch(err => {
+      console.error('renderRequestsTab failed:', err);
+      toast('Error loading requests: ' + err.message);
+    });
+}
 
 function renderMyFriendsTab(){
   const list = document.getElementById('peopleList');
@@ -1738,6 +1797,20 @@ async function getUserCached(uid){
   const u = snap.exists() ? snap.data() : { displayName:'User', photoURL:'' };
   convoUsersCache.set(uid, u);
   return u;
+}
+
+async function renderMsgStoryStrip(){
+  const strip = document.getElementById('msgStoryStrip');
+  if(!strip) return;
+  const uids = Array.from(myFriends);
+  if(uids.length === 0){ strip.outerHTML = '<div id="msgStoryStrip" class="story-empty">Add friends to start chatting.</div>'; return; }
+  const users = await Promise.all(uids.map(async uid => ({ uid, ...(await getUserCached(uid)) })));
+  strip.className = 'story-strip';
+  strip.innerHTML = users.map(u => `
+    <div class="story-avatar-item" onclick="openChat('${u.uid}')">
+      <div class="avatar">${avatarHTML(u.photoURL,u.displayName)}<span class="online-dot"></span></div>
+      <div class="sname">${escapeHtml((u.displayName||'User').split(' ')[0])}</div>
+    </div>`).join('');
 }
 
 async function renderConvoList(){
@@ -2222,13 +2295,19 @@ function renderNotifications(docs){
       reaction: t('notifReactSuffix')
     };
     return `<div class="notif-row ${n.read?'':'unread'}" onclick="handleNotifClick('${n.type}','${n.postId||''}','${n.convoId||''}','${n.fromUid}')">
-      <div class="icon">${icons[n.type]||'•'}</div>
+      <div class="notif-avatar-wrap">
+        <div class="avatar">${avatarHTML(u.photoURL,u.displayName)}</div>
+        <span class="type-badge">${icons[n.type]||'•'}</span>
+      </div>
       <div class="body">
         <div class="text"><b>${escapeHtml(u.displayName||'User')}</b> ${texts[n.type]||''}</div>
         <div class="ntime">${timeAgo(n.createdAt)}</div>
       </div>
     </div>`;
-  })).then(rows => { list.innerHTML = rows.join(''); });
+  })).then(rows => {
+    const hasUnread = docs.some(d => !d.data().read);
+    list.innerHTML = (hasUnread ? `<div class="fb-section-label">New</div>` : '') + rows.join('');
+  });
 }
 
 window.handleNotifClick = function(type, postId, convoId, fromUid){
@@ -2383,62 +2462,6 @@ window.adminDeleteGroup = async function(gid){
     renderAdminGroups();
   }catch(e){ toast(e.message); }
 };
-</script>
-<script>
-  // Your web app's Firebase configuration (from your screenshot)
-  const firebaseConfig = {
-      apiKey: "AIzaSyD9j6Emef7z1sxtGuqgEePwIJetPo4ZhQQ",
-  authDomain: "meskot-b1a69.firebaseapp.com",
-  databaseURL: "https://meskot-b1a69-default-rtdb.firebaseio.com",
-  projectId: "meskot-b1a69",
-  storageBucket: "meskot-b1a69.firebasestorage.app",
-  messagingSenderId: "1083041536701",
-  appId: "1:1083041536701:web:4654f20e5ae08a2d0435d4",
-  measurementId: "G-VXMRY8JGTE"
-};
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-
-  // Initialize Cloud Firestore
-  const db = firebase.firestore();
-
-  console.log("Firebase connected successfully!");
-function doLogin() {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPass").value;
-
-    db.collection("participants").add({
-        email: email,
-        loginTime: new Date()
-    })
-    .then(() => {
-        alert("Logged in and saved to Firebase!");
-    })
-    .catch((error) => {
-        console.error("Error saving login: ", error);
-    });
-}
-function loadParticipants() {
-    const listContainer = document.getElementById("participantList");
-    if (!listContainer) return;
-    
-    listContainer.innerHTML = "Loading participants...";
-
-    db.collection("participants").get()
-    .then((querySnapshot) => {
-        listContainer.innerHTML = ""; // Clear old list
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            // Create a small paragraph for each user saved in Firebase
-            listContainer.innerHTML += `<p>User: ${data.email || data.name} (Saved)</p>`;
-        });
-    })
-    .catch((error) => {
-        console.error("Error getting documents: ", error);
-    });
-}
-
 </script>
 </body>
 </html>
