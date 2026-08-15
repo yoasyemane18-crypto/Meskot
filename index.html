@@ -1,0 +1,2438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meskot · መስኮት</title>
+<!-- Firebase App (Core) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<!-- Firestore Database -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2A22;
+    --paper:#EEF2ED;
+    --paper-2:#E3E9DF;
+    --card:#FBFCF9;
+    --gold:#B8863A;
+    --gold-deep:#8F6524;
+    --cross:#8C2F39;
+    --line:#D8DECF;
+    --muted:#5C6B5F;
+    --shadow: 0 1px 2px rgba(27,42,34,0.06), 0 8px 24px rgba(27,42,34,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  [lang-am]{font-family:'Noto Sans Ethiopic','Inter',sans-serif;}
+  .disp{font-family:'Fraunces',serif;}
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  ::selection{background:var(--gold);color:#fff;}
+
+  /* ===== lattice window motif ===== */
+  .lattice-bg{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(184,134,58,0.05) 0, transparent 40%),
+      radial-gradient(circle at 80% 60%, rgba(140,47,57,0.04) 0, transparent 40%);
+  }
+
+  /* ===== top nav ===== */
+  .nav{
+    position:sticky;top:0;z-index:40;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 20px;
+    background:rgba(238,242,237,0.9);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-mark{
+    width:34px;height:34px;border-radius:9px 9px 4px 4px;
+    background:linear-gradient(160deg,var(--gold) 0%,var(--gold-deep) 100%);
+    position:relative;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);
+  }
+  .brand-mark::before,.brand-mark::after{
+    content:"";position:absolute;background:rgba(255,255,255,0.55);
+  }
+  .brand-mark::before{left:50%;top:15%;bottom:15%;width:1.5px;transform:translateX(-50%);}
+  .brand-mark::after{top:50%;left:15%;right:15%;height:1.5px;transform:translateY(-50%);}
+  .brand-name{font-family:'Fraunces',serif;font-weight:600;font-size:21px;letter-spacing:-0.01em;}
+  .brand-name small{display:block;font-family:'Noto Sans Ethiopic',sans-serif;font-size:11px;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:-2px;}
+  .nav-right{display:flex;align-items:center;gap:10px;}
+  .lang-toggle{
+    display:flex;background:var(--paper-2);border-radius:20px;padding:3px;border:1px solid var(--line);
+  }
+  .lang-toggle button{
+    border:none;background:none;padding:5px 12px;border-radius:16px;font-size:12.5px;font-weight:600;color:var(--muted);
+  }
+  .lang-toggle button.active{background:var(--ink);color:#fff;}
+  .avatar{
+    width:36px;height:36px;border-radius:50%;object-fit:cover;
+    background:var(--gold-deep);color:#fff;display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:600;font-size:14px;flex-shrink:0;
+    border:2px solid #fff;box-shadow:0 0 0 1px var(--line);
+  }
+  .btn{
+    padding:9px 16px;border-radius:9px;border:1px solid var(--ink);background:var(--ink);color:#fff;
+    font-size:13.5px;font-weight:600;transition:opacity .15s;
+  }
+  .btn:hover{opacity:.85;}
+  .btn.ghost{background:transparent;color:var(--ink);}
+  .btn.gold{background:var(--gold);border-color:var(--gold);}
+  .btn.danger{background:transparent;color:var(--cross);border-color:transparent;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* ===== auth screen ===== */
+  .auth-wrap{
+    min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:24px;
+  }
+  .auth-card{
+    width:100%;max-width:380px;background:var(--card);border-radius:18px;padding:32px 28px;
+    box-shadow:var(--shadow);border:1px solid var(--line);position:relative;overflow:hidden;
+  }
+  .auth-card::before{
+    content:"";position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;
+    background:radial-gradient(circle,rgba(184,134,58,0.13),transparent 70%);
+  }
+  .auth-title{font-family:'Fraunces',serif;font-size:26px;font-weight:600;margin:0 0 4px;}
+  .auth-sub{color:var(--muted);font-size:13.5px;margin:0 0 22px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em;}
+  .field input,.field textarea{
+    width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--line);background:#fff;
+    font-size:14px;font-family:inherit;color:var(--ink);
+  }
+  .field input:focus,.field textarea:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
+  .auth-switch button{background:none;border:none;color:var(--gold-deep);font-weight:600;text-decoration:underline;font-size:13px;}
+  .auth-error{background:#FBEAEA;color:var(--cross);border:1px solid #F0C6C9;padding:9px 12px;border-radius:8px;font-size:12.5px;margin-bottom:14px;}
+  .auth-note{background:#FFF7E8;border:1px solid #F0DDAE;color:#7A5A16;padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:16px;line-height:1.5;}
+  .auth-success{background:#EAF6EC;color:#276B3B;border:1px solid #BFE3C7;padding:9px 12px;border-radius:8px;font-size:12.5px;margin-bottom:14px;line-height:1.5;}
+  .forgot-link-row{text-align:right;margin:-6px 0 14px;}
+  .forgot-link-row button{background:none;border:none;color:var(--gold-deep);font-size:12px;font-weight:600;text-decoration:underline;padding:0;}
+
+  /* ===== app layout ===== */
+  .app{display:none;max-width:920px;margin:0 auto;padding:20px 16px 80px;gap:20px;}
+  .app.show{display:grid;grid-template-columns:240px 1fr;}
+  @media (max-width:760px){.app.show{grid-template-columns:1fr;} .sidebar{order:2;} .feed-col{order:1;}}
+
+  .sidebar{position:sticky;top:74px;align-self:start;}
+  .profile-card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;text-align:center;
+    box-shadow:var(--shadow);margin-bottom:14px;
+  }
+  .profile-card .avatar{width:64px;height:64px;font-size:22px;margin:0 auto 10px;}
+  .profile-card h3{font-family:'Fraunces',serif;margin:0 0 2px;font-size:17px;}
+  .profile-card p{margin:0;font-size:12.5px;color:var(--muted);}
+  .profile-card .edit-link{margin-top:12px;font-size:12.5px;font-weight:600;color:var(--gold-deep);background:none;border:none;text-decoration:underline;}
+
+  .nav-list{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:var(--shadow);}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13.5px;font-weight:500;
+    color:var(--muted);
+  }
+  .nav-item .dot{width:6px;height:6px;border-radius:50%;background:var(--line);}
+  .nav-item.locked{opacity:.6;}
+  .nav-item .soon{margin-left:auto;font-size:9.5px;background:var(--paper-2);padding:2px 6px;border-radius:8px;font-weight:700;letter-spacing:.03em;}
+
+  .feed-col{min-width:0;}
+  .composer{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:18px;
+  }
+  .composer-top{display:flex;gap:10px;}
+  .composer textarea{
+    flex:1;border:none;resize:none;font-family:inherit;font-size:14.5px;padding:8px 4px;min-height:44px;background:transparent;color:var(--ink);
+  }
+  .composer textarea:focus{outline:none;}
+  .composer-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:10px;border-top:1px solid var(--line);}
+  .img-btn{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted);background:none;border:none;}
+  .img-btn-icon{font-size:16px;}
+  .img-preview{position:relative;margin-top:10px;border-radius:10px;overflow:hidden;max-height:220px;}
+  .img-preview img{width:100%;max-height:220px;object-fit:cover;display:block;}
+  .img-preview button{position:absolute;top:6px;right:6px;background:rgba(27,42,34,0.7);color:#fff;border:none;width:26px;height:26px;border-radius:50%;font-size:14px;}
+
+  .composer-media-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .mp-item{position:relative;width:84px;height:84px;border-radius:10px;overflow:hidden;background:var(--paper-2);flex-shrink:0;}
+  .mp-item img,.mp-item video{width:100%;height:100%;object-fit:cover;display:block;}
+  .mp-item .mp-vid-badge{position:absolute;bottom:3px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-size:8.5px;padding:1px 5px;border-radius:7px;}
+  .mp-item .mp-remove{position:absolute;top:3px;right:3px;background:rgba(27,42,34,0.75);color:#fff;border:none;width:20px;height:20px;border-radius:50%;font-size:11px;line-height:1;}
+  .mp-add-tile{
+    width:84px;height:84px;border-radius:10px;border:1.5px dashed var(--line);display:flex;align-items:center;justify-content:center;
+    font-size:20px;color:var(--gold-deep);background:var(--card);flex-shrink:0;
+  }
+
+  .post-media-grid{display:grid;gap:2px;}
+  .post-media-grid[data-n="1"]{grid-template-columns:1fr;}
+  .post-media-grid[data-n="1"] .pmg-item{max-height:420px;}
+  .post-media-grid:not([data-n="1"]){grid-template-columns:1fr 1fr;}
+  .post-media-grid:not([data-n="1"]) .pmg-item{aspect-ratio:1/1;}
+  .pmg-item{overflow:hidden;position:relative;background:#000;}
+  .pmg-item img,.pmg-item video{width:100%;height:100%;object-fit:cover;display:block;}
+  .pmg-item .pmg-vid-badge{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:2px 6px;border-radius:8px;}
+
+  .post{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow);
+    position:relative;
+  }
+  .post-arch{
+    position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--gold) 0%,var(--cross) 50%,var(--gold-deep) 100%);
+    opacity:.7;
+  }
+  .post-head{display:flex;gap:10px;align-items:center;padding:14px 16px 10px;}
+  .post-head .who{flex:1;min-width:0;}
+  .post-head .name{font-weight:600;font-size:14.5px;}
+  .post-head .time{font-size:11.5px;color:var(--muted);}
+  .post-body{padding:0 16px 12px;font-size:14.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;}
+  .post-img{width:100%;max-height:420px;object-fit:cover;display:block;}
+  .post-actions{display:flex;border-top:1px solid var(--line);}
+  .post-actions button{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:none;border:none;
+    font-size:13px;font-weight:600;color:var(--muted);
+  }
+  .post-actions button.liked{color:var(--cross);}
+  .post-actions button:hover{background:var(--paper);}
+  .comments{border-top:1px solid var(--line);padding:12px 16px;background:var(--paper);display:none;}
+  .comments.show{display:block;}
+  .comment-row{display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;}
+  .comment-bubble{background:#fff;border-radius:12px;padding:8px 12px;font-size:13px;flex:1;border:1px solid var(--line);}
+  .comment-bubble .cname{font-weight:600;font-size:12.5px;margin-bottom:2px;}
+  .comment-form{display:flex;gap:8px;margin-top:6px;}
+  .comment-form input{flex:1;border:1px solid var(--line);border-radius:16px;padding:8px 14px;font-size:13px;font-family:inherit;}
+  .comment-form button{background:var(--ink);color:#fff;border:none;border-radius:16px;padding:8px 14px;font-size:12.5px;font-weight:600;}
+
+  .empty{text-align:center;padding:50px 20px;color:var(--muted);}
+  .empty .glyph{font-size:36px;margin-bottom:10px;}
+  .loading{text-align:center;padding:30px;color:var(--muted);font-size:13px;}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(27,42,34,0.45);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .modal-bg.show{display:flex;}
+  .modal{background:var(--card);border-radius:16px;padding:24px;max-width:380px;width:100%;box-shadow:var(--shadow);}
+  .modal h3{font-family:'Fraunces',serif;margin:0 0 16px;}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+    padding:11px 18px;border-radius:10px;font-size:13px;z-index:200;display:none;box-shadow:var(--shadow);
+  }
+  .toast.show{display:block;}
+  .config-banner{
+    background:#FBEAEA;border-bottom:1px solid #F0C6C9;color:var(--cross);padding:10px 16px;font-size:12.5px;text-align:center;
+  }
+
+  /* ===== phase 2: friends + profile ===== */
+  .clickable-id{cursor:pointer;}
+  .clickable-id:hover .name{text-decoration:underline;}
+  .nav-item{cursor:pointer;}
+  .badge{
+    margin-left:auto;background:var(--cross);color:#fff;font-size:10px;font-weight:700;
+    padding:2px 7px;border-radius:10px;
+  }
+  .view-panel{display:none;}
+  .view-panel.active{display:block;}
+
+  .tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:16px;box-shadow:var(--shadow);}
+  .tab{flex:1;text-align:center;padding:9px 8px;border-radius:10px;font-size:12.5px;font-weight:600;color:var(--muted);border:none;background:none;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .tab.active{background:var(--ink);color:#fff;}
+
+  .search-row{margin-bottom:14px;}
+  .search-row input{
+    width:100%;padding:10px 14px;border-radius:20px;border:1px solid var(--line);background:#fff;font-size:13.5px;font-family:inherit;
+  }
+  .search-row input:focus{outline:2px solid var(--gold);outline-offset:1px;}
+
+  .people-list{display:flex;flex-direction:column;gap:10px;}
+  .person-row{
+    display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);
+  }
+  .person-row .who{flex:1;min-width:0;}
+  .person-row .name{font-weight:600;font-size:14px;}
+  .person-row .sub{font-size:11.5px;color:var(--muted);}
+  .fbtn{
+    padding:7px 13px;border-radius:8px;font-size:12.5px;font-weight:600;border:1px solid var(--ink);background:var(--ink);color:#fff;white-space:nowrap;
+  }
+  .fbtn.outline{background:transparent;color:var(--ink);}
+  .fbtn.gold{background:var(--gold);border-color:var(--gold);}
+  .fbtn.subtle{background:var(--paper-2);border-color:var(--line);color:var(--ink);}
+  .fbtn-row{display:flex;gap:6px;}
+
+  .profile-header{
+    background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 22px;margin-bottom:18px;
+    text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  }
+  .profile-header::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:64px;
+    background:linear-gradient(120deg,rgba(184,134,58,0.18),rgba(140,47,57,0.12));
+  }
+  .profile-header .avatar{width:84px;height:84px;font-size:28px;margin:14px auto 10px;position:relative;}
+  .profile-header h2{font-family:'Fraunces',serif;margin:0 0 4px;font-size:22px;}
+  .profile-header p{margin:0 0 14px;color:var(--muted);font-size:13.5px;}
+  .back-link{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--muted);background:none;border:none;margin-bottom:12px;}
+  .empty-small{text-align:center;padding:30px;color:var(--muted);font-size:13px;}
+
+  /* ===== phase 3: messaging ===== */
+  .convo-row{cursor:pointer;}
+  .convo-row .snippet{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .convo-row .meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+  .convo-row .convo-time{font-size:10.5px;color:var(--muted);}
+  .unread-dot{width:9px;height:9px;border-radius:50%;background:var(--cross);}
+
+  .chat-panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;height:min(560px, 70vh);}
+  .chat-header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);}
+  .chat-header .name{font-weight:600;font-size:14.5px;}
+  .chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--paper);}
+  .bubble-row{display:flex;}
+  .bubble-row.mine{justify-content:flex-end;}
+  .bubble{
+    max-width:75%;padding:8px 13px;border-radius:15px;font-size:13.5px;line-height:1.45;word-break:break-word;
+    background:#fff;border:1px solid var(--line);
+  }
+  .bubble-row.mine .bubble{background:var(--ink);color:#fff;border-color:var(--ink);border-bottom-right-radius:4px;}
+  .bubble-row:not(.mine) .bubble{border-bottom-left-radius:4px;}
+  .bubble-time{font-size:9.5px;color:var(--muted);margin-top:2px;display:block;}
+  .bubble-row.mine .bubble-time{color:rgba(255,255,255,0.65);}
+  .chat-input-bar{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:var(--card);}
+  .chat-input-bar input{
+    flex:1;border:1px solid var(--line);border-radius:20px;padding:9px 15px;font-size:13.5px;font-family:inherit;
+  }
+  .chat-input-bar input:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .chat-input-bar button{background:var(--ink);color:#fff;border:none;border-radius:20px;padding:9px 16px;font-size:12.5px;font-weight:600;}
+  .msg-btn{padding:7px 13px;border-radius:8px;font-size:12.5px;font-weight:600;border:1px solid var(--line);background:var(--paper-2);color:var(--ink);}
+  .section-title{font-family:'Fraunces',serif;font-size:19px;margin:0 0 14px;}
+
+  /* ===== phase 4: groups ===== */
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .group-row .group-cover{
+    width:46px;height:46px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-family:'Fraunces',serif;font-weight:600;font-size:16px;
+  }
+  .group-page-header{
+    background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:18px;box-shadow:var(--shadow);
+  }
+  .group-cover-banner{height:88px;position:relative;}
+  .group-page-body{padding:18px 20px;text-align:center;position:relative;}
+  .group-page-body .group-cover{width:64px;height:64px;border-radius:16px;font-size:22px;position:absolute;top:-40px;left:50%;transform:translateX(-50%);border:3px solid var(--card);}
+  .group-page-body h2{font-family:'Fraunces',serif;margin:26px 0 4px;font-size:21px;}
+  .group-page-body p{margin:0 0 6px;color:var(--muted);font-size:13.5px;}
+  .group-page-body .member-count{font-size:12px;color:var(--muted);margin-bottom:14px;}
+  .join-gate{text-align:center;padding:20px;background:var(--card);border:1px dashed var(--line);border-radius:14px;margin-bottom:18px;color:var(--muted);font-size:13px;}
+
+  /* ===== phase 5: photos & video ===== */
+  .album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+  .album-card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);
+  }
+  .album-cover{width:100%;aspect-ratio:1/1;background:var(--paper-2);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--muted);position:relative;overflow:hidden;}
+  .album-cover img,.album-cover video{width:100%;height:100%;object-fit:cover;}
+  .album-info{padding:9px 11px;}
+  .album-info .name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .album-info .sub{font-size:11px;color:var(--muted);}
+  .create-album-card{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    border:1.5px dashed var(--line);border-radius:14px;aspect-ratio:1/1;color:var(--gold-deep);font-size:12.5px;font-weight:600;cursor:pointer;background:var(--card);
+  }
+  .create-album-card .plus{font-size:26px;line-height:1;}
+
+  .media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;}
+  .media-thumb{aspect-ratio:1/1;border-radius:10px;overflow:hidden;cursor:pointer;position:relative;background:var(--paper-2);}
+  .media-thumb img,.media-thumb video{width:100%;height:100%;object-fit:cover;}
+  .media-thumb .vid-badge{position:absolute;bottom:5px;right:5px;background:rgba(27,42,34,0.7);color:#fff;font-size:10px;padding:1px 6px;border-radius:8px;}
+  .add-media-tile{
+    aspect-ratio:1/1;border-radius:10px;border:1.5px dashed var(--line);display:flex;align-items:center;justify-content:center;
+    font-size:22px;color:var(--gold-deep);cursor:pointer;background:var(--card);
+  }
+
+  .lightbox-bg{position:fixed;inset:0;background:rgba(15,20,17,0.92);display:none;align-items:center;justify-content:center;z-index:150;padding:20px;}
+  .lightbox-bg.show{display:flex;}
+  .lightbox-content{max-width:min(92vw,720px);max-height:86vh;position:relative;}
+  .lightbox-content img,.lightbox-content video{max-width:100%;max-height:86vh;border-radius:10px;display:block;margin:0 auto;}
+  .lightbox-caption{color:#EEF2ED;text-align:center;font-size:13px;margin-top:10px;}
+  .lightbox-close{position:absolute;top:-40px;right:0;background:none;border:none;color:#fff;font-size:26px;}
+  .lightbox-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);color:#fff;border:none;width:42px;height:42px;border-radius:50%;font-size:20px;}
+  .lightbox-prev{left:14px;} .lightbox-next{right:14px;}
+  .photos-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+
+  /* ===== phase 6: notifications ===== */
+  .bell-btn{position:relative;background:none;border:none;font-size:19px;padding:6px 8px;border-radius:8px;color:var(--ink);}
+  .bell-btn:hover{background:var(--paper-2);}
+  .bell-badge{
+    position:absolute;top:1px;right:1px;background:var(--cross);color:#fff;font-size:9px;font-weight:700;
+    padding:1px 5px;border-radius:8px;min-width:14px;text-align:center;line-height:1.4;
+  }
+  .notif-row{
+    display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:12px 14px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow);
+  }
+  .notif-row.unread{border-left:3px solid var(--gold);}
+  .notif-row .icon{
+    width:34px;height:34px;border-radius:50%;background:var(--paper-2);display:flex;align-items:center;justify-content:center;
+    font-size:15px;flex-shrink:0;
+  }
+  .notif-row .body{flex:1;min-width:0;}
+  .notif-row .text{font-size:13px;line-height:1.4;}
+  .notif-row .text b{font-weight:600;}
+  .notif-row .ntime{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  /* ===== phase 7: admin dashboard ===== */
+  .admin-badge{
+    display:inline-block;margin-left:6px;background:var(--cross);color:#fff;font-size:9.5px;font-weight:700;
+    padding:2px 7px;border-radius:8px;letter-spacing:.02em;vertical-align:middle;
+  }
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:18px;}
+  .stat-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;box-shadow:var(--shadow);}
+  .stat-card .num{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--gold-deep);}
+  .stat-card .lbl{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .admin-row{
+    display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:11px 14px;margin-bottom:8px;box-shadow:var(--shadow);
+  }
+  .admin-row .who{flex:1;min-width:0;}
+  .admin-row .name{font-weight:600;font-size:13.5px;}
+  .admin-row .sub{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .admin-row .tag{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:6px;}
+  .tag.suspended{background:#FBEAEA;color:var(--cross);}
+  .tag.admin{background:#FFF3D6;color:var(--gold-deep);}
+  .admin-row .actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+  /* ===== FB-style restyle: icon nav bar + pill composer + reactions line ===== */
+  .icon-nav{
+    display:none;position:sticky;top:57px;z-index:35;
+    background:rgba(238,242,237,0.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    padding:0 2px;
+    justify-content:space-between;align-items:stretch;
+  }
+  .inav-btn{
+    flex:1 1 0;min-width:0;background:none;border:none;padding:9px 2px 8px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .inav-icon-wrap{
+    position:relative;display:inline-flex;align-items:center;justify-content:center;
+    width:30px;height:26px;padding-bottom:9px;border-bottom:2.5px solid transparent;
+  }
+  .inav-icon{font-size:19px;filter:grayscale(45%);opacity:.75;line-height:1;}
+  .inav-btn.active .inav-icon-wrap{border-bottom-color:var(--gold);}
+  .inav-btn.active .inav-icon{filter:none;opacity:1;}
+  .inav-badge{
+    position:absolute;top:-4px;right:-7px;background:var(--cross);color:#fff;font-size:9px;font-weight:700;
+    padding:1px 5px;border-radius:8px;min-width:14px;text-align:center;line-height:1.3;
+  }
+
+  .composer-pill{
+    flex:1;background:var(--paper-2);border-radius:22px;padding:2px 16px;display:flex;align-items:center;
+  }
+  .composer-pill textarea{padding:9px 0 !important;min-height:20px !important;}
+  .composer-pill:focus-within{background:var(--paper);box-shadow:0 0 0 2px var(--gold) inset;}
+
+  .post-reactions-line{
+    display:flex;align-items:center;gap:6px;padding:8px 16px 4px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);
+    cursor:default;
+  }
+  .post-reactions-line .heart-badge{
+    width:18px;height:18px;border-radius:50%;background:var(--cross);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;
+  }
+  .post-reactions-line .reaction-icons{display:flex;align-items:center;}
+  .post-reactions-line .reaction-icons span{
+    display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;
+    background:#fff;font-size:11px;border:1.5px solid var(--card);margin-left:-6px;
+  }
+  .post-reactions-line .reaction-icons span:first-child{margin-left:0;}
+
+  /* ===== reactions: pick-a-reaction popover ===== */
+  .react-wrap{position:relative;flex:1;display:flex;}
+  .react-btn{width:100%;user-select:none;-webkit-user-select:none;transition:color .12s;}
+  .react-btn.react-love{color:var(--cross)!important;}
+  .react-btn.react-haha,.react-btn.react-wow{color:var(--gold-deep)!important;}
+  .react-btn.react-sad,.react-btn.react-angry{color:var(--muted)!important;}
+  .react-picker{
+    position:absolute;bottom:calc(100% + 6px);left:8px;
+    display:flex;gap:2px;background:#fff;border:1px solid var(--line);border-radius:26px;
+    padding:5px 6px;box-shadow:var(--shadow);
+    opacity:0;visibility:hidden;transform:translateY(6px) scale(.9);transform-origin:bottom left;
+    transition:opacity .12s,transform .12s;z-index:20;
+  }
+  .react-picker.show{opacity:1;visibility:visible;transform:translateY(0) scale(1);}
+  .react-picker button{
+    background:none;border:none;font-size:22px;line-height:1;padding:5px;border-radius:50%;
+    transition:transform .1s;
+  }
+  .react-picker button:hover{transform:scale(1.35) translateY(-4px);background:var(--paper-2);}
+</style></head>
+<body>
+
+<div class="lattice-bg"></div>
+<div id="configBanner" class="config-banner" style="display:none;">
+  ⚠ Firebase is not configured yet. Open this file and fill in <code>firebaseConfig</code> near the top of the script.
+</div>
+
+<nav class="nav">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div class="brand-name">Meskot<small lang-am>መስኮት · መስኮትህ ለማህበረሰብህ</small></div>
+  </div>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button id="langEn" class="active" onclick="setLang('en')">EN</button>
+      <button id="langAm" onclick="setLang('am')">አማ</button>
+    </div>
+    <div id="navAuthArea"></div>
+  </div>
+</nav>
+
+<nav class="icon-nav" id="iconNav" style="display:none;">
+  <button class="inav-btn active" data-view="feed" onclick="navigateFeed()" title="Feed">
+    <span class="inav-icon-wrap"><span class="inav-icon">🏠</span></span>
+  </button>
+  <button class="inav-btn" data-view="friends" onclick="navigateFriends()" title="Friends">
+    <span class="inav-icon-wrap"><span class="inav-icon">👥</span><span class="inav-badge" id="reqBadge" style="display:none;">0</span></span>
+  </button>
+  <button class="inav-btn" data-view="messages" onclick="navigateMessages()" title="Messages">
+    <span class="inav-icon-wrap"><span class="inav-icon">💬</span><span class="inav-badge" id="msgBadge" style="display:none;">0</span></span>
+  </button>
+  <button class="inav-btn" data-view="groups" onclick="navigateGroups()" title="Groups">
+    <span class="inav-icon-wrap"><span class="inav-icon">👪</span></span>
+  </button>
+  <button class="inav-btn" data-view="photos" onclick="navigatePhotos(currentUser && currentUser.uid)" title="Photos">
+    <span class="inav-icon-wrap"><span class="inav-icon">🖼️</span></span>
+  </button>
+  <button class="inav-btn" data-view="notifications" onclick="navigateNotifications()" title="Notifications">
+    <span class="inav-icon-wrap"><span class="inav-icon">🔔</span><span class="inav-badge" id="bellBadge" style="display:none;">0</span></span>
+  </button>
+  <button class="inav-btn" id="navAdminIcon" data-view="admin" onclick="navigateAdmin()" title="Admin" style="display:none;">
+    <span class="inav-icon-wrap"><span class="inav-icon">🛡️</span></span>
+  </button>
+</nav>
+
+<!-- AUTH SCREEN -->
+<div id="authWrap" class="auth-wrap">
+  <div class="auth-card">
+    <div id="authErr" class="auth-error" style="display:none;"></div>
+    <div id="authOk" class="auth-success" style="display:none;"></div>
+    <div id="loginForm">
+      <h2 class="auth-title" data-t="welcomeBack">Welcome back</h2>
+      <p class="auth-sub" data-t="loginSub">Log in to see what your circle is sharing</p>
+      <div class="field"><label data-t="email">Email</label><input type="email" id="loginEmail" autocomplete="email"></div>
+      <div class="field"><label data-t="password">Password</label><input type="password" id="loginPass" autocomplete="current-password"></div>
+      <div class="forgot-link-row"><button onclick="showForgotPassword()" data-t="forgotPassword">Forgot password?</button></div>
+      <button class="btn gold" style="width:100%;" onclick="doLogin()" data-t="logIn">Log in</button>
+      <div class="auth-switch">
+        <span data-t="noAccount">No account yet?</span>
+        <button onclick="toggleAuth(false)" data-t="signUpLink">Sign up</button>
+      </div>
+    </div>
+    <div id="signupForm" style="display:none;">
+      <h2 class="auth-title" data-t="joinTitle">Join Meskot</h2>
+      <p class="auth-sub" data-t="joinSub">Create your window onto the community</p>
+      <div class="field"><label data-t="fullName">Full name</label><input type="text" id="suName" autocomplete="name"></div>
+      <div class="field"><label data-t="email">Email</label><input type="email" id="suEmail" autocomplete="email"></div>
+      <div class="field"><label data-t="password">Password</label><input type="password" id="suPass" autocomplete="new-password"></div>
+      <button class="btn gold" style="width:100%;" onclick="doSignup()" data-t="createAccount">Create account</button>
+      <div class="auth-switch">
+        <span data-t="hasAccount">Already have an account?</span>
+        <button onclick="toggleAuth(true)" data-t="logInLink">Log in</button>
+      </div>
+    </div>
+    <div id="forgotPasswordForm" style="display:none;">
+      <h2 class="auth-title" data-t="resetPassTitle">Reset your password</h2>
+      <p class="auth-sub" data-t="resetPassSub">Enter your email and we'll send you a reset link</p>
+      <div class="field"><label data-t="email">Email</label><input type="email" id="forgotEmail" autocomplete="email"></div>
+      <button class="btn gold" style="width:100%;" onclick="doForgotPassword()" id="forgotBtn" data-t="sendResetLink">Send reset link</button>
+      <div class="auth-switch">
+        <button onclick="hideForgotPassword()" data-t="backToLogin">← Back to log in</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="participantList"></div>
+<button onclick="loadParticipants()">Refresh</button>
+
+<!-- MAIN APP -->
+<div id="app" class="app">
+  <aside class="sidebar">
+    <div class="profile-card">
+      <div class="avatar" id="sideAvatar" onclick="navigateProfile(currentUser && currentUser.uid)" style="cursor:pointer;"></div>
+      <h3 id="sideName" onclick="navigateProfile(currentUser && currentUser.uid)" style="cursor:pointer;"></h3>
+      <p id="sideBio" data-t="noBioYet">No bio yet</p>
+      <button class="edit-link" onclick="openProfileModal()" data-t="editProfile">Edit profile</button>
+    </div>
+  </aside>
+
+  <main class="feed-col">
+    <!-- FEED VIEW -->
+    <div id="feedView" class="view-panel active">
+      <div class="composer">
+        <div class="composer-top">
+          <div class="avatar" id="composerAvatar"></div>
+          <div class="composer-pill" onclick="document.getElementById('postText').focus()">
+            <textarea id="postText" data-tph="composerPh" placeholder="What's on your mind?"></textarea>
+          </div>
+        </div>
+        <div id="composerImgPreview"></div>
+        <div class="composer-bottom">
+          <button class="img-btn" onclick="document.getElementById('postImgInput').click()">
+            <span class="img-btn-icon">🖼️</span> <span data-t="addPhoto">Add photo</span>
+          </button>
+          <input type="file" id="postImgInput" accept="image/*,video/*" multiple style="display:none;" onchange="handleImgSelect(event)">
+          <button class="btn" onclick="submitPost()" id="postBtn" data-t="post">Post</button>
+        </div>
+      </div>
+
+      <div id="feedList"></div>
+      <div id="feedEmpty" class="empty" style="display:none;">
+        <div class="glyph">🪟</div>
+        <div data-t="emptyFeed">No posts yet — be the first to share something.</div>
+      </div>
+      <div id="feedLoading" class="loading" data-t="loadingFeed">Loading feed…</div>
+    </div>
+
+    <!-- FRIENDS VIEW -->
+    <div id="friendsView" class="view-panel">
+      <div class="tabs">
+        <button class="tab active" id="tabDiscover" onclick="switchFriendsTab('discover')" data-t="tabDiscover">Discover</button>
+        <button class="tab" id="tabRequests" onclick="switchFriendsTab('requests')"><span data-t="tabRequests">Requests</span><span class="badge" id="tabReqBadge" style="display:none;">0</span></button>
+        <button class="tab" id="tabMyFriends" onclick="switchFriendsTab('mine')" data-t="tabMyFriends">My Friends</button>
+      </div>
+      <div class="search-row" id="discoverSearchRow">
+        <input type="text" id="peopleSearch" data-tph="searchPeople" placeholder="Search people…" oninput="renderDiscover()">
+      </div>
+      <div id="peopleList" class="people-list"></div>
+      <div id="peopleEmpty" class="empty-small" style="display:none;" data-t="noPeople">Nothing here yet.</div>
+    </div>
+
+    <!-- PROFILE VIEW -->
+    <div id="profileView" class="view-panel">
+      <button class="back-link" onclick="navigateFeed()">← <span data-t="backToFeed">Back to feed</span></button>
+      <div class="profile-header">
+        <div class="avatar" id="profAvatar"></div>
+        <h2 id="profName"></h2>
+        <p id="profBio"></p>
+        <div id="profActionArea"></div>
+      </div>
+      <div id="profPostsList"></div>
+      <div id="profPostsEmpty" class="empty-small" style="display:none;" data-t="noPostsYet">No posts yet.</div>
+    </div>
+
+    <!-- MESSAGES VIEW -->
+    <div id="messagesView" class="view-panel">
+      <div id="convoListPanel">
+        <h2 class="section-title" data-t="navMessages">Messages</h2>
+        <div id="convoList" class="people-list"></div>
+        <div id="convoEmpty" class="empty-small" style="display:none;" data-t="noConvos">No conversations yet — message a friend from their profile.</div>
+      </div>
+      <div id="chatPanel" style="display:none;">
+        <button class="back-link" onclick="closeChat()">← <span data-t="backToMessages">Back to messages</span></button>
+        <div class="chat-panel">
+          <div class="chat-header">
+            <div class="avatar" id="chatAvatar" style="width:34px;height:34px;font-size:13px;"></div>
+            <div class="name" id="chatName"></div>
+          </div>
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input-bar">
+            <input type="text" id="chatInput" data-tph="typeMessage" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendMessage()">
+            <button onclick="sendMessage()" data-t="send">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GROUPS LIST VIEW -->
+    <div id="groupsView" class="view-panel">
+      <div class="tabs">
+        <button class="tab active" id="tabGroupsDiscover" onclick="switchGroupsTab('discover')" data-t="tabDiscover">Discover</button>
+        <button class="tab" id="tabMyGroups" onclick="switchGroupsTab('mine')" data-t="tabMyGroups">My Groups</button>
+      </div>
+      <div class="section-head">
+        <div class="search-row" style="margin-bottom:0;flex:1;" id="groupSearchRow">
+          <input type="text" id="groupSearch" data-tph="searchGroups" placeholder="Search groups…" oninput="renderGroupsList()">
+        </div>
+        <button class="btn gold" style="margin-left:10px;white-space:nowrap;" onclick="openGroupModal()" data-t="createGroup">Create group</button>
+      </div>
+      <div id="groupsList" class="people-list"></div>
+      <div id="groupsEmpty" class="empty-small" style="display:none;" data-t="noGroups">No groups yet.</div>
+    </div>
+
+    <!-- GROUP PAGE VIEW -->
+    <div id="groupPageView" class="view-panel">
+      <button class="back-link" onclick="navigateGroups()">← <span data-t="backToGroups">Back to groups</span></button>
+      <div class="group-page-header">
+        <div class="group-cover-banner" id="groupBanner"></div>
+        <div class="group-page-body">
+          <div class="group-cover" id="groupPageCover"></div>
+          <h2 id="groupPageName"></h2>
+          <p id="groupPageDesc"></p>
+          <div class="member-count" id="groupMemberCount"></div>
+          <div id="groupActionArea"></div>
+        </div>
+      </div>
+      <div id="groupComposerWrap"></div>
+      <div id="groupJoinGate" class="join-gate" style="display:none;" data-t="joinToPost">Join this group to post and comment.</div>
+      <div id="groupPostsList"></div>
+      <div id="groupPostsEmpty" class="empty-small" style="display:none;" data-t="noGroupPosts">No posts yet — start the conversation.</div>
+    </div>
+
+    <!-- PHOTOS: ALBUMS VIEW -->
+    <div id="photosView" class="view-panel">
+      <button class="back-link" id="photosBackLink" onclick="navigateFeed()" style="display:none;">← <span data-t="backToFeed">Back to feed</span></button>
+      <div class="photos-header-row">
+        <h2 class="section-title" id="photosHeading" style="margin:0;" data-t="myAlbums">My Albums</h2>
+      </div>
+      <div id="albumGrid" class="album-grid"></div>
+      <div id="albumsEmpty" class="empty-small" style="display:none;" data-t="noAlbums">No albums yet.</div>
+    </div>
+
+    <!-- PHOTOS: ALBUM DETAIL VIEW -->
+    <div id="albumView" class="view-panel">
+      <button class="back-link" onclick="navigatePhotos(currentAlbumOwnerUid)">← <span data-t="backToAlbums">Back to albums</span></button>
+      <div class="photos-header-row">
+        <h2 class="section-title" id="albumTitleHeading" style="margin:0;"></h2>
+      </div>
+      <div id="mediaGrid" class="media-grid"></div>
+      <div id="mediaEmpty" class="empty-small" style="display:none;" data-t="noMedia">No photos or videos yet.</div>
+      <input type="file" id="mediaFileInput" accept="image/*,video/*" multiple style="display:none;" onchange="handleMediaUpload(event)">
+    </div>
+
+    <!-- NOTIFICATIONS VIEW -->
+    <div id="notificationsView" class="view-panel">
+      <button class="back-link" onclick="navigateFeed()">← <span data-t="backToFeed">Back to feed</span></button>
+      <h2 class="section-title" data-t="notifications">Notifications</h2>
+      <div id="notifList"></div>
+      <div id="notifEmpty" class="empty-small" style="display:none;" data-t="noNotifs">No notifications yet.</div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="adminView" class="view-panel">
+      <button class="back-link" onclick="navigateFeed()">← <span data-t="backToFeed">Back to feed</span></button>
+      <h2 class="section-title" data-t="adminDashboard">Admin Dashboard</h2>
+      <div class="tabs">
+        <button class="tab active" id="tabAdminOverview" onclick="switchAdminTab('overview')" data-t="tabOverview">Overview</button>
+        <button class="tab" id="tabAdminUsers" onclick="switchAdminTab('users')" data-t="tabUsers">Users</button>
+        <button class="tab" id="tabAdminPosts" onclick="switchAdminTab('posts')" data-t="tabPosts">Posts</button>
+        <button class="tab" id="tabAdminGroups" onclick="switchAdminTab('groups')" data-t="tabGroupsAdmin">Groups</button>
+      </div>
+      <div id="adminOverviewPanel">
+        <div class="stat-grid" id="statGrid"></div>
+      </div>
+      <div id="adminUsersPanel" style="display:none;">
+        <div class="search-row"><input type="text" id="adminUserSearch" data-tph="searchPeople" placeholder="Search people…" oninput="renderAdminUsers()"></div>
+        <div id="adminUsersList"></div>
+      </div>
+      <div id="adminPostsPanel" style="display:none;">
+        <div id="adminPostsList"></div>
+      </div>
+      <div id="adminGroupsPanel" style="display:none;">
+        <div id="adminGroupsList"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="modal-bg" id="groupModalBg">
+  <div class="modal">
+    <h3 data-t="createGroup">Create group</h3>
+    <div class="field"><label data-t="groupName">Group name</label><input type="text" id="newGroupName"></div>
+    <div class="field"><label data-t="groupDesc">Description</label><textarea id="newGroupDesc" rows="3"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeGroupModal()" data-t="cancel">Cancel</button>
+      <button class="btn gold" onclick="createGroup()" id="createGroupBtn" data-t="create">Create</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="albumModalBg">
+  <div class="modal">
+    <h3 data-t="createAlbum">Create album</h3>
+    <div class="field"><label data-t="albumTitle">Album title</label><input type="text" id="newAlbumTitle"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeAlbumModal()" data-t="cancel">Cancel</button>
+      <button class="btn gold" onclick="createAlbum()" data-t="create">Create</button>
+    </div>
+  </div>
+</div>
+<div class="lightbox-bg" id="lightboxBg" onclick="if(event.target===this)closeLightbox()">
+  <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)">‹</button>
+  <div class="lightbox-content">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <div id="lightboxMedia"></div>
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+  <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)">›</button>
+</div>
+
+<!-- profile edit modal -->
+<div class="modal-bg" id="profileModalBg">
+  <div class="modal">
+    <h3 data-t="editProfile">Edit profile</h3>
+    <div class="field"><label data-t="fullName">Full name</label><input type="text" id="editName"></div>
+    <div class="field"><label data-t="bio">Bio</label><textarea id="editBio" rows="3"></textarea></div>
+    <div class="field"><label data-t="photo">Photo</label><input type="file" id="editPhotoInput" accept="image/*"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeProfileModal()" data-t="cancel">Cancel</button>
+      <button class="btn gold" onclick="saveProfile()" data-t="save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc, deleteDoc, updateDoc, collection, addDoc,
+  onSnapshot, query, orderBy, where, limit, serverTimestamp, arrayUnion, arrayRemove,
+  increment, getDocs, getCountFromServer, deleteField
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getStorage, ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD9j6Emef7z1sxtGuqgEePwIJetPo4ZhQQ",
+  authDomain: "meskot-b1a69.firebaseapp.com",
+  projectId: "meskot-b1a69",
+  storageBucket: "meskot-b1a69.firebasestorage.app",
+  messagingSenderId: "1083041536701",
+  appId: "1:1083041536701:web:4654f20e5ae08a2d0435d4",
+  measurementId: "G-VXMRY8JGTE"
+};
+
+let fbApp, auth, db, storage, configured = true;
+try {
+  if (firebaseConfig.apiKey === "YOUR_API_KEY") throw new Error("not configured");
+  fbApp = initializeApp(firebaseConfig);
+  auth = getAuth(fbApp);
+  db = getFirestore(fbApp);
+  storage = getStorage(fbApp);
+} catch (e) {
+  configured = false;
+  document.getElementById('configBanner').style.display = 'block';
+}
+
+function withTimeout(promise, ms, label){
+  ms = ms || 20000;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => {
+      reject(new Error((label ? label + ': ' : '') + 'timed out after ' + Math.round(ms/1000) + 's — check your internet connection and Firebase setup.'));
+    }, ms))
+  ]);
+}
+window.addEventListener('unhandledrejection', function(ev){
+  console.error('Unhandled error:', ev.reason);
+  try{ toast((ev.reason && ev.reason.message) ? ev.reason.message : 'Unexpected error — check console.'); }catch(e2){}
+});
+
+const REACTIONS = {
+  like: { emoji:'👍', labelKey:'reactLike' },
+  love: { emoji:'❤️', labelKey:'reactLove' },
+  haha: { emoji:'😆', labelKey:'reactHaha' },
+  wow:  { emoji:'😮', labelKey:'reactWow' },
+  sad:  { emoji:'😢', labelKey:'reactSad' },
+  angry:{ emoji:'😡', labelKey:'reactAngry' }
+};
+const REACTION_ORDER = ['like','love','haha','wow','sad','angry'];
+
+const dict = {
+  en: {
+    welcomeBack:"Welcome back", loginSub:"Log in to see what your circle is sharing",
+    email:"Email", password:"Password", logIn:"Log in", noAccount:"No account yet?", signUpLink:"Sign up",
+    joinTitle:"Join Meskot", joinSub:"Create your window onto the community", fullName:"Full name",
+    createAccount:"Create account", hasAccount:"Already have an account?", logInLink:"Log in",
+    noBioYet:"No bio yet", editProfile:"Edit profile", navFeed:"News Feed", navFriends:"Friends",
+    navMessages:"Messages", navGroups:"Groups", navPhotos:"Photos", soon:"SOON",
+    composerPh:"What's on your mind?", addPhoto:"Add photo", post:"Post",
+    emptyFeed:"No posts yet — be the first to share something.", loadingFeed:"Loading feed…",
+    bio:"Bio", photo:"Photo", cancel:"Cancel", save:"Save", like:"Like", liked:"Liked",
+    comment:"Comment", writeComment:"Write a comment…", send:"Send", logout:"Log out",
+    justNow:"just now", minAgo:"m ago", hrAgo:"h ago", dayAgo:"d ago",
+    fillFields:"Please fill in all fields.", postFailed:"Couldn't post. Try again.",
+    profileSaved:"Profile saved.", posted:"Posted.", notConfigured:"Connect Firebase first — see instructions in the file's source code.",
+    tabDiscover:"Discover", tabRequests:"Requests", tabMyFriends:"My Friends", searchPeople:"Search people…",
+    noPeople:"Nothing here yet.", backToFeed:"Back to feed", noPostsYet:"No posts yet.",
+    addFriend:"Add friend", requested:"Requested", cancelReq:"Cancel request", accept:"Accept", decline:"Decline",
+    friendsLabel:"Friends", unfriend:"Unfriend", noRequests:"No pending requests.", noFriendsYet:"No friends yet — find people in Discover.",
+    you:"You", incomingSub:"wants to be friends",
+    messageBtn:"Message", noConvos:"No conversations yet — message a friend from their profile.",
+    typeMessage:"Type a message…", backToMessages:"Back to messages", startedChat:"Say hello 👋",
+    tabMyGroups:"My Groups", searchGroups:"Search groups…", createGroup:"Create group", noGroups:"No groups yet — be the first to create one.",
+    groupName:"Group name", groupDesc:"Description", create:"Create", backToGroups:"Back to groups",
+    joinToPost:"Join this group to post and comment.", noGroupPosts:"No posts yet — start the conversation.",
+    join:"Join", leave:"Leave", member:"Member", members:"members", whatsHappening:"Share something with the group…",
+    myAlbums:"My Albums", noAlbums:"No albums yet.", createAlbum:"Create album", albumTitle:"Album title",
+    backToAlbums:"Back to albums", noMedia:"No photos or videos yet.", viewPhotos:"View photos",
+    addMedia:"Add photos/videos", theirAlbums:"Albums", uploading:"Uploading…", items:"items",
+    notifications:"Notifications", noNotifs:"No notifications yet.",
+    notifLikeSuffix:"liked your post", notifCommentSuffix:"commented on your post",
+    notifReqSuffix:"sent you a friend request", notifAcceptSuffix:"accepted your friend request",
+    notifMsgSuffix:"sent you a message", notifReactSuffix:"reacted to your post",
+    navAdmin:"Admin", adminDashboard:"Admin Dashboard", tabOverview:"Overview", tabUsers:"Users",
+    tabPosts:"Posts", tabGroupsAdmin:"Groups", statUsers:"Users", statPosts:"Posts", statGroupPosts:"Group posts",
+    statGroupsAdmin:"Groups", statAlbums:"Albums", suspend:"Suspend", unsuspend:"Unsuspend",
+    makeAdmin:"Make admin", removeAdmin:"Remove admin", deletePost:"Delete", deleteGroup:"Delete",
+    accountSuspended:"This account has been suspended.", confirmDeletePost:"Delete this post? This can't be undone.",
+    confirmDeleteGroup:"Delete this group? This can't be undone.", likesLabel:"likes",
+    forgotPassword:"Forgot password?", resetPassTitle:"Reset your password",
+    resetPassSub:"Enter your email and we'll send you a reset link",
+    sendResetLink:"Send reset link", backToLogin:"← Back to log in",
+    resetEmailSent:"Reset link sent — check your inbox (and spam folder).",
+    reactLike:"Like", reactLove:"Love", reactHaha:"Haha", reactWow:"Wow", reactSad:"Sad", reactAngry:"Angry"
+  },
+  am: {
+    welcomeBack:"እንኳን ደህና መጡ", loginSub:"ማህበረሰብዎ ምን እያካፈለ እንደሆነ ለማየት ይግቡ",
+    email:"ኢሜይል", password:"የይለፍ ቃል", logIn:"ግባ", noAccount:"አካውንት የለዎትም?", signUpLink:"ይመዝገቡ",
+    joinTitle:"ወደ መስኮት ይቀላቀሉ", joinSub:"ወደ ማህበረሰቡ የሚያዩበትን መስኮት ይፍጠሩ", fullName:"ሙሉ ስም",
+    createAccount:"አካውንት ይፍጠሩ", hasAccount:"አካውንት አለዎት?", logInLink:"ይግቡ",
+    noBioYet:"እስካሁን የመግለጫ ጽሁፍ የለም", editProfile:"መገለጫ አርትዕ", navFeed:"ዜና ምግብ", navFriends:"ጓደኞች",
+    navMessages:"መልዕክቶች", navGroups:"ቡድኖች", navPhotos:"ፎቶዎች", soon:"በቅርቡ",
+    composerPh:"ምን እያሰቡ ነው?", addPhoto:"ፎቶ ጨምር", post:"ለጥፍ",
+    emptyFeed:"እስካሁን ምንም ልጥፍ የለም — የመጀመሪያው ይሁኑ።", loadingFeed:"ዜና ምግብ በመጫን ላይ…",
+    bio:"የመግለጫ ጽሁፍ", photo:"ፎቶ", cancel:"ይቅር", save:"አስቀምጥ", like:"ውደድ", liked:"ወድጃለሁ",
+    comment:"አስተያየት", writeComment:"አስተያየት ይጻፉ…", send:"ላክ", logout:"ውጣ",
+    justNow:"አሁን", minAgo:"ደቂቃ በፊት", hrAgo:"ሰዓት በፊት", dayAgo:"ቀን በፊት",
+    fillFields:"እባክዎ ሁሉንም መስኮች ይሙሉ።", postFailed:"መለጠፍ አልተቻለም። እንደገና ይሞክሩ።",
+    profileSaved:"መገለጫ ተቀምጧል።", posted:"ተለጥፏል።", notConfigured:"መጀመሪያ Firebase ያገናኙ — በፋይሉ ምንጭ ኮድ ውስጥ ያሉትን መመሪያዎች ይመልከቱ።",
+    tabDiscover:"ያግኙ", tabRequests:"ጥያቄዎች", tabMyFriends:"ጓደኞቼ", searchPeople:"ሰዎችን ይፈልጉ…",
+    noPeople:"እስካሁን ምንም የለም።", backToFeed:"ወደ ዜና ምግብ ተመለስ", noPostsYet:"እስካሁን ምንም ልጥፍ የለም።",
+    addFriend:"ጓደኛ ጨምር", requested:"ጥያቄ ተልኳል", cancelReq:"ጥያቄ ሰርዝ", accept:"ተቀበል", decline:"አትቀበል",
+    friendsLabel:"ጓደኞች", unfriend:"ከጓደኝነት አስወግድ", noRequests:"ምንም ያልተመለሱ ጥያቄዎች የሉም።", noFriendsYet:"እስካሁን ጓደኛ የለም — በ«ያግኙ» ውስጥ ሰዎችን ይፈልጉ።",
+    you:"እርስዎ", incomingSub:"የጓደኝነት ጥያቄ ልኳል",
+    messageBtn:"መልእክት", noConvos:"እስካሁን ምንም ውይይት የለም — ከጓደኛዎ መገለጫ ገጽ መልእክት ይላኩ።",
+    typeMessage:"መልእክት ይጻፉ…", backToMessages:"ወደ መልእክቶች ተመለስ", startedChat:"ሰላም ይበሉ 👋",
+    tabMyGroups:"የእኔ ቡድኖች", searchGroups:"ቡድኖችን ይፈልጉ…", createGroup:"ቡድን ይፍጠሩ", noGroups:"እስካሁን ምንም ቡድን የለም — የመጀመሪያው ይሁኑ።",
+    groupName:"የቡድን ስም", groupDesc:"መግለጫ", create:"ይፍጠሩ", backToGroups:"ወደ ቡድኖች ተመለስ",
+    joinToPost:"ለመልጠፍና አስተያየት ለመስጠት ይህን ቡድን ይቀላቀሉ።", noGroupPosts:"እስካሁን ምንም ልጥፍ የለም — ውይይት ይጀምሩ።",
+    join:"ይቀላቀሉ", leave:"ይውጡ", member:"አባል", members:"አባላት", whatsHappening:"ከቡድኑ ጋር የሆነ ነገር ያካፍሉ…",
+    myAlbums:"የእኔ አልበሞች", noAlbums:"እስካሁን ምንም አልበም የለም።", createAlbum:"አልበም ይፍጠሩ", albumTitle:"የአልበም ርዕስ",
+    backToAlbums:"ወደ አልበሞች ተመለስ", noMedia:"እስካሁን ምንም ፎቶ ወይም ቪዲዮ የለም።", viewPhotos:"ፎቶዎችን ይመልከቱ",
+    addMedia:"ፎቶ/ቪዲዮ ጨምር", theirAlbums:"አልበሞች", uploading:"በመስቀል ላይ…", items:"ንጥሎች",
+    notifications:"ማሳወቂያዎች", noNotifs:"እስካሁን ምንም ማሳወቂያ የለም።",
+    notifLikeSuffix:"ልጥፍዎን ወድዷል", notifCommentSuffix:"በልጥፍዎ ላይ አስተያየት ሰጥቷል",
+    notifReqSuffix:"የጓደኝነት ጥያቄ ልኮልዎታል", notifAcceptSuffix:"የጓደኝነት ጥያቄዎን ተቀብሏል",
+    notifMsgSuffix:"መልእክት ልኮልዎታል", notifReactSuffix:"በልጥፍዎ ላይ ምላሽ ሰጥቷል",
+    navAdmin:"አስተዳደር", adminDashboard:"የአስተዳደር ዳሽቦርድ", tabOverview:"አጠቃላይ እይታ", tabUsers:"ተጠቃሚዎች",
+    tabPosts:"ልጥፎች", tabGroupsAdmin:"ቡድኖች", statUsers:"ተጠቃሚዎች", statPosts:"ልጥፎች", statGroupPosts:"የቡድን ልጥፎች",
+    statGroupsAdmin:"ቡድኖች", statAlbums:"አልበሞች", suspend:"አግድ", unsuspend:"እገዳ አንሳ",
+    makeAdmin:"አስተዳዳሪ አድርግ", removeAdmin:"አስተዳዳሪነት አንሳ", deletePost:"ሰርዝ", deleteGroup:"ሰርዝ",
+    accountSuspended:"ይህ አካውንት ታግዷል።", confirmDeletePost:"ይህ ልጥፍ ይሰረዝ? ይህ ተመልሶ አይመጣም።",
+    confirmDeleteGroup:"ይህ ቡድን ይሰረዝ? ይህ ተመልሶ አይመጣም።", likesLabel:"ውዳሴዎች",
+    forgotPassword:"የይለፍ ቃል ረሱ?", resetPassTitle:"የይለፍ ቃል ዳግም ያስጀምሩ",
+    resetPassSub:"ኢሜይልዎን ያስገቡ የዳግም ማስጀመሪያ ማገናኛ እንልክልዎታለን",
+    sendResetLink:"ማገናኛ ላክ", backToLogin:"← ወደ መግቢያ ተመለስ",
+    resetEmailSent:"ማገናኛ ተልኳል — የገቢ መልእክት ሳጥንዎን (እና ስፓም ማህደርን) ይመልከቱ።",
+    reactLike:"ውደድ", reactLove:"ውደድ በጣም", reactHaha:"ሳቅ", reactWow:"ዋው", reactSad:"አዝኗል", reactAngry:"ተናደደ"
+  }
+};
+let lang = localStorage.getItem('meskot_lang') || 'en';
+function t(key){ return (dict[lang] && dict[lang][key]) || dict.en[key] || key; }
+window.setLang = function(l){
+  lang = l; localStorage.setItem('meskot_lang', l);
+  document.getElementById('langEn').classList.toggle('active', l==='en');
+  document.getElementById('langAm').classList.toggle('active', l==='am');
+  document.body.querySelectorAll('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
+  document.body.querySelectorAll('[data-tph]').forEach(el => el.placeholder = t(el.dataset.tph));
+  document.documentElement.lang = l;
+  renderNavAuthArea();
+  if (currentUser) renderSidebar();
+};
+
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2600);
+}
+function initials(name){
+  if(!name) return '?';
+  return name.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+}
+function timeAgo(ts){
+  if(!ts) return t('justNow');
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const diff = Math.floor((Date.now() - d.getTime())/1000);
+  if(diff < 60) return t('justNow');
+  if(diff < 3600) return Math.floor(diff/60)+t('minAgo');
+  if(diff < 86400) return Math.floor(diff/3600)+t('hrAgo');
+  return Math.floor(diff/86400)+t('dayAgo');
+}
+
+window.toggleAuth = function(showLogin){
+  document.getElementById('loginForm').style.display = showLogin ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = showLogin ? 'none' : 'block';
+  document.getElementById('forgotPasswordForm').style.display = 'none';
+  document.getElementById('authErr').style.display = 'none';
+  document.getElementById('authOk').style.display = 'none';
+};
+window.showForgotPassword = function(){
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('signupForm').style.display = 'none';
+  document.getElementById('forgotPasswordForm').style.display = 'block';
+  document.getElementById('authErr').style.display = 'none';
+  document.getElementById('authOk').style.display = 'none';
+  const emailField = document.getElementById('forgotEmail');
+  const loginEmail = document.getElementById('loginEmail').value.trim();
+  if(loginEmail) emailField.value = loginEmail;
+};
+window.hideForgotPassword = function(){
+  document.getElementById('forgotPasswordForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('authErr').style.display = 'none';
+  document.getElementById('authOk').style.display = 'none';
+};
+function showAuthError(msg){
+  document.getElementById('authOk').style.display = 'none';
+  const el = document.getElementById('authErr');
+  el.textContent = msg; el.style.display = 'block';
+}
+function showAuthOk(msg){
+  document.getElementById('authErr').style.display = 'none';
+  const el = document.getElementById('authOk');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+window.doForgotPassword = async function(){
+  if (!configured) return toast(t('notConfigured'));
+  const email = document.getElementById('forgotEmail').value.trim();
+  if(!email) return showAuthError(t('fillFields'));
+  const btn = document.getElementById('forgotBtn');
+  btn.disabled = true;
+  try{
+    await sendPasswordResetEmail(auth, email);
+    showAuthOk(t('resetEmailSent'));
+  }catch(e){ showAuthError(e.message); }
+  finally{ btn.disabled = false; }
+};
+
+window.doSignup = async function(){
+  if (!configured) return toast(t('notConfigured'));
+  const name = document.getElementById('suName').value.trim();
+  const email = document.getElementById('suEmail').value.trim();
+  const pass = document.getElementById('suPass').value;
+  if(!name || !email || !pass) return showAuthError(t('fillFields'));
+  try{
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      displayName: name, bio: '', photoURL: '', createdAt: serverTimestamp()
+    });
+  }catch(e){ showAuthError(e.message); }
+};
+window.doLogin = async function(){
+  if (!configured) return toast(t('notConfigured'));
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if(!email || !pass) return showAuthError(t('fillFields'));
+  try{ await signInWithEmailAndPassword(auth, email, pass); }
+  catch(e){ showAuthError(e.message); }
+};
+window.doLogout = async function(){ await signOut(auth); };
+
+let currentUser = null;
+let currentProfile = null;
+let unsubFeed = null;
+let suspendedFlag = false;
+
+function renderNavAuthArea(){
+  const el = document.getElementById('navAuthArea');
+  if(currentUser){
+    el.innerHTML = `<button class="btn ghost" onclick="doLogout()">${t('logout')}</button>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+if (configured) {
+  onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    if(user){
+      const snap = await getDoc(doc(db,'users',user.uid));
+      currentProfile = snap.exists() ? snap.data() : { displayName:user.displayName||'User', bio:'', photoURL:'' };
+      if(currentProfile.suspended){
+        suspendedFlag = true;
+        await signOut(auth);
+        return;
+      }
+      document.getElementById('authWrap').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      renderSidebar();
+      renderNavAuthArea();
+      document.getElementById('iconNav').style.display = 'flex';
+      startFeedListener();
+      startFriendsListeners();
+      startMessagesListener();
+      startGroupsListener();
+      startNotificationsListener();
+      navigateFeed();
+    } else {
+      currentProfile = null;
+      document.getElementById('authWrap').style.display = 'flex';
+      document.getElementById('app').classList.remove('show');
+      renderNavAuthArea();
+      document.getElementById('iconNav').style.display = 'none';
+      if(suspendedFlag){ showAuthError(t('accountSuspended')); suspendedFlag = false; }
+      if(unsubFeed) unsubFeed();
+      if(friendsUnsub) friendsUnsub();
+      if(requestsOutUnsub) requestsOutUnsub();
+      if(requestsInUnsub) requestsInUnsub();
+      if(conversationsUnsub) conversationsUnsub();
+      if(chatMessagesUnsub) chatMessagesUnsub();
+      if(typeof groupsMembershipUnsub !== 'undefined' && groupsMembershipUnsub) groupsMembershipUnsub();
+      if(typeof groupPostsUnsub !== 'undefined' && groupPostsUnsub) groupPostsUnsub();
+      if(typeof albumsUnsub !== 'undefined' && albumsUnsub) albumsUnsub();
+      if(typeof mediaUnsub !== 'undefined' && mediaUnsub) mediaUnsub();
+      if(typeof notifUnsub !== 'undefined' && notifUnsub) notifUnsub();
+      myFriends = new Set(); outgoingReq = new Set(); incomingReq = new Map();
+      allUsersCache = null; currentProfileUid = null;
+      conversations = new Map(); convoUsersCache = new Map();
+      activeChatUid = null; activeConvoId = null;
+    }
+  });
+}
+
+function avatarHTML(photoURL, name, size){
+  if(photoURL) return `<img src="${photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+  return initials(name);
+}
+
+function renderSidebar(){
+  document.getElementById('sideAvatar').innerHTML = avatarHTML(currentProfile.photoURL, currentProfile.displayName);
+  document.getElementById('composerAvatar').innerHTML = avatarHTML(currentProfile.photoURL, currentProfile.displayName);
+  document.getElementById('sideName').textContent = currentProfile.displayName || 'User';
+  document.getElementById('sideBio').textContent = currentProfile.bio || t('noBioYet');
+  document.getElementById('navAdminIcon').style.display = currentProfile.isAdmin ? 'inline-flex' : 'none';
+}
+
+window.openProfileModal = function(){
+  document.getElementById('editName').value = currentProfile.displayName || '';
+  document.getElementById('editBio').value = currentProfile.bio || '';
+  document.getElementById('profileModalBg').classList.add('show');
+};
+window.closeProfileModal = function(){ document.getElementById('profileModalBg').classList.remove('show'); };
+window.saveProfile = async function(){
+  const name = document.getElementById('editName').value.trim();
+  const bio = document.getElementById('editBio').value.trim();
+  const fileInput = document.getElementById('editPhotoInput');
+  const updates = { displayName: name, bio };
+  try{
+    if(fileInput.files && fileInput.files[0]){
+      const file = fileInput.files[0];
+      const r = ref(storage, `avatars/${currentUser.uid}/${Date.now()}_${file.name}`);
+      await uploadBytes(r, file);
+      updates.photoURL = await getDownloadURL(r);
+    }
+    await updateDoc(doc(db,'users',currentUser.uid), updates);
+    currentProfile = { ...currentProfile, ...updates };
+    renderSidebar();
+    closeProfileModal();
+    toast(t('profileSaved'));
+  }catch(e){ toast(e.message); }
+};
+
+let pendingMediaFiles = [];
+window.handleImgSelect = function(evt){
+  const files = Array.from(evt.target.files || []);
+  if(!files.length) return;
+  pendingMediaFiles = pendingMediaFiles.concat(files);
+  renderComposerMediaPreview();
+};
+function renderComposerMediaPreview(){
+  const box = document.getElementById('composerImgPreview');
+  if(!pendingMediaFiles.length){ box.innerHTML = ''; return; }
+  box.innerHTML = `<div class="composer-media-preview">${pendingMediaFiles.map((f,i) => mediaPreviewTileHTML(f,i)).join('')}
+    <div class="mp-add-tile" onclick="document.getElementById('postImgInput').click()">+</div>
+  </div>`;
+}
+function mediaPreviewTileHTML(file, index, isGroup){
+  const isVideo = file.type.startsWith('video/');
+  const url = URL.createObjectURL(file);
+  const removeFn = isGroup ? 'removePendingGroupMedia' : 'removePendingMedia';
+  return `<div class="mp-item">
+    ${isVideo ? `<video src="${url}" muted></video><span class="mp-vid-badge">▶</span>` : `<img src="${url}">`}
+    <button class="mp-remove" onclick="${removeFn}(${index})">✕</button>
+  </div>`;
+}
+window.removePendingMedia = function(index){
+  pendingMediaFiles.splice(index, 1);
+  renderComposerMediaPreview();
+};
+window.clearImgPreview = function(){
+  pendingMediaFiles = [];
+  document.getElementById('postImgInput').value = '';
+  document.getElementById('composerImgPreview').innerHTML = '';
+};
+
+function mediaUploadTimeout(files){
+  // Videos need far longer than the 20s baseline used for text/image-only posts.
+  // Scale generously with total payload size so large videos don't get killed mid-upload.
+  const totalBytes = files.reduce((sum, f) => sum + (f.size || 0), 0);
+  const hasVideo = files.some(f => f.type && f.type.startsWith('video/'));
+  const base = hasVideo ? 60000 : 20000;
+  const perMB = hasVideo ? 15000 : 4000; // ~15s per MB for video, ~4s per MB for images
+  const sizeBased = base + (totalBytes / (1024 * 1024)) * perMB;
+  return Math.min(Math.max(sizeBased, base), 600000); // cap at 10 minutes
+}
+
+window.submitPost = async function(){
+  const textEl = document.getElementById('postText');
+  const text = textEl.value.trim();
+  if(!text && !pendingMediaFiles.length) return;
+  const btn = document.getElementById('postBtn');
+  btn.disabled = true;
+  try{
+    await withTimeout((async () => {
+      const media = [];
+      for(const file of pendingMediaFiles){
+        const isVideo = file.type.startsWith('video/');
+        const r = ref(storage, `posts/${currentUser.uid}/${Date.now()}_${file.name}`);
+        await uploadBytes(r, file);
+        const url = await getDownloadURL(r);
+        media.push({ url, type: isVideo ? 'video' : 'image' });
+      }
+      await addDoc(collection(db,'posts'), {
+        uid: currentUser.uid,
+        authorName: currentProfile.displayName || 'User',
+        authorPhoto: currentProfile.photoURL || '',
+        text, media,
+        imageURL: (media.find(m => m.type==='image') || {}).url || '',
+        likes: [],
+        reactions: {},
+        commentCount: 0,
+        createdAt: serverTimestamp()
+      });
+    })(), mediaUploadTimeout(pendingMediaFiles), 'Post');
+    textEl.value = '';
+    clearImgPreview();
+    toast(t('posted'));
+  }catch(e){ toast(e.message || t('postFailed')); console.error(e); }
+  finally{ btn.disabled = false; }
+};
+
+function startFeedListener(){
+  const q = query(collection(db,'posts'), orderBy('createdAt','desc'));
+  unsubFeed = onSnapshot(q, (snap) => {
+    document.getElementById('feedLoading').style.display = 'none';
+    const list = document.getElementById('feedList');
+    const emptyEl = document.getElementById('feedEmpty');
+    if(snap.empty){ list.innerHTML=''; emptyEl.style.display='block'; return; }
+    emptyEl.style.display = 'none';
+    list.innerHTML = snap.docs.map(d => renderPost(d.id, d.data())).join('');
+  }, (err) => {
+    document.getElementById('feedLoading').textContent = err.message;
+  });
+}
+
+function getReactionMap(p){
+  if(p.reactions && Object.keys(p.reactions).length) return p.reactions;
+  const map = {};
+  (p.likes||[]).forEach(uid => { map[uid] = 'like'; });
+  return map;
+}
+function reactionSummary(map){
+  const counts = {};
+  Object.values(map).forEach(type => { counts[type] = (counts[type]||0) + 1; });
+  const total = Object.keys(map).length;
+  const top = REACTION_ORDER.filter(k => counts[k]).sort((a,b) => counts[b]-counts[a]).slice(0,3);
+  return { total, top, counts };
+}
+
+function renderPost(id, p, col){
+  col = col || 'posts';
+  const reactionMap = getReactionMap(p);
+  const myReaction = currentUser ? reactionMap[currentUser.uid] : null;
+  const summary = reactionSummary(reactionMap);
+  const media = (p.media && p.media.length) ? p.media : (p.imageURL ? [{ url:p.imageURL, type:'image' }] : []);
+  const btnLabel = myReaction ? t(REACTIONS[myReaction].labelKey) : t('like');
+  const btnIcon = myReaction ? REACTIONS[myReaction].emoji : '👍';
+  const btnClass = myReaction ? `liked react-${myReaction}` : '';
+  const pickerBtns = REACTION_ORDER.map(k => `<button title="${t(REACTIONS[k].labelKey)}" onclick="event.stopPropagation();setReaction('${id}','${col}','${k}')">${REACTIONS[k].emoji}</button>`).join('');
+  return `
+    <div class="post" id="post-${col}-${id}">
+      <div class="post-arch"></div>
+      <div class="post-head clickable-id" onclick="navigateProfile('${p.uid}')">
+        <div class="avatar">${avatarHTML(p.authorPhoto, p.authorName)}</div>
+        <div class="who">
+          <div class="name">${escapeHtml(p.authorName||'User')}</div>
+          <div class="time">${timeAgo(p.createdAt)}</div>
+        </div>
+      </div>
+      ${p.text ? `<div class="post-body">${escapeHtml(p.text)}</div>` : ''}
+      ${postMediaGridHTML(media)}
+      ${summary.total > 0 ? `<div class="post-reactions-line"><span class="reaction-icons">${summary.top.map(k=>`<span>${REACTIONS[k].emoji}</span>`).join('')}</span> ${summary.total} ${t('likesLabel')}</div>` : ''}
+      <div class="post-actions">
+        <div class="react-wrap"
+             onmouseenter="showReactPicker('${col}-${id}')" onmouseleave="hideReactPickerDelay('${col}-${id}')">
+          <div class="react-picker" id="reactPicker-${col}-${id}">${pickerBtns}</div>
+          <button class="${btnClass}" id="reactBtn-${col}-${id}"
+            onclick="handleReactClick('${id}','${col}')"
+            ontouchstart="startPressTimer('${col}-${id}')"
+            ontouchend="endPressTimer('${col}-${id}')"
+            ontouchmove="cancelPressTimer('${col}-${id}')">${btnIcon} ${btnLabel}</button>
+        </div>
+        <button onclick="toggleComments('${id}','${col}')">💬 ${t('comment')} ${p.commentCount ? `· ${p.commentCount}` : ''}</button>
+      </div>
+      <div class="comments" id="comments-${col}-${id}">
+        <div id="commentList-${col}-${id}"></div>
+        <div class="comment-form">
+          <input type="text" id="commentInput-${col}-${id}" placeholder="${t('writeComment')}" onkeydown="if(event.key==='Enter')submitComment('${id}','${col}')">
+          <button onclick="submitComment('${id}','${col}')">${t('send')}</button>
+        </div>
+      </div>
+    </div>`;
+}
+function postMediaGridHTML(media){
+  if(!media || !media.length) return '';
+  const n = media.length === 1 ? '1' : (media.length === 2 ? '2' : (media.length === 3 ? '3' : '4+'));
+  return `<div class="post-media-grid" data-n="${n}">${media.map(m => `
+    <div class="pmg-item">
+      ${m.type === 'video'
+        ? `<video src="${m.url}" controls></video><span class="pmg-vid-badge">▶</span>`
+        : `<img src="${m.url}">`}
+    </div>`).join('')}</div>`;
+}
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ===== reactions interaction =====
+let pressTimers = {};
+let pickerHideTimers = {};
+let longPressFired = {};
+
+window.showReactPicker = function(key){
+  clearTimeout(pickerHideTimers[key]);
+  const el = document.getElementById('reactPicker-'+key);
+  if(el) el.classList.add('show');
+};
+window.hideReactPickerDelay = function(key){
+  pickerHideTimers[key] = setTimeout(() => {
+    const el = document.getElementById('reactPicker-'+key);
+    if(el) el.classList.remove('show');
+  }, 350);
+};
+function hideReactPickerNow(key){
+  const el = document.getElementById('reactPicker-'+key);
+  if(el) el.classList.remove('show');
+}
+window.startPressTimer = function(key){
+  longPressFired[key] = false;
+  pressTimers[key] = setTimeout(() => {
+    longPressFired[key] = true;
+    showReactPicker(key);
+    if(navigator.vibrate) navigator.vibrate(12);
+  }, 420);
+};
+window.endPressTimer = function(key){
+  clearTimeout(pressTimers[key]);
+  if(longPressFired[key]){
+    // picker is shown; let the user tap an option. auto-hide after a bit if they don't.
+    setTimeout(() => hideReactPickerDelay(key), 2200);
+  }
+};
+window.cancelPressTimer = function(key){
+  clearTimeout(pressTimers[key]);
+};
+
+window.handleReactClick = function(postId, col){
+  const key = col+'-'+postId;
+  if(longPressFired[key]){
+    longPressFired[key] = false;
+    return; // long-press already opened the picker; ignore the trailing click
+  }
+  toggleQuickReaction(postId, col);
+};
+
+async function toggleQuickReaction(postId, col){
+  col = col || 'posts';
+  if(!currentUser) return;
+  const ref_ = doc(db,col,postId);
+  const snap = await getDoc(ref_);
+  if(!snap.exists()) return;
+  const p = snap.data();
+  const map = getReactionMap(p);
+  const current = map[currentUser.uid];
+  const field = `reactions.${currentUser.uid}`;
+  if(current){
+    await updateDoc(ref_, { [field]: deleteField() });
+  } else {
+    await updateDoc(ref_, { [field]: 'like' });
+    addNotification(p.uid, 'reaction', { postId, groupId: p.groupId || null, reactionType:'like' });
+  }
+}
+
+window.setReaction = async function(postId, col, type){
+  col = col || 'posts';
+  if(!currentUser) return;
+  const key = col+'-'+postId;
+  hideReactPickerNow(key);
+  const ref_ = doc(db,col,postId);
+  const snap = await getDoc(ref_);
+  if(!snap.exists()) return;
+  const p = snap.data();
+  const map = getReactionMap(p);
+  const current = map[currentUser.uid];
+  const field = `reactions.${currentUser.uid}`;
+  try{
+    if(current === type){
+      await updateDoc(ref_, { [field]: deleteField() });
+    } else {
+      await updateDoc(ref_, { [field]: type });
+      addNotification(p.uid, 'reaction', { postId, groupId: p.groupId || null, reactionType:type });
+    }
+  }catch(e){ toast(e.message); }
+};
+
+const openComments = new Set();
+let commentUnsubs = {};
+window.toggleComments = function(postId, col){
+  col = col || 'posts';
+  const key = col+'-'+postId;
+  const el = document.getElementById('comments-'+key);
+  const isOpen = el.classList.contains('show');
+  if(isOpen){
+    el.classList.remove('show');
+    openComments.delete(key);
+    if(commentUnsubs[key]){ commentUnsubs[key](); delete commentUnsubs[key]; }
+  } else {
+    el.classList.add('show');
+    openComments.add(key);
+    listenComments(postId, col);
+  }
+};
+function listenComments(postId, col){
+  col = col || 'posts';
+  const key = col+'-'+postId;
+  const q = query(collection(db,col,postId,'comments'), orderBy('createdAt','asc'));
+  commentUnsubs[key] = onSnapshot(q, (snap) => {
+    const list = document.getElementById('commentList-'+key);
+    if(!list) return;
+    list.innerHTML = snap.docs.map(d => {
+      const c = d.data();
+      return `<div class="comment-row">
+        <div class="avatar" style="width:28px;height:28px;font-size:11px;">${avatarHTML(c.authorPhoto,c.authorName)}</div>
+        <div class="comment-bubble"><div class="cname">${escapeHtml(c.authorName||'User')}</div>${escapeHtml(c.text)}</div>
+      </div>`;
+    }).join('');
+  });
+}
+window.submitComment = async function(postId, col){
+  col = col || 'posts';
+  const key = col+'-'+postId;
+  const input = document.getElementById('commentInput-'+key);
+  const text = input.value.trim();
+  if(!text || !currentUser) return;
+  input.value = '';
+  await addDoc(collection(db,col,postId,'comments'), {
+    uid: currentUser.uid,
+    authorName: currentProfile.displayName || 'User',
+    authorPhoto: currentProfile.photoURL || '',
+    text,
+    createdAt: serverTimestamp()
+  });
+  await updateDoc(doc(db,col,postId), { commentCount: increment(1) });
+  try{
+    const pSnap = await getDoc(doc(db,col,postId));
+    if(pSnap.exists()){
+      const p = pSnap.data();
+      addNotification(p.uid, 'comment', { postId, groupId: p.groupId || null });
+    }
+  }catch(e){ console.error(e); }
+};
+
+let myFriends = new Set();
+let outgoingReq = new Set();
+let incomingReq = new Map();
+let friendsUnsub = null, requestsOutUnsub = null, requestsInUnsub = null;
+let allUsersCache = null;
+let currentFriendsTab = 'discover';
+let currentProfileUid = null;
+
+function reqId(fromUid, toUid){ return `${fromUid}_${toUid}`; }
+
+function startFriendsListeners(){
+  if(!currentUser) return;
+  friendsUnsub = onSnapshot(collection(db,'users',currentUser.uid,'friends'), (snap) => {
+    myFriends = new Set(snap.docs.map(d => d.id));
+    if(currentFriendsTab==='mine') renderMyFriendsTab();
+    if(currentFriendsTab==='discover') renderDiscover();
+    if(currentProfileUid) renderProfileAction(currentProfileUid);
+  });
+  requestsOutUnsub = onSnapshot(query(collection(db,'friendRequests'), where('from','==',currentUser.uid), where('status','==','pending')), (snap) => {
+    outgoingReq = new Set(snap.docs.map(d => d.data().to));
+    if(currentFriendsTab==='discover') renderDiscover();
+    if(currentProfileUid) renderProfileAction(currentProfileUid);
+  });
+  requestsInUnsub = onSnapshot(query(collection(db,'friendRequests'), where('to','==',currentUser.uid), where('status','==','pending')), (snap) => {
+    incomingReq = new Map(snap.docs.map(d => [d.data().from, d.id]));
+    updateReqBadges();
+    if(currentFriendsTab==='requests') renderRequestsTab();
+    if(currentProfileUid) renderProfileAction(currentProfileUid);
+  });
+}
+
+function updateReqBadges(){
+  const n = incomingReq.size;
+  ['reqBadge','tabReqBadge'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.textContent = n;
+    el.style.display = n > 0 ? 'inline-block' : 'none';
+  });
+}
+
+window.navigateFeed = function(){
+  currentProfileUid = null;
+  setView('feedView');
+};
+window.navigateFriends = function(){
+  currentProfileUid = null;
+  setView('friendsView');
+  switchFriendsTab(currentFriendsTab);
+};
+window.navigateMessages = function(){
+  currentProfileUid = null;
+  setView('messagesView');
+  document.getElementById('convoListPanel').style.display = 'block';
+  document.getElementById('chatPanel').style.display = 'none';
+  renderConvoList();
+};
+window.navigateProfile = function(uid){
+  if(!uid) return;
+  currentProfileUid = uid;
+  setView('profileView');
+  loadProfileView(uid);
+};
+window.navigateGroups = function(){
+  currentGroupId = null;
+  setView('groupsView');
+  renderGroupsList();
+};
+window.navigateGroupPage = function(gid){
+  if(!gid) return;
+  currentGroupId = gid;
+  setView('groupPageView');
+  loadGroupPage(gid);
+};
+function setView(id){
+  document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const tabMap = {
+    feedView:'feed', friendsView:'friends', messagesView:'messages',
+    groupsView:'groups', groupPageView:'groups',
+    photosView:'photos', albumView:'photos',
+    notificationsView:'notifications', adminView:'admin'
+  };
+  const activeTab = tabMap[id] || null;
+  document.querySelectorAll('.inav-btn').forEach(btn => {
+    btn.classList.toggle('active', activeTab && btn.dataset.view === activeTab);
+  });
+}
+
+window.switchFriendsTab = function(tab){
+  currentFriendsTab = tab;
+  document.getElementById('tabDiscover').classList.toggle('active', tab==='discover');
+  document.getElementById('tabRequests').classList.toggle('active', tab==='requests');
+  document.getElementById('tabMyFriends').classList.toggle('active', tab==='mine');
+  document.getElementById('discoverSearchRow').style.display = tab==='discover' ? 'block' : 'none';
+  if(tab==='discover') renderDiscover();
+  else if(tab==='requests') renderRequestsTab();
+  else renderMyFriendsTab();
+};
+
+async function fetchAllUsers(){
+  if(allUsersCache) return allUsersCache;
+  const snap = await getDocs(collection(db,'users'));
+  allUsersCache = snap.docs.map(d => ({ uid:d.id, ...d.data() })).filter(u => u.uid !== currentUser.uid);
+  return allUsersCache;
+}
+
+function personRowHTML(u){
+  const status = myFriends.has(u.uid) ? 'friends' : outgoingReq.has(u.uid) ? 'outgoing' : incomingReq.has(u.uid) ? 'incoming' : 'none';
+  let actions = '';
+  if(status === 'friends'){
+    actions = `<div class="fbtn-row">
+      <button class="msg-btn" onclick="event.stopPropagation();openChat('${u.uid}')">${t('messageBtn')}</button>
+      <button class="fbtn subtle" onclick="unfriend('${u.uid}')">${t('unfriend')}</button>
+    </div>`;
+  } else if(status === 'outgoing'){
+    actions = `<button class="fbtn outline" onclick="cancelRequestTo('${u.uid}')">${t('requested')}</button>`;
+  } else if(status === 'incoming'){
+    actions = `<div class="fbtn-row">
+      <button class="fbtn gold" onclick="acceptRequest('${u.uid}')">${t('accept')}</button>
+      <button class="fbtn outline" onclick="declineRequestFrom('${u.uid}')">${t('decline')}</button>
+    </div>`;
+  } else {
+    actions = `<button class="fbtn gold" onclick="sendFriendRequest('${u.uid}')">${t('addFriend')}</button>`;
+  }
+  return `<div class="person-row">
+    <div class="avatar clickable-id" onclick="navigateProfile('${u.uid}')">${avatarHTML(u.photoURL,u.displayName)}</div>
+    <div class="who clickable-id" onclick="navigateProfile('${u.uid}')">
+      <div class="name">${escapeHtml(u.displayName||'User')}</div>
+      <div class="sub">${escapeHtml(u.bio||'')}</div>
+    </div>
+    ${actions}
+  </div>`;
+}
+
+window.renderDiscover = async function(){
+  const list = document.getElementById('peopleList');
+  const emptyEl = document.getElementById('peopleEmpty');
+  const term = (document.getElementById('peopleSearch').value || '').trim().toLowerCase();
+  const users = await fetchAllUsers();
+  const filtered = users.filter(u => !term || (u.displayName||'').toLowerCase().includes(term));
+  if(filtered.length === 0){ list.innerHTML=''; emptyEl.style.display='block'; return; }
+  emptyEl.style.display = 'none';
+  list.innerHTML = filtered.map(personRowHTML).join('');
+};
+
+function renderRequestsTab(){
+  const list = document.getElementById('peopleList');
+  const emptyEl = document.getElementById('peopleEmpty');
+  const uids = Array.from(incomingReq.keys());
+  if(uids.length === 0){ list.innerHTML=''; emptyEl.textContent = t('noRequests'); emptyEl.style.display='block'; return; }
+  emptyEl.style.display = 'none';
+  Promise.all(uids.map(uid => getDoc(doc(db,'users',uid)))).then(snaps => {
+    list.innerHTML = snaps.filter(s=>s.exists()).map(s => personRowHTML({ uid:s.id, ...s.data() })).join('');
+  });
+}
+
+function renderMyFriendsTab(){
+  const list = document.getElementById('peopleList');
+  const emptyEl = document.getElementById('peopleEmpty');
+  const uids = Array.from(myFriends);
+  if(uids.length === 0){ list.innerHTML=''; emptyEl.textContent = t('noFriendsYet'); emptyEl.style.display='block'; return; }
+  emptyEl.style.display = 'none';
+  Promise.all(uids.map(uid => getDoc(doc(db,'users',uid)))).then(snaps => {
+    list.innerHTML = snaps.filter(s=>s.exists()).map(s => personRowHTML({ uid:s.id, ...s.data() })).join('');
+  });
+}
+
+window.sendFriendRequest = async function(toUid){
+  if(!currentUser || toUid===currentUser.uid) return;
+  try{
+    await setDoc(doc(db,'friendRequests',reqId(currentUser.uid,toUid)), {
+      from: currentUser.uid, to: toUid, status:'pending', createdAt: serverTimestamp()
+    });
+    addNotification(toUid, 'friend_request', {});
+  }catch(e){ toast(e.message); }
+};
+window.cancelRequestTo = async function(toUid){
+  try{ await deleteDoc(doc(db,'friendRequests',reqId(currentUser.uid,toUid))); }
+  catch(e){ toast(e.message); }
+};
+window.declineRequestFrom = async function(fromUid){
+  try{ await deleteDoc(doc(db,'friendRequests',reqId(fromUid,currentUser.uid))); }
+  catch(e){ toast(e.message); }
+};
+window.acceptRequest = async function(fromUid){
+  try{
+    await setDoc(doc(db,'users',currentUser.uid,'friends',fromUid), { since: serverTimestamp() });
+    await setDoc(doc(db,'users',fromUid,'friends',currentUser.uid), { since: serverTimestamp() });
+    await deleteDoc(doc(db,'friendRequests',reqId(fromUid,currentUser.uid)));
+    addNotification(fromUid, 'friend_accept', {});
+  }catch(e){ toast(e.message); }
+};
+window.unfriend = async function(uid){
+  try{
+    await deleteDoc(doc(db,'users',currentUser.uid,'friends',uid));
+    await deleteDoc(doc(db,'users',uid,'friends',currentUser.uid));
+  }catch(e){ toast(e.message); }
+};
+
+async function loadProfileView(uid){
+  document.getElementById('profPostsList').innerHTML = '';
+  document.getElementById('profPostsEmpty').style.display = 'none';
+  const snap = await getDoc(doc(db,'users',uid));
+  if(!snap.exists()) return;
+  const u = snap.data();
+  document.getElementById('profAvatar').innerHTML = avatarHTML(u.photoURL, u.displayName);
+  document.getElementById('profName').textContent = (uid===currentUser.uid ? `${u.displayName} (${t('you')})` : u.displayName) || 'User';
+  document.getElementById('profBio').textContent = u.bio || t('noBioYet');
+  renderProfileAction(uid, u);
+
+  try{
+    const q = query(collection(db,'posts'), where('uid','==',uid), orderBy('createdAt','desc'));
+    const psnap = await getDocs(q);
+    if(psnap.empty){
+      document.getElementById('profPostsEmpty').style.display = 'block';
+    } else {
+      document.getElementById('profPostsList').innerHTML = psnap.docs.map(d => renderPost(d.id, d.data())).join('');
+    }
+  }catch(e){ console.error(e); }
+}
+
+function renderProfileAction(uid, cachedUser){
+  const area = document.getElementById('profActionArea');
+  if(!area || currentProfileUid !== uid) return;
+  const photosLink = `<div style="margin-top:8px;"><button class="fbtn subtle" onclick="navigatePhotos('${uid}')">📷 ${t('viewPhotos')}</button></div>`;
+  if(uid === currentUser.uid){
+    area.innerHTML = `<button class="btn ghost" onclick="openProfileModal()">${t('editProfile')}</button>${photosLink}`;
+    return;
+  }
+  const status = myFriends.has(uid) ? 'friends' : outgoingReq.has(uid) ? 'outgoing' : incomingReq.has(uid) ? 'incoming' : 'none';
+  if(status === 'friends'){
+    area.innerHTML = `<div class="fbtn-row" style="justify-content:center;">
+      <button class="msg-btn" onclick="openChat('${uid}')">${t('messageBtn')}</button>
+      <button class="fbtn subtle" onclick="unfriend('${uid}')">✓ ${t('friendsLabel')} · ${t('unfriend')}</button>
+    </div>${photosLink}`;
+  } else if(status === 'outgoing'){
+    area.innerHTML = `<button class="fbtn outline" onclick="cancelRequestTo('${uid}')">${t('requested')}</button>${photosLink}`;
+  } else if(status === 'incoming'){
+    area.innerHTML = `<div class="fbtn-row" style="justify-content:center;">
+      <button class="fbtn gold" onclick="acceptRequest('${uid}')">${t('accept')}</button>
+      <button class="fbtn outline" onclick="declineRequestFrom('${uid}')">${t('decline')}</button>
+    </div>${photosLink}`;
+  } else {
+    area.innerHTML = `<button class="fbtn gold" onclick="sendFriendRequest('${uid}')">${t('addFriend')}</button>${photosLink}`;
+  }
+}
+
+function convoId(uidA, uidB){ return [uidA, uidB].sort().join('_'); }
+
+let conversations = new Map();
+let convoUsersCache = new Map();
+let conversationsUnsub = null;
+let chatMessagesUnsub = null;
+let activeChatUid = null;
+let activeConvoId = null;
+
+function startMessagesListener(){
+  if(!currentUser) return;
+  const q = query(collection(db,'conversations'), where('participants','array-contains',currentUser.uid));
+  conversationsUnsub = onSnapshot(q, (snap) => {
+    conversations = new Map(snap.docs.map(d => [d.id, d.data()]));
+    updateMsgBadge();
+    if(document.getElementById('messagesView').classList.contains('active') && !activeChatUid){
+      renderConvoList();
+    }
+  });
+}
+
+function updateMsgBadge(){
+  let unread = 0;
+  conversations.forEach(c => { unread += (c.unread && c.unread[currentUser.uid]) || 0; });
+  const el = document.getElementById('msgBadge');
+  el.textContent = unread;
+  el.style.display = unread > 0 ? 'inline-block' : 'none';
+}
+
+async function getUserCached(uid){
+  if(convoUsersCache.has(uid)) return convoUsersCache.get(uid);
+  const snap = await getDoc(doc(db,'users',uid));
+  const u = snap.exists() ? snap.data() : { displayName:'User', photoURL:'' };
+  convoUsersCache.set(uid, u);
+  return u;
+}
+
+async function renderConvoList(){
+  const list = document.getElementById('convoList');
+  const emptyEl = document.getElementById('convoEmpty');
+  const items = Array.from(conversations.entries())
+    .sort((a,b) => (b[1].lastMessageAt?.toMillis?.()||0) - (a[1].lastMessageAt?.toMillis?.()||0));
+  if(items.length === 0){ list.innerHTML=''; emptyEl.style.display='block'; return; }
+  emptyEl.style.display = 'none';
+  const rows = await Promise.all(items.map(async ([id, c]) => {
+    const otherUid = c.participants.find(p => p !== currentUser.uid);
+    const u = await getUserCached(otherUid);
+    const unread = (c.unread && c.unread[currentUser.uid]) || 0;
+    return `<div class="person-row convo-row" onclick="openChat('${otherUid}')">
+      <div class="avatar">${avatarHTML(u.photoURL,u.displayName)}</div>
+      <div class="who">
+        <div class="name">${escapeHtml(u.displayName||'User')}</div>
+        <div class="snippet">${escapeHtml(c.lastMessage||'')}</div>
+      </div>
+      <div class="meta">
+        <div class="convo-time">${timeAgo(c.lastMessageAt)}</div>
+        ${unread > 0 ? '<div class="unread-dot"></div>' : ''}
+      </div>
+    </div>`;
+  }));
+  list.innerHTML = rows.join('');
+}
+
+window.openChat = async function(otherUid){
+  if(!otherUid || otherUid === currentUser.uid) return;
+  activeChatUid = otherUid;
+  activeConvoId = convoId(currentUser.uid, otherUid);
+  setView('messagesView');
+  document.getElementById('convoListPanel').style.display = 'none';
+  document.getElementById('chatPanel').style.display = 'block';
+
+  const u = await getUserCached(otherUid);
+  document.getElementById('chatAvatar').innerHTML = avatarHTML(u.photoURL, u.displayName);
+  document.getElementById('chatName').textContent = u.displayName || 'User';
+  document.getElementById('chatMessages').innerHTML = `<div class="empty-small">${t('startedChat')}</div>`;
+
+  const cSnap = await getDoc(doc(db,'conversations',activeConvoId));
+  if(cSnap.exists()){
+    updateDoc(doc(db,'conversations',activeConvoId), { [`unread.${currentUser.uid}`]: 0 }).catch(()=>{});
+  }
+
+  if(chatMessagesUnsub) chatMessagesUnsub();
+  const q = query(collection(db,'conversations',activeConvoId,'messages'), orderBy('createdAt','asc'));
+  chatMessagesUnsub = onSnapshot(q, (snap) => {
+    const box = document.getElementById('chatMessages');
+    if(snap.empty){ box.innerHTML = `<div class="empty-small">${t('startedChat')}</div>`; return; }
+    box.innerHTML = snap.docs.map(d => {
+      const m = d.data();
+      const mine = m.from === currentUser.uid;
+      return `<div class="bubble-row ${mine?'mine':''}">
+        <div><div class="bubble">${escapeHtml(m.text)}</div><span class="bubble-time">${timeAgo(m.createdAt)}</span></div>
+      </div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  });
+};
+
+window.closeChat = function(){
+  activeChatUid = null; activeConvoId = null;
+  if(chatMessagesUnsub){ chatMessagesUnsub(); chatMessagesUnsub = null; }
+  navigateMessages();
+};
+
+window.sendMessage = async function(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text || !activeConvoId || !activeChatUid) return;
+  input.value = '';
+  const cRef = doc(db,'conversations',activeConvoId);
+  try{
+    const cSnap = await getDoc(cRef);
+    if(!cSnap.exists()){
+      await setDoc(cRef, {
+        participants: [currentUser.uid, activeChatUid],
+        lastMessage: text, lastMessageAt: serverTimestamp(),
+        unread: { [currentUser.uid]: 0, [activeChatUid]: 1 }
+      });
+    } else {
+      await updateDoc(cRef, {
+        lastMessage: text, lastMessageAt: serverTimestamp(),
+        [`unread.${activeChatUid}`]: increment(1),
+        [`unread.${currentUser.uid}`]: 0
+      });
+    }
+    await addDoc(collection(db,'conversations',activeConvoId,'messages'), {
+      from: currentUser.uid, text, createdAt: serverTimestamp()
+    });
+    addNotification(activeChatUid, 'message', { convoId: activeConvoId });
+  }catch(e){ toast(e.message); }
+};
+
+// ================= PHASE 4: Groups =================
+let myGroups = new Set();
+let groupsMembershipUnsub = null;
+let currentGroupsTab = 'discover';
+let currentGroupId = null;
+let groupPostsUnsub = null;
+let pendingGroupMediaFiles = [];
+
+function startGroupsListener(){
+  if(!currentUser) return;
+  groupsMembershipUnsub = onSnapshot(collection(db,'users',currentUser.uid,'groups'), (snap) => {
+    myGroups = new Set(snap.docs.map(d => d.id));
+    if(currentGroupsTab === 'mine') renderGroupsList();
+    if(currentGroupId) loadGroupPage(currentGroupId);
+  });
+}
+
+window.switchGroupsTab = function(tab){
+  currentGroupsTab = tab;
+  document.getElementById('tabGroupsDiscover').classList.toggle('active', tab==='discover');
+  document.getElementById('tabMyGroups').classList.toggle('active', tab==='mine');
+  renderGroupsList();
+};
+
+window.renderGroupsList = async function(){
+  const list = document.getElementById('groupsList');
+  const emptyEl = document.getElementById('groupsEmpty');
+  const term = (document.getElementById('groupSearch').value || '').trim().toLowerCase();
+  const snap = await getDocs(collection(db,'groups'));
+  let groups = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  if(currentGroupsTab === 'mine'){
+    groups = groups.filter(g => myGroups.has(g.id));
+  }
+  if(term){
+    groups = groups.filter(g => (g.name||'').toLowerCase().includes(term) || (g.description||'').toLowerCase().includes(term));
+  }
+  if(groups.length === 0){ list.innerHTML=''; emptyEl.style.display='block'; return; }
+  emptyEl.style.display = 'none';
+  list.innerHTML = groups.map(g => {
+    const isMember = myGroups.has(g.id);
+    const colors = ['#B8863A','#8C2F39','#2A4838','#4A3B5C','#335577'];
+    const col = colors[Math.abs(g.id.split('').reduce((acc,c)=>acc+c.charCodeAt(0),0)) % colors.length];
+    return `<div class="person-row group-row" onclick="navigateGroupPage('${g.id}')">
+      <div class="group-cover" style="background:${col}">${(g.name||'G')[0].toUpperCase()}</div>
+      <div class="who">
+        <div class="name">${escapeHtml(g.name)}</div>
+        <div class="sub">${g.memberCount||1} ${t('members')} · ${escapeHtml(g.description||'')}</div>
+      </div>
+      <button class="fbtn ${isMember?'subtle':'gold'}" onclick="event.stopPropagation();toggleGroupJoin('${g.id}',${isMember})">${t(isMember?'member':'join')}</button>
+    </div>`;
+  }).join('');
+};
+
+window.openGroupModal = function(){
+  document.getElementById('newGroupName').value = '';
+  document.getElementById('newGroupDesc').value = '';
+  document.getElementById('groupModalBg').classList.add('show');
+};
+window.closeGroupModal = function(){ document.getElementById('groupModalBg').classList.remove('show'); };
+window.createGroup = async function(){
+  const name = document.getElementById('newGroupName').value.trim();
+  const description = document.getElementById('newGroupDesc').value.trim();
+  if(!name) return;
+  const btn = document.getElementById('createGroupBtn');
+  btn.disabled = true;
+  try{
+    const ref_ = await addDoc(collection(db,'groups'), {
+      name, description, createdBy: currentUser.uid, memberCount: 1, createdAt: serverTimestamp()
+    });
+    await setDoc(doc(db,'groups',ref_.id,'members',currentUser.uid), { joinedAt: serverTimestamp() });
+    await setDoc(doc(db,'users',currentUser.uid,'groups',ref_.id), { joinedAt: serverTimestamp() });
+    closeGroupModal();
+    navigateGroupPage(ref_.id);
+  }catch(e){ toast(e.message); }
+  finally{ btn.disabled = false; }
+};
+
+window.toggleGroupJoin = async function(gid, isMember){
+  try{
+    const gRef = doc(db,'groups',gid);
+    if(isMember){
+      await deleteDoc(doc(db,'groups',gid,'members',currentUser.uid));
+      await deleteDoc(doc(db,'users',currentUser.uid,'groups',gid));
+      await updateDoc(gRef, { memberCount: increment(-1) });
+    } else {
+      await setDoc(doc(db,'groups',gid,'members',currentUser.uid), { joinedAt: serverTimestamp() });
+      await setDoc(doc(db,'users',currentUser.uid,'groups',gid), { joinedAt: serverTimestamp() });
+      await updateDoc(gRef, { memberCount: increment(1) });
+    }
+    if(currentGroupId === gid) loadGroupPage(gid);
+    else renderGroupsList();
+  }catch(e){ toast(e.message); }
+};
+
+async function loadGroupPage(gid){
+  const snap = await getDoc(doc(db,'groups',gid));
+  if(!snap.exists()) return;
+  const g = snap.data();
+  const isMember = myGroups.has(gid);
+  const colors = ['#B8863A','#8C2F39','#2A4838','#4A3B5C','#335577'];
+  const col = colors[Math.abs(gid.split('').reduce((acc,c)=>acc+c.charCodeAt(0),0)) % colors.length];
+
+  document.getElementById('groupBanner').style.background = col;
+  document.getElementById('groupPageCover').style.background = col;
+  document.getElementById('groupPageCover').textContent = (g.name||'G')[0].toUpperCase();
+  document.getElementById('groupPageName').textContent = g.name;
+  document.getElementById('groupPageDesc').textContent = g.description || '';
+  document.getElementById('groupMemberCount').textContent = `${g.memberCount||1} ${t('members')}`;
+  document.getElementById('groupActionArea').innerHTML = `<button class="fbtn ${isMember?'subtle':'gold'}" onclick="toggleGroupJoin('${gid}',${isMember})">${t(isMember?'leave':'join')}</button>`;
+
+  const compWrap = document.getElementById('groupComposerWrap');
+  const gate = document.getElementById('groupJoinGate');
+  if(isMember){
+    gate.style.display = 'none';
+    compWrap.style.display = 'block';
+    compWrap.innerHTML = `<div class="composer">
+      <div class="composer-top">
+        <div class="avatar">${avatarHTML(currentProfile.photoURL, currentProfile.displayName)}</div>
+        <div class="composer-pill" onclick="document.getElementById('groupPostText').focus()">
+          <textarea id="groupPostText" data-tph="whatsHappening" placeholder="${t('whatsHappening')}"></textarea>
+        </div>
+      </div>
+      <div id="groupComposerImgPreview"></div>
+      <div class="composer-bottom">
+        <button class="img-btn" onclick="document.getElementById('groupPostImgInput').click()">
+          <span class="img-btn-icon">🖼️</span> <span data-t="addPhoto">Add photo</span>
+        </button>
+        <input type="file" id="groupPostImgInput" accept="image/*,video/*" multiple style="display:none;" onchange="handleGroupImgSelect(event)">
+        <button class="btn" onclick="submitGroupPost('${gid}')" id="groupPostBtn" data-t="post">Post</button>
+      </div>
+    </div>`;
+  } else {
+    gate.style.display = 'block';
+    compWrap.style.display = 'none';
+    compWrap.innerHTML = '';
+  }
+
+  if(groupPostsUnsub) groupPostsUnsub();
+  const q = query(collection(db,'groupPosts'), where('groupId','==',gid), orderBy('createdAt','desc'));
+  groupPostsUnsub = onSnapshot(q, (psnap) => {
+    const list = document.getElementById('groupPostsList');
+    const emptyEl = document.getElementById('groupPostsEmpty');
+    if(psnap.empty){ list.innerHTML=''; emptyEl.style.display='block'; return; }
+    emptyEl.style.display = 'none';
+    list.innerHTML = psnap.docs.map(d => renderPost(d.id, d.data(), 'groupPosts')).join('');
+  });
+}
+
+window.handleGroupImgSelect = function(evt){
+  const files = Array.from(evt.target.files || []);
+  if(!files.length) return;
+  pendingGroupMediaFiles = pendingGroupMediaFiles.concat(files);
+  renderGroupComposerMediaPreview();
+};
+function renderGroupComposerMediaPreview(){
+  const box = document.getElementById('groupComposerImgPreview');
+  if(!box) return;
+  if(!pendingGroupMediaFiles.length){ box.innerHTML = ''; return; }
+  box.innerHTML = `<div class="composer-media-preview">${pendingGroupMediaFiles.map((f,i) => mediaPreviewTileHTML(f,i,true)).join('')}
+    <div class="mp-add-tile" onclick="document.getElementById('groupPostImgInput').click()">+</div>
+  </div>`;
+}
+window.removePendingGroupMedia = function(index){
+  pendingGroupMediaFiles.splice(index, 1);
+  renderGroupComposerMediaPreview();
+};
+
+window.submitGroupPost = async function(gid){
+  const textEl = document.getElementById('groupPostText');
+  const text = textEl.value.trim();
+  if(!text && !pendingGroupMediaFiles.length) return;
+  const btn = document.getElementById('groupPostBtn');
+  btn.disabled = true;
+  try{
+    await withTimeout((async () => {
+      const media = [];
+      for(const file of pendingGroupMediaFiles){
+        const isVideo = file.type.startsWith('video/');
+        const r = ref(storage, `groupPosts/${currentUser.uid}/${Date.now()}_${file.name}`);
+        await uploadBytes(r, file);
+        const url = await getDownloadURL(r);
+        media.push({ url, type: isVideo ? 'video' : 'image' });
+      }
+      await addDoc(collection(db,'groupPosts'), {
+        groupId: gid,
+        uid: currentUser.uid,
+        authorName: currentProfile.displayName || 'User',
+        authorPhoto: currentProfile.photoURL || '',
+        text, media,
+        imageURL: (media.find(m => m.type==='image') || {}).url || '',
+        likes: [],
+        reactions: {},
+        commentCount: 0,
+        createdAt: serverTimestamp()
+      });
+    })(), mediaUploadTimeout(pendingGroupMediaFiles), 'Group Post');
+    textEl.value = '';
+    pendingGroupMediaFiles = [];
+    const box = document.getElementById('groupComposerImgPreview');
+    if(box) box.innerHTML = '';
+    toast(t('posted'));
+  }catch(e){ toast(e.message || t('postFailed')); }
+  finally{ btn.disabled = false; }
+};
+
+// ================= PHASE 5: Photos & Videos =================
+let albumsUnsub = null;
+let mediaUnsub = null;
+let currentAlbumOwnerUid = null;
+let currentAlbumId = null;
+let currentAlbumItems = [];
+let lightboxIndex = 0;
+
+window.navigatePhotos = function(uid){
+  if(!uid) uid = currentUser.uid;
+  currentAlbumOwnerUid = uid;
+  setView('photosView');
+  const isMe = uid === currentUser.uid;
+  document.getElementById('photosHeading').textContent = isMe ? t('myAlbums') : t('theirAlbums');
+  document.getElementById('photosBackLink').style.display = isMe ? 'none' : 'inline-flex';
+  startAlbumsListener(uid);
+};
+
+function startAlbumsListener(uid){
+  if(albumsUnsub) albumsUnsub();
+  const q = query(collection(db,'albums'), where('uid','==',uid), orderBy('createdAt','desc'));
+  albumsUnsub = onSnapshot(q, (snap) => {
+    const grid = document.getElementById('albumGrid');
+    const empty = document.getElementById('albumsEmpty');
+    const isMe = uid === currentUser.uid;
+    let html = isMe ? `<div class="create-album-card" onclick="openAlbumModal()"><span class="plus">+</span><span>${t('createAlbum')}</span></div>` : '';
+    if(snap.empty && !isMe){
+      grid.innerHTML = ''; empty.style.display = 'block'; return;
+    }
+    empty.style.display = 'none';
+    const docs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    html += docs.map(a => `
+      <div class="album-card" onclick="openAlbum('${a.id}','${escapeHtml(a.title)}')">
+        <div class="album-cover">
+          ${a.coverURL ? (a.coverType==='video'?`<video src="${a.coverURL}"></video>`:`<img src="${a.coverURL}">`):'🖼️'}
+        </div>
+        <div class="album-info">
+          <div class="name">${escapeHtml(a.title)}</div>
+          <div class="sub">${a.count||0} ${t('items')}</div>
+        </div>
+      </div>`).join('');
+    grid.innerHTML = html;
+  });
+}
+
+window.openAlbumModal = function(){
+  document.getElementById('newAlbumTitle').value = '';
+  document.getElementById('albumModalBg').classList.add('show');
+};
+window.closeAlbumModal = function(){ document.getElementById('albumModalBg').classList.remove('show'); };
+window.createAlbum = async function(){
+  const title = document.getElementById('newAlbumTitle').value.trim();
+  if(!title) return;
+  try{
+    await addDoc(collection(db,'albums'), {
+      uid: currentUser.uid, title, count: 0, createdAt: serverTimestamp()
+    });
+    closeAlbumModal();
+  }catch(e){ toast(e.message); }
+};
+
+window.openAlbum = function(albumId, title){
+  currentAlbumId = albumId;
+  setView('albumView');
+  document.getElementById('albumTitleHeading').textContent = title;
+  startMediaListener(albumId);
+};
+
+function startMediaListener(albumId){
+  if(mediaUnsub) mediaUnsub();
+  const q = query(collection(db,'albums',albumId,'media'), orderBy('createdAt','desc'));
+  mediaUnsub = onSnapshot(q, (snap) => {
+    const grid = document.getElementById('mediaGrid');
+    const empty = document.getElementById('mediaEmpty');
+    const isMe = currentAlbumOwnerUid === currentUser.uid;
+    let html = isMe ? `<div class="add-media-tile" onclick="document.getElementById('mediaFileInput').click()">+</div>` : '';
+    if(snap.empty && !isMe){
+      grid.innerHTML = ''; empty.style.display = 'block'; currentAlbumItems = []; return;
+    }
+    empty.style.display = 'none';
+    currentAlbumItems = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    html += currentAlbumItems.map((m,i) => `
+      <div class="media-thumb" onclick="openLightbox(${i})">
+        ${m.type==='video'?`<video src="${m.url}"></video><span class="vid-badge">▶</span>`:`<img src="${m.url}">`}
+      </div>`).join('');
+    grid.innerHTML = html;
+  });
+}
+
+window.handleMediaUpload = async function(evt){
+  const files = Array.from(evt.target.files || []);
+  if(!files.length || !currentAlbumId) return;
+  toast(t('uploading'));
+  try{
+    for(const file of files){
+      const isVideo = file.type.startsWith('video/');
+      const r = ref(storage, `albums/${currentUser.uid}/${currentAlbumId}/${Date.now()}_${file.name}`);
+      await uploadBytes(r, file);
+      const url = await getDownloadURL(r);
+      const type = isVideo ? 'video' : 'image';
+      await addDoc(collection(db,'albums',currentAlbumId,'media'), {
+        uid: currentUser.uid, url, type, createdAt: serverTimestamp()
+      });
+      await updateDoc(doc(db,'albums',currentAlbumId), {
+        count: increment(1),
+        coverURL: url,
+        coverType: type
+      });
+    }
+    toast(t('posted'));
+  }catch(e){ toast(e.message); }
+};
+
+window.openLightbox = function(index){
+  lightboxIndex = index;
+  renderLightboxItem();
+  document.getElementById('lightboxBg').classList.add('show');
+};
+window.closeLightbox = function(){
+  document.getElementById('lightboxBg').classList.remove('show');
+};
+window.lightboxNav = function(dir){
+  lightboxIndex = (lightboxIndex + dir + currentAlbumItems.length) % currentAlbumItems.length;
+  renderLightboxItem();
+};
+function renderLightboxItem(){
+  const m = currentAlbumItems[lightboxIndex];
+  if(!m) return;
+  const box = document.getElementById('lightboxMedia');
+  box.innerHTML = m.type==='video' ? `<video src="${m.url}" controls autoplay></video>` : `<img src="${m.url}">`;
+}
+
+// ================= PHASE 6: Notifications =================
+let notifUnsub = null;
+
+function startNotificationsListener(){
+  if(!currentUser) return;
+  const q = query(collection(db,'notifications'), where('to','==',currentUser.uid), orderBy('createdAt','desc'), limit(30));
+  notifUnsub = onSnapshot(q, (snap) => {
+    let unreadCount = 0;
+    snap.docs.forEach(d => { if(!d.data().read) unreadCount++; });
+    const badge = document.getElementById('bellBadge');
+    badge.textContent = unreadCount;
+    badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+
+    if(document.getElementById('notificationsView').classList.contains('active')){
+      renderNotifications(snap.docs);
+    }
+  });
+}
+
+window.navigateNotifications = async function(){
+  setView('notificationsView');
+  const q = query(collection(db,'notifications'), where('to','==',currentUser.uid), orderBy('createdAt','desc'), limit(30));
+  const snap = await getDocs(q);
+  renderNotifications(snap.docs);
+
+  // mark as read
+  snap.docs.forEach(d => {
+    if(!d.data().read){
+      updateDoc(doc(db,'notifications',d.id), { read:true }).catch(()=>{});
+    }
+  });
+};
+
+function renderNotifications(docs){
+  const list = document.getElementById('notifList');
+  const empty = document.getElementById('notifEmpty');
+  if(!docs.length){ list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  Promise.all(docs.map(async d => {
+    const n = d.data();
+    const u = await getUserCached(n.fromUid);
+    const icons = { like:'♥', comment:'💬', friend_request:'👥', friend_accept:'✓', message:'✉', reaction:(n.reactionType && REACTIONS[n.reactionType] ? REACTIONS[n.reactionType].emoji : '👍') };
+    const texts = {
+      like: t('notifLikeSuffix'),
+      comment: t('notifCommentSuffix'),
+      friend_request: t('notifReqSuffix'),
+      friend_accept: t('notifAcceptSuffix'),
+      message: t('notifMsgSuffix'),
+      reaction: t('notifReactSuffix')
+    };
+    return `<div class="notif-row ${n.read?'':'unread'}" onclick="handleNotifClick('${n.type}','${n.postId||''}','${n.convoId||''}','${n.fromUid}')">
+      <div class="icon">${icons[n.type]||'•'}</div>
+      <div class="body">
+        <div class="text"><b>${escapeHtml(u.displayName||'User')}</b> ${texts[n.type]||''}</div>
+        <div class="ntime">${timeAgo(n.createdAt)}</div>
+      </div>
+    </div>`;
+  })).then(rows => { list.innerHTML = rows.join(''); });
+}
+
+window.handleNotifClick = function(type, postId, convoId, fromUid){
+  if(type==='like' || type==='comment' || type==='reaction'){
+    navigateFeed();
+  } else if(type==='friend_request' || type==='friend_accept'){
+    navigateProfile(fromUid);
+  } else if(type==='message'){
+    if(convoId) openChat(fromUid);
+    else navigateMessages();
+  }
+};
+
+async function addNotification(toUid, type, data){
+  if(!currentUser || toUid === currentUser.uid) return;
+  try{
+    await addDoc(collection(db,'notifications'), {
+      to: toUid,
+      fromUid: currentUser.uid,
+      type,
+      postId: data.postId || null,
+      groupId: data.groupId || null,
+      convoId: data.convoId || null,
+      reactionType: data.reactionType || null,
+      read: false,
+      createdAt: serverTimestamp()
+    });
+  }catch(e){ console.error(e); }
+}
+
+// ================= PHASE 7: Admin Dashboard =================
+let currentAdminTab = 'overview';
+
+window.navigateAdmin = function(){
+  if(!currentProfile || !currentProfile.isAdmin) return;
+  setView('adminView');
+  switchAdminTab('overview');
+};
+
+window.switchAdminTab = function(tab){
+  currentAdminTab = tab;
+  ['overview','users','posts','groups'].forEach(t => {
+    document.getElementById('tabAdmin'+t[0].toUpperCase()+t.slice(1)).classList.toggle('active', t===tab);
+    document.getElementById('admin'+t[0].toUpperCase()+t.slice(1)+'Panel').style.display = t===tab ? 'block' : 'none';
+  });
+  if(tab==='overview') loadAdminOverview();
+  else if(tab==='users') renderAdminUsers();
+  else if(tab==='posts') renderAdminPosts();
+  else if(tab==='groups') renderAdminGroups();
+};
+
+async function loadAdminOverview(){
+  try{
+    const [uSnap, pSnap, gpSnap, gSnap, aSnap] = await Promise.all([
+      getCountFromServer(collection(db,'users')),
+      getCountFromServer(collection(db,'posts')),
+      getCountFromServer(collection(db,'groupPosts')),
+      getCountFromServer(collection(db,'groups')),
+      getCountFromServer(collection(db,'albums'))
+    ]);
+    document.getElementById('statGrid').innerHTML = `
+      <div class="stat-card"><div class="num">${uSnap.data().count}</div><div class="lbl">${t('statUsers')}</div></div>
+      <div class="stat-card"><div class="num">${pSnap.data().count}</div><div class="lbl">${t('statPosts')}</div></div>
+      <div class="stat-card"><div class="num">${gpSnap.data().count}</div><div class="lbl">${t('statGroupPosts')}</div></div>
+      <div class="stat-card"><div class="num">${gSnap.data().count}</div><div class="lbl">${t('statGroupsAdmin')}</div></div>
+      <div class="stat-card"><div class="num">${aSnap.data().count}</div><div class="lbl">${t('statAlbums')}</div></div>
+    `;
+  }catch(e){ console.error(e); }
+}
+
+window.renderAdminUsers = async function(){
+  const list = document.getElementById('adminUsersList');
+  const term = (document.getElementById('adminUserSearch').value || '').trim().toLowerCase();
+  const snap = await getDocs(collection(db,'users'));
+  const users = snap.docs.map(d => ({ uid:d.id, ...d.data() }));
+  const filtered = users.filter(u => !term || (u.displayName||'').toLowerCase().includes(term));
+  list.innerHTML = filtered.map(u => `
+    <div class="admin-row">
+      <div class="avatar">${avatarHTML(u.photoURL, u.displayName)}</div>
+      <div class="who">
+        <div class="name">${escapeHtml(u.displayName||'User')} ${u.isAdmin?`<span class="tag admin">Admin</span>`:''} ${u.suspended?`<span class="tag suspended">Suspended</span>`:''}</div>
+        <div class="sub">${escapeHtml(u.bio||'')}</div>
+      </div>
+      <div class="actions">
+        <button class="fbtn subtle" onclick="adminToggleSuspend('${u.uid}',${!!u.suspended})">${t(u.suspended?'unsuspend':'suspend')}</button>
+        <button class="fbtn subtle" onclick="adminToggleAdmin('${u.uid}',${!!u.isAdmin})">${u.isAdmin?t('removeAdmin'):t('makeAdmin')}</button>
+      </div>
+    </div>`).join('');
+};
+
+window.adminToggleSuspend = async function(uid, isSuspended){
+  try{
+    await updateDoc(doc(db,'users',uid), { suspended: !isSuspended });
+    renderAdminUsers();
+    toast('Updated');
+  }catch(e){ toast(e.message); }
+};
+
+window.adminToggleAdmin = async function(uid, isAdmin){
+  try{
+    await updateDoc(doc(db,'users',uid), { isAdmin: !isAdmin });
+    renderAdminUsers();
+    toast('Updated');
+  }catch(e){ toast(e.message); }
+};
+
+async function renderAdminPosts(){
+  const list = document.getElementById('adminPostsList');
+  const snap = await getDocs(query(collection(db,'posts'), orderBy('createdAt','desc'), limit(50)));
+  list.innerHTML = snap.docs.map(d => {
+    const p = d.id;
+    const dat = d.data();
+    return `<div class="admin-row">
+      <div class="who">
+        <div class="name">${escapeHtml(dat.authorName||'User')}</div>
+        <div class="sub">${escapeHtml(dat.text||'[Media]')}</div>
+      </div>
+      <button class="fbtn subtle" style="color:var(--cross);" onclick="adminDeletePost('${d.id}','posts')">${t('deletePost')}</button>
+    </div>`;
+  }).join('');
+}
+
+window.adminDeletePost = async function(id, col){
+  if(!confirm(t('confirmDeletePost'))) return;
+  try{
+    await deleteDoc(doc(db,col,id));
+    toast('Deleted');
+    if(currentAdminTab==='posts') renderAdminPosts();
+  }catch(e){ toast(e.message); }
+};
+
+async function renderAdminGroups(){
+  const list = document.getElementById('adminGroupsList');
+  const snap = await getDocs(collection(db,'groups'));
+  list.innerHTML = snap.docs.map(d => {
+    const g = d.data();
+    return `<div class="admin-row">
+      <div class="who">
+        <div class="name">${escapeHtml(g.name)}</div>
+        <div class="sub">${escapeHtml(g.description||'')}</div>
+      </div>
+      <button class="fbtn subtle" style="color:var(--cross);" onclick="adminDeleteGroup('${d.id}')">${t('deleteGroup')}</button>
+    </div>`;
+  }).join('');
+}
+
+window.adminDeleteGroup = async function(gid){
+  if(!confirm(t('confirmDeleteGroup'))) return;
+  try{
+    await deleteDoc(doc(db,'groups',gid));
+    toast('Deleted');
+    renderAdminGroups();
+  }catch(e){ toast(e.message); }
+};
+</script>
+<script>
+  // Your web app's Firebase configuration (from your screenshot)
+  const firebaseConfig = {
+      apiKey: "AIzaSyD9j6Emef7z1sxtGuqgEePwIJetPo4ZhQQ",
+  authDomain: "meskot-b1a69.firebaseapp.com",
+  databaseURL: "https://meskot-b1a69-default-rtdb.firebaseio.com",
+  projectId: "meskot-b1a69",
+  storageBucket: "meskot-b1a69.firebasestorage.app",
+  messagingSenderId: "1083041536701",
+  appId: "1:1083041536701:web:4654f20e5ae08a2d0435d4",
+  measurementId: "G-VXMRY8JGTE"
+};
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  // Initialize Cloud Firestore
+  const db = firebase.firestore();
+
+  console.log("Firebase connected successfully!");
+function doLogin() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPass").value;
+
+    db.collection("participants").add({
+        email: email,
+        loginTime: new Date()
+    })
+    .then(() => {
+        alert("Logged in and saved to Firebase!");
+    })
+    .catch((error) => {
+        console.error("Error saving login: ", error);
+    });
+}
+function loadParticipants() {
+    const listContainer = document.getElementById("participantList");
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = "Loading participants...";
+
+    db.collection("participants").get()
+    .then((querySnapshot) => {
+        listContainer.innerHTML = ""; // Clear old list
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            // Create a small paragraph for each user saved in Firebase
+            listContainer.innerHTML += `<p>User: ${data.email || data.name} (Saved)</p>`;
+        });
+    })
+    .catch((error) => {
+        console.error("Error getting documents: ", error);
+    });
+}
+
+</script>
+</body>
+</html>
