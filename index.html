@@ -2588,6 +2588,9 @@ let pendingIncomingCallId = null;
 let pendingIncomingCallData = null;
 let micMuted = false;
 let camOff = false;
+let ringAudioCtx = null;
+let ringIntervalId = null;
+let callTimerInterval = null;
 
 function formatCallDuration(sec){
   sec = Math.max(0, Math.round(sec));
@@ -2610,6 +2613,50 @@ function hideCallOverlay(){
 function setCallStatusText(txt){
   const el = document.getElementById('callStatusText');
   if(el) el.textContent = txt;
+}
+
+// Synthesized ringtone (no external audio file needed) — dual-tone burst repeated on an interval.
+// isIncoming=true uses a faster classic "ring-ring" cadence for the receiver;
+// isIncoming=false uses a slower ringback cadence for the caller.
+function startRingtone(isIncoming){
+  stopRingtone();
+  try{
+    ringAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }catch(e){ return; }
+  const playBurst = () => {
+    if(!ringAudioCtx) return;
+    const now = ringAudioCtx.currentTime;
+    [(isIncoming?480:425), (isIncoming?620:475)].forEach((freq) => {
+      const osc = ringAudioCtx.createOscillator();
+      const gain = ringAudioCtx.createGain();
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.16, now+0.05);
+      gain.gain.setValueAtTime(0.16, now+0.85);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now+1.0);
+      osc.connect(gain).connect(ringAudioCtx.destination);
+      osc.start(now);
+      osc.stop(now+1.0);
+    });
+  };
+  playBurst();
+  ringIntervalId = setInterval(playBurst, isIncoming ? 2000 : 3500);
+}
+function stopRingtone(){
+  if(ringIntervalId){ clearInterval(ringIntervalId); ringIntervalId = null; }
+  if(ringAudioCtx){ try{ ringAudioCtx.close(); }catch(e){} ringAudioCtx = null; }
+}
+function startCallTimer(){
+  stopCallTimer();
+  setCallStatusText(formatCallDuration(0));
+  callTimerInterval = setInterval(() => {
+    if(!callStartTime) return;
+    setCallStatusText(formatCallDuration((Date.now()-callStartTime)/1000));
+  }, 1000);
+}
+function stopCallTimer(){
+  if(callTimerInterval){ clearInterval(callTimerInterval); callTimerInterval = null; }
 }
 
 async function addCallLogMessage(convoId_, type, status, durationSec){
@@ -2637,6 +2684,7 @@ window.startCall = async function(type){
   document.getElementById('callAvatar').innerHTML = avatarHTML(other.photoURL, other.displayName);
   document.getElementById('callName').textContent = other.displayName || 'User';
   showCallOverlay(type, 'Calling…');
+  startRingtone(false);
 
   pc = new RTCPeerConnection(RTC_CONFIG);
   localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
@@ -2663,13 +2711,14 @@ window.startCall = async function(type){
   callDocUnsub = onSnapshot(callRef, async (snap) => {
     const data = snap.data();
     if(!data) return;
-    if(data.status === 'declined'){ toast('Call declined'); endCall(false, 'missed'); return; }
-    if(data.status === 'ended'){ endCall(false, callStartTime ? 'completed' : 'missed'); return; }
+    if(data.status === 'declined'){ stopRingtone(); toast('Call declined'); endCall(false, 'missed'); return; }
+    if(data.status === 'ended'){ stopRingtone(); endCall(false, callStartTime ? 'completed' : 'missed'); return; }
     if(data.status === 'accepted' && data.answer && pc && !pc.currentRemoteDescription){
       try{
         await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-        setCallStatusText('Connected');
+        stopRingtone();
         callStartTime = Date.now();
+        startCallTimer();
       }catch(e){ console.error(e); }
     }
   });
@@ -2692,9 +2741,11 @@ function startIncomingCallListener(){
         document.getElementById('incomingCallName').textContent = caller.displayName || 'User';
         document.getElementById('incomingCallType').textContent = pendingIncomingCallData.type === 'video' ? 'Incoming video call' : 'Incoming audio call';
         document.getElementById('incomingCallModalBg').classList.add('show');
+        startRingtone(true);
       }
       if(change.type === 'modified' && change.doc.data().status !== 'ringing' && change.doc.id === pendingIncomingCallId){
         document.getElementById('incomingCallModalBg').classList.remove('show');
+        stopRingtone();
       }
     });
   });
@@ -2704,6 +2755,7 @@ window.acceptIncomingCall = async function(){
   const callId = pendingIncomingCallId;
   const data = pendingIncomingCallData;
   document.getElementById('incomingCallModalBg').classList.remove('show');
+  stopRingtone();
   if(!callId || !data) return;
   try{
     localStream = await navigator.mediaDevices.getUserMedia({ audio:true, video: data.type==='video' });
@@ -2736,11 +2788,12 @@ window.acceptIncomingCall = async function(){
     });
     callStartTime = Date.now();
     setCallStatusText('Connected');
+    startCallTimer();
   }catch(e){ toast(e.message); cleanupCall(); return; }
 
   callDocUnsub = onSnapshot(doc(db,'calls',callId), (snap) => {
     const d = snap.data();
-    if(d && d.status === 'ended'){ endCall(false, 'completed'); }
+    if(d && d.status === 'ended'){ stopCallTimer(); endCall(false, 'completed'); }
   });
   iceCandUnsub = onSnapshot(collection(db,'calls',callId,'callerCandidates'), (snap) => {
     snap.docChanges().forEach(change => {
@@ -2751,6 +2804,7 @@ window.acceptIncomingCall = async function(){
 
 window.declineIncomingCall = async function(){
   document.getElementById('incomingCallModalBg').classList.remove('show');
+  stopRingtone();
   if(pendingIncomingCallId && pendingIncomingCallData){
     try{ await updateDoc(doc(db,'calls',pendingIncomingCallId), { status:'declined' }); }catch(e){}
     addCallLogMessage(pendingIncomingCallData.convoId, pendingIncomingCallData.type, 'missed', 0);
@@ -2771,6 +2825,8 @@ window.endCall = async function(notifyRemote, statusOverride){
 };
 
 function cleanupCall(){
+  stopRingtone();
+  stopCallTimer();
   if(pc){ try{ pc.close(); }catch(e){} pc = null; }
   if(localStream){ localStream.getTracks().forEach(tr => tr.stop()); localStream = null; }
   if(callDocUnsub){ callDocUnsub(); callDocUnsub = null; }
