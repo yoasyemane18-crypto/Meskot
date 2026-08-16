@@ -659,6 +659,21 @@
   </div>
 </div>
 
+<!-- EMAIL VERIFICATION GATE -->
+<div id="verifyEmailWrap" class="auth-wrap" style="display:none;">
+  <div class="auth-card" style="text-align:center;">
+    <h2 class="auth-title" data-t="verifyTitle">Verify your email</h2>
+    <p class="auth-sub" data-t="verifySub">We sent a verification link to:</p>
+    <p style="font-weight:700;margin:-10px 0 20px;word-break:break-word;" id="verifyEmailAddress"></p>
+    <div id="verifyMsg" class="auth-success" style="display:none;"></div>
+    <button class="btn gold" style="width:100%;margin-bottom:10px;" onclick="checkVerifiedStatus()" data-t="ivVerified">I've verified — Continue</button>
+    <button class="btn ghost" style="width:100%;margin-bottom:10px;" onclick="resendVerificationEmail()" data-t="resendEmail">Resend email</button>
+    <div class="auth-switch">
+      <button onclick="doLogout()" data-t="useAnotherAccount">Use a different account</button>
+    </div>
+  </div>
+</div>
+
 <!-- MAIN APP -->
 <div id="app" class="app">
   <aside class="sidebar">
@@ -939,7 +954,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail
+  signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail, sendEmailVerification
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore, doc, setDoc, getDoc, deleteDoc, updateDoc, collection, addDoc,
@@ -1039,7 +1054,10 @@ const dict = {
     resetPassSub:"Enter your email and we'll send you a reset link",
     sendResetLink:"Send reset link", backToLogin:"← Back to log in",
     resetEmailSent:"Reset link sent — check your inbox (and spam folder).",
-    reactLike:"Like", reactLove:"Love", reactHaha:"Haha", reactWow:"Wow", reactSad:"Sad", reactAngry:"Angry"
+    reactLike:"Like", reactLove:"Love", reactHaha:"Haha", reactWow:"Wow", reactSad:"Sad", reactAngry:"Angry",
+    verifyTitle:"Verify your email", verifySub:"We sent a verification link to:",
+    ivVerified:"I've verified — Continue", resendEmail:"Resend email", useAnotherAccount:"Use a different account",
+    verifyEmailSent:"Verification email sent — check your inbox.", notYetVerified:"Not verified yet — check your inbox and spam folder."
   },
   am: {
     welcomeBack:"እንኳን ደህና መጡ", loginSub:"ማህበረሰብዎ ምን እያካፈለ እንደሆነ ለማየት ይግቡ",
@@ -1083,7 +1101,10 @@ const dict = {
     resetPassSub:"ኢሜይልዎን ያስገቡ የዳግም ማስጀመሪያ ማገናኛ እንልክልዎታለን",
     sendResetLink:"ማገናኛ ላክ", backToLogin:"← ወደ መግቢያ ተመለስ",
     resetEmailSent:"ማገናኛ ተልኳል — የገቢ መልእክት ሳጥንዎን (እና ስፓም ማህደርን) ይመልከቱ።",
-    reactLike:"ውደድ", reactLove:"ውደድ በጣም", reactHaha:"ሳቅ", reactWow:"ዋው", reactSad:"አዝኗል", reactAngry:"ተናደደ"
+    reactLike:"ውደድ", reactLove:"ውደድ በጣም", reactHaha:"ሳቅ", reactWow:"ዋው", reactSad:"አዝኗል", reactAngry:"ተናደደ",
+    verifyTitle:"ኢሜይልዎን ያረጋግጡ", verifySub:"የማረጋገጫ ማገናኛ ልከናል ወደ:",
+    ivVerified:"አረጋግጫለሁ — ቀጥል", resendEmail:"እንደገና ላክ", useAnotherAccount:"ሌላ አካውንት ተጠቀም",
+    verifyEmailSent:"የማረጋገጫ ኢሜይል ተልኳል — የገቢ መልእክት ሳጥንዎን ይመልከቱ።", notYetVerified:"እስካሁን አልተረጋገጠም — የገቢ መልእክት ሳጥንዎን (እና ስፓም ማህደርን) ይመልከቱ።"
   }
 };
 let lang = localStorage.getItem('meskot_lang') || 'en';
@@ -1177,6 +1198,7 @@ window.doSignup = async function(){
     await setDoc(doc(db, 'users', cred.user.uid), {
       displayName: name, bio: '', photoURL: '', createdAt: serverTimestamp()
     });
+    await sendEmailVerification(cred.user);
   }catch(e){ showAuthError(e.message); }
 };
 window.doLogin = async function(){
@@ -1188,6 +1210,42 @@ window.doLogin = async function(){
   catch(e){ showAuthError(e.message); }
 };
 window.doLogout = async function(){ await signOut(auth); };
+window.resendVerificationEmail = async function(){
+  if(!auth.currentUser) return;
+  try{
+    await sendEmailVerification(auth.currentUser);
+    const el = document.getElementById('verifyMsg');
+    el.textContent = t('verifyEmailSent');
+    el.style.display = 'block';
+  }catch(e){ toast(e.message); }
+};
+window.checkVerifiedStatus = async function(){
+  if(!auth.currentUser) return;
+  try{
+    await auth.currentUser.reload();
+    if(auth.currentUser.emailVerified){
+      document.getElementById('verifyEmailWrap').style.display = 'none';
+      // Re-run the sign-in flow now that the user is verified
+      currentUser = auth.currentUser;
+      const snap = await getDoc(doc(db,'users',currentUser.uid));
+      currentProfile = snap.exists() ? snap.data() : { displayName:currentUser.displayName||'User', bio:'', photoURL:'' };
+      document.getElementById('app').classList.add('show');
+      renderSidebar();
+      renderNavAuthArea();
+      document.getElementById('iconNav').style.display = 'flex';
+      startFeedListener();
+      startFriendsListeners();
+      startMessagesListener();
+      startGroupsListener();
+      startNotificationsListener();
+      startPresenceHeartbeat();
+      startIncomingCallListener();
+      navigateFeed();
+    } else {
+      toast(t('notYetVerified'));
+    }
+  }catch(e){ toast(e.message); }
+};
 
 let currentUser = null;
 let currentProfile = null;
@@ -1207,6 +1265,15 @@ if (configured) {
   onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     if(user){
+      if(!user.emailVerified){
+        document.getElementById('authWrap').style.display = 'none';
+        document.getElementById('app').classList.remove('show');
+        document.getElementById('iconNav').style.display = 'none';
+        document.getElementById('verifyEmailWrap').style.display = 'flex';
+        document.getElementById('verifyEmailAddress').textContent = user.email || '';
+        return;
+      }
+      document.getElementById('verifyEmailWrap').style.display = 'none';
       const snap = await getDoc(doc(db,'users',user.uid));
       if(!snap.exists()){
         // Self-healing: create a profile doc if one is missing (e.g. account created outside the signup form)
@@ -1237,6 +1304,7 @@ if (configured) {
     } else {
       currentProfile = null;
       document.getElementById('authWrap').style.display = 'flex';
+      document.getElementById('verifyEmailWrap').style.display = 'none';
       document.getElementById('app').classList.remove('show');
       renderNavAuthArea();
       document.getElementById('iconNav').style.display = 'none';
@@ -2507,6 +2575,7 @@ window.renderGroupsList = async function(){
     </div>`;
   }).join('');
 };
+
 window.openGroupModal = function(){
   document.getElementById('newGroupName').value = '';
   document.getElementById('newGroupDesc').value = '';
@@ -2809,6 +2878,7 @@ function startNotificationsListener(){
     }
   });
 }
+
 window.navigateNotifications = async function(){
   setView('notificationsView');
   const q = query(collection(db,'notifications'), where('to','==',currentUser.uid), orderBy('createdAt','desc'), limit(30));
