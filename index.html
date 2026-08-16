@@ -516,6 +516,59 @@
   .bubble-edit-form input{flex:1;border:1px solid var(--line);border-radius:14px;padding:6px 12px;font-size:13px;font-family:inherit;}
   .bubble-edit-form button{background:var(--ink);color:#fff;border:none;border-radius:14px;padding:6px 12px;font-size:11.5px;font-weight:600;}
   .msg-edit-btn{margin-left:4px;}
+
+  /* ===== phase 10: audio/video calling ===== */
+  .chat-status{font-size:11px;color:var(--muted);margin-top:-1px;}
+  .chat-header-actions{display:flex;gap:6px;}
+  .call-icon-btn{
+    width:34px;height:34px;border-radius:50%;border:none;background:var(--paper-2);
+    font-size:15px;display:flex;align-items:center;justify-content:center;
+  }
+  .call-icon-btn:hover{background:var(--gold);color:#fff;}
+
+  .incoming-call-modal{text-align:center;}
+  .call-answer-btn{
+    width:58px;height:58px;border-radius:50%;border:none;font-size:22px;color:#fff;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .call-answer-btn.decline{background:var(--cross);}
+  .call-answer-btn.accept{background:#2E9E52;}
+
+  .call-overlay{
+    position:fixed;inset:0;background:#0F1611;z-index:300;display:none;
+    flex-direction:column;align-items:center;justify-content:space-between;padding:40px 20px;
+  }
+  .call-overlay.show{display:flex;}
+  .call-overlay video#remoteMedia{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0F1611;
+  }
+  .call-overlay video#remoteMedia:not([data-active="1"]){display:none;}
+  .local-video-pip{
+    position:absolute;top:20px;right:20px;width:110px;height:150px;border-radius:12px;
+    object-fit:cover;border:2px solid rgba(255,255,255,0.3);z-index:2;display:none;
+  }
+  .local-video-pip.show{display:block;}
+  .call-info{position:relative;z-index:1;text-align:center;color:#EEF2ED;margin-top:60px;}
+  .call-avatar{width:110px;height:110px;font-size:38px;margin:0 auto 16px;border:3px solid rgba(255,255,255,0.2);}
+  .call-name{font-family:'Fraunces',serif;font-size:23px;font-weight:600;}
+  .call-status{font-size:14px;opacity:.75;margin-top:6px;}
+  .call-controls{position:relative;z-index:1;display:flex;gap:22px;align-items:center;}
+  .call-ctrl-btn{
+    width:58px;height:58px;border-radius:50%;border:none;background:rgba(255,255,255,0.14);
+    color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;
+  }
+  .call-ctrl-btn.muted{background:rgba(255,255,255,0.35);}
+  .hangup-btn{background:var(--cross);width:64px;height:64px;font-size:24px;transform:rotate(135deg);}
+
+  .call-log-bubble{
+    display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;
+    padding:9px 14px;cursor:pointer;
+  }
+  .bubble-row.mine .call-log-bubble{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);}
+  .call-log-icon{font-size:17px;}
+  .call-log-label{font-size:13px;font-weight:600;}
+  .call-log-sub{font-size:11px;color:var(--muted);}
+  .bubble-row.mine .call-log-sub{color:rgba(255,255,255,0.65);}
 </style></head>
 <body>
 
@@ -686,7 +739,14 @@
         <div class="chat-panel">
           <div class="chat-header">
             <div class="avatar" id="chatAvatar" style="width:34px;height:34px;font-size:13px;"></div>
-            <div class="name" id="chatName"></div>
+            <div class="who" style="flex:1;min-width:0;">
+              <div class="name" id="chatName"></div>
+              <div class="chat-status" id="chatStatus"></div>
+            </div>
+            <div class="chat-header-actions">
+              <button class="call-icon-btn" onclick="startCall('audio')" title="Audio call">📞</button>
+              <button class="call-icon-btn" onclick="startCall('video')" title="Video call">📹</button>
+            </div>
           </div>
           <div class="chat-messages" id="chatMessages"></div>
           <div class="chat-input-bar">
@@ -828,6 +888,35 @@
     <div class="lightbox-caption" id="lightboxCaption"></div>
   </div>
   <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)">›</button>
+</div>
+
+<!-- incoming call modal -->
+<div class="modal-bg" id="incomingCallModalBg">
+  <div class="modal incoming-call-modal">
+    <div class="avatar" id="incomingCallAvatar" style="width:80px;height:80px;font-size:28px;margin:0 auto 14px;"></div>
+    <h3 id="incomingCallName" style="text-align:center;margin-bottom:2px;"></h3>
+    <p id="incomingCallType" style="text-align:center;color:var(--muted);margin-bottom:20px;"></p>
+    <div class="modal-actions" style="justify-content:center;gap:16px;">
+      <button class="call-answer-btn decline" onclick="declineIncomingCall()">✕</button>
+      <button class="call-answer-btn accept" onclick="acceptIncomingCall()">✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- full-screen call overlay -->
+<div class="call-overlay" id="callOverlay">
+  <video id="remoteMedia" autoplay playsinline></video>
+  <video id="localMedia" autoplay playsinline muted class="local-video-pip"></video>
+  <div class="call-info">
+    <div class="avatar call-avatar" id="callAvatar"></div>
+    <div class="call-name" id="callName"></div>
+    <div class="call-status" id="callStatusText">Calling…</div>
+  </div>
+  <div class="call-controls">
+    <button class="call-ctrl-btn" id="muteBtn" onclick="toggleMute()">🎤</button>
+    <button class="call-ctrl-btn hangup-btn" onclick="endCall()">📞</button>
+    <button class="call-ctrl-btn" id="camBtn" onclick="toggleCamera()" style="display:none;">📹</button>
+  </div>
 </div>
 
 <!-- profile edit modal -->
@@ -1142,6 +1231,8 @@ if (configured) {
       startMessagesListener();
       startGroupsListener();
       startNotificationsListener();
+      startPresenceHeartbeat();
+      startIncomingCallListener();
       navigateFeed();
     } else {
       currentProfile = null;
@@ -1161,6 +1252,9 @@ if (configured) {
       if(typeof albumsUnsub !== 'undefined' && albumsUnsub) albumsUnsub();
       if(typeof mediaUnsub !== 'undefined' && mediaUnsub) mediaUnsub();
       if(typeof notifUnsub !== 'undefined' && notifUnsub) notifUnsub();
+      stopPresenceHeartbeat();
+      if(incomingCallUnsub) incomingCallUnsub();
+      cleanupCall();
       myFriends = new Set(); outgoingReq = new Set(); incomingReq = new Map();
       allUsersCache = null; currentProfileUid = null;
       conversations = new Map(); convoUsersCache = new Map();
@@ -1901,6 +1995,25 @@ function renderProfileAction(uid, cachedUser){
 
 function convoId(uidA, uidB){ return [uidA, uidB].sort().join('_'); }
 
+// ===== presence (lightweight "Active Xh ago") =====
+let presenceInterval = null;
+function startPresenceHeartbeat(){
+  const beat = () => { if(currentUser){ updateDoc(doc(db,'users',currentUser.uid), { lastSeen: serverTimestamp() }).catch(()=>{}); } };
+  beat();
+  presenceInterval = setInterval(beat, 60000);
+}
+function stopPresenceHeartbeat(){
+  if(presenceInterval){ clearInterval(presenceInterval); presenceInterval = null; }
+}
+function presenceText(lastSeen){
+  if(!lastSeen) return '';
+  const d = lastSeen.toDate ? lastSeen.toDate() : new Date(lastSeen);
+  const diffMin = Math.floor((Date.now() - d.getTime())/60000);
+  if(diffMin < 3) return 'Active now';
+  if(diffMin < 60) return `Active ${diffMin}m ago`;
+  return `Active ${timeAgo(lastSeen)}`;
+}
+
 let conversations = new Map();
 let convoUsersCache = new Map();
 let conversationsUnsub = null;
@@ -1987,6 +2100,7 @@ window.openChat = async function(otherUid){
   const u = await getUserCached(otherUid);
   document.getElementById('chatAvatar').innerHTML = avatarHTML(u.photoURL, u.displayName);
   document.getElementById('chatName').textContent = u.displayName || 'User';
+  document.getElementById('chatStatus').textContent = presenceText(u.lastSeen);
   document.getElementById('chatMessages').innerHTML = `<div class="empty-small">${t('startedChat')}</div>`;
 
   const cSnap = await getDoc(doc(db,'conversations',activeConvoId));
@@ -2003,6 +2117,22 @@ window.openChat = async function(otherUid){
       const m = d.data();
       const mid = d.id;
       const mine = m.from === currentUser.uid;
+      if(m.callLog){
+        const icon = m.callType==='video' ? '📹' : '📞';
+        const missed = m.callStatus==='missed';
+        const label = missed ? (m.callType==='video'?'Missed video call':'Missed audio call') : (m.callType==='video'?'Video call':'Audio call');
+        const sub = missed ? 'Tap to call back' : formatCallDuration(m.callDuration||0);
+        const callBackAttr = missed ? `onclick="startCall('${m.callType}')"` : '';
+        return `<div class="bubble-row ${mine?'mine':''}">
+          <div>
+            <div class="call-log-bubble" ${callBackAttr}>
+              <span class="call-log-icon">${icon}</span>
+              <div><div class="call-log-label">${label}</div><div class="call-log-sub">${sub}</div></div>
+            </div>
+            <span class="bubble-time">${timeAgo(m.createdAt)}</span>
+          </div>
+        </div>`;
+      }
       msgTextCache[mid] = m.text || '';
       const editBtn = mine ? `<button class="mini-edit-btn msg-edit-btn" onclick="toggleEditMessage('${mid}')" title="Edit">✏️</button>` : '';
       const deleteBtn = mine ? `<button class="mini-edit-btn msg-edit-btn mini-delete-btn" onclick="deleteOwnMessage('${mid}')" title="Delete">🗑️</button>` : '';
@@ -2089,6 +2219,242 @@ window.sendMessage = async function(){
   }catch(e){ toast(e.message); }
 };
 
+// ================= PHASE 10: Audio/Video Calling (WebRTC + Firestore signaling) =================
+// NOTE: uses public STUN servers only (no TURN). Calls work reliably on WiFi-to-WiFi and most
+// networks, but may fail to connect across some strict carrier NATs since no relay server is configured.
+const RTC_CONFIG = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
+  ]
+};
+
+let pc = null;
+let localStream = null;
+let remoteStream = null;
+let currentCallId = null;
+let currentCallType = 'audio';
+let currentCallConvoId = null;
+let callStartTime = null;
+let callDocUnsub = null;
+let iceCandUnsub = null;
+let incomingCallUnsub = null;
+let pendingIncomingCallId = null;
+let pendingIncomingCallData = null;
+let micMuted = false;
+let camOff = false;
+
+function formatCallDuration(sec){
+  sec = Math.max(0, Math.round(sec));
+  const m = Math.floor(sec/60), s = sec%60;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function showCallOverlay(type, statusText){
+  document.getElementById('callOverlay').classList.add('show');
+  document.getElementById('callStatusText').textContent = statusText;
+  document.getElementById('camBtn').style.display = type==='video' ? 'flex' : 'none';
+  document.getElementById('localMedia').classList.toggle('show', type==='video');
+  document.getElementById('remoteMedia').dataset.active = type==='video' ? '1' : '0';
+}
+function hideCallOverlay(){
+  document.getElementById('callOverlay').classList.remove('show');
+  document.getElementById('localMedia').srcObject = null;
+  document.getElementById('remoteMedia').srcObject = null;
+}
+function setCallStatusText(txt){
+  const el = document.getElementById('callStatusText');
+  if(el) el.textContent = txt;
+}
+
+async function addCallLogMessage(convoId_, type, status, durationSec){
+  if(!convoId_ || !currentUser) return;
+  const label = status==='missed' ? (type==='video'?'Missed video call':'Missed audio call') : (type==='video'?'Video call':'Audio call');
+  try{
+    await addDoc(collection(db,'conversations',convoId_,'messages'), {
+      from: currentUser.uid, callLog:true, callType:type, callStatus:status, callDuration:durationSec||0,
+      text: label, createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db,'conversations',convoId_), { lastMessage: label, lastMessageAt: serverTimestamp() });
+  }catch(e){ console.error('addCallLogMessage failed:', e); }
+}
+
+window.startCall = async function(type){
+  if(!activeChatUid || !activeConvoId) return;
+  if(currentCallId) return toast('A call is already in progress.');
+  currentCallType = type;
+  currentCallConvoId = activeConvoId;
+  try{
+    localStream = await navigator.mediaDevices.getUserMedia({ audio:true, video: type==='video' });
+  }catch(e){ return toast('Camera/mic permission denied or unavailable: ' + e.message); }
+
+  const other = await getUserCached(activeChatUid);
+  document.getElementById('callAvatar').innerHTML = avatarHTML(other.photoURL, other.displayName);
+  document.getElementById('callName').textContent = other.displayName || 'User';
+  showCallOverlay(type, 'Calling…');
+
+  pc = new RTCPeerConnection(RTC_CONFIG);
+  localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+  if(type==='video') document.getElementById('localMedia').srcObject = localStream;
+  remoteStream = new MediaStream();
+  document.getElementById('remoteMedia').srcObject = remoteStream;
+  pc.ontrack = (event) => { event.streams[0].getTracks().forEach(tr => remoteStream.addTrack(tr)); };
+
+  const callRef = doc(collection(db,'calls'));
+  currentCallId = callRef.id;
+  const callerCandidates = collection(db,'calls',currentCallId,'callerCandidates');
+  pc.onicecandidate = (event) => { if(event.candidate) addDoc(callerCandidates, event.candidate.toJSON()).catch(()=>{}); };
+
+  try{
+    const offerDescription = await pc.createOffer();
+    await pc.setLocalDescription(offerDescription);
+    await setDoc(callRef, {
+      from: currentUser.uid, to: activeChatUid, type, status:'ringing', convoId: activeConvoId,
+      offer: { sdp: offerDescription.sdp, type: offerDescription.type },
+      createdAt: serverTimestamp()
+    });
+  }catch(e){ toast(e.message); cleanupCall(); return; }
+
+  callDocUnsub = onSnapshot(callRef, async (snap) => {
+    const data = snap.data();
+    if(!data) return;
+    if(data.status === 'declined'){ toast('Call declined'); endCall(false, 'missed'); return; }
+    if(data.status === 'ended'){ endCall(false, callStartTime ? 'completed' : 'missed'); return; }
+    if(data.status === 'accepted' && data.answer && pc && !pc.currentRemoteDescription){
+      try{
+        await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+        setCallStatusText('Connected');
+        callStartTime = Date.now();
+      }catch(e){ console.error(e); }
+    }
+  });
+  iceCandUnsub = onSnapshot(collection(db,'calls',currentCallId,'calleeCandidates'), (snap) => {
+    snap.docChanges().forEach(change => {
+      if(change.type === 'added' && pc){ pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(()=>{}); }
+    });
+  });
+};
+
+function startIncomingCallListener(){
+  if(!currentUser) return;
+  incomingCallUnsub = onSnapshot(query(collection(db,'calls'), where('to','==',currentUser.uid), where('status','==','ringing')), (snap) => {
+    snap.docChanges().forEach(async change => {
+      if(change.type === 'added'){
+        pendingIncomingCallId = change.doc.id;
+        pendingIncomingCallData = change.doc.data();
+        const caller = await getUserCached(pendingIncomingCallData.from);
+        document.getElementById('incomingCallAvatar').innerHTML = avatarHTML(caller.photoURL, caller.displayName);
+        document.getElementById('incomingCallName').textContent = caller.displayName || 'User';
+        document.getElementById('incomingCallType').textContent = pendingIncomingCallData.type === 'video' ? 'Incoming video call' : 'Incoming audio call';
+        document.getElementById('incomingCallModalBg').classList.add('show');
+      }
+      if(change.type === 'modified' && change.doc.data().status !== 'ringing' && change.doc.id === pendingIncomingCallId){
+        document.getElementById('incomingCallModalBg').classList.remove('show');
+      }
+    });
+  });
+}
+
+window.acceptIncomingCall = async function(){
+  const callId = pendingIncomingCallId;
+  const data = pendingIncomingCallData;
+  document.getElementById('incomingCallModalBg').classList.remove('show');
+  if(!callId || !data) return;
+  try{
+    localStream = await navigator.mediaDevices.getUserMedia({ audio:true, video: data.type==='video' });
+  }catch(e){ toast(e.message); return declineIncomingCall(); }
+
+  currentCallId = callId; currentCallType = data.type; currentCallConvoId = data.convoId;
+  activeChatUid = data.from; activeConvoId = data.convoId;
+
+  const caller = await getUserCached(data.from);
+  document.getElementById('callAvatar').innerHTML = avatarHTML(caller.photoURL, caller.displayName);
+  document.getElementById('callName').textContent = caller.displayName || 'User';
+  showCallOverlay(data.type, 'Connecting…');
+
+  pc = new RTCPeerConnection(RTC_CONFIG);
+  localStream.getTracks().forEach(tr => pc.addTrack(tr, localStream));
+  if(data.type==='video') document.getElementById('localMedia').srcObject = localStream;
+  remoteStream = new MediaStream();
+  document.getElementById('remoteMedia').srcObject = remoteStream;
+  pc.ontrack = (event) => { event.streams[0].getTracks().forEach(tr => remoteStream.addTrack(tr)); };
+
+  const calleeCandidates = collection(db,'calls',callId,'calleeCandidates');
+  pc.onicecandidate = (event) => { if(event.candidate) addDoc(calleeCandidates, event.candidate.toJSON()).catch(()=>{}); };
+
+  try{
+    await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+    const answerDescription = await pc.createAnswer();
+    await pc.setLocalDescription(answerDescription);
+    await updateDoc(doc(db,'calls',callId), {
+      status:'accepted', answer: { sdp: answerDescription.sdp, type: answerDescription.type }
+    });
+    callStartTime = Date.now();
+    setCallStatusText('Connected');
+  }catch(e){ toast(e.message); cleanupCall(); return; }
+
+  callDocUnsub = onSnapshot(doc(db,'calls',callId), (snap) => {
+    const d = snap.data();
+    if(d && d.status === 'ended'){ endCall(false, 'completed'); }
+  });
+  iceCandUnsub = onSnapshot(collection(db,'calls',callId,'callerCandidates'), (snap) => {
+    snap.docChanges().forEach(change => {
+      if(change.type === 'added' && pc){ pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(()=>{}); }
+    });
+  });
+};
+
+window.declineIncomingCall = async function(){
+  document.getElementById('incomingCallModalBg').classList.remove('show');
+  if(pendingIncomingCallId && pendingIncomingCallData){
+    try{ await updateDoc(doc(db,'calls',pendingIncomingCallId), { status:'declined' }); }catch(e){}
+    addCallLogMessage(pendingIncomingCallData.convoId, pendingIncomingCallData.type, 'missed', 0);
+  }
+  pendingIncomingCallId = null; pendingIncomingCallData = null;
+};
+
+window.endCall = async function(notifyRemote, statusOverride){
+  const convoForLog = currentCallConvoId;
+  const typeForLog = currentCallType;
+  const durationSec = callStartTime ? (Date.now() - callStartTime)/1000 : 0;
+  const status = statusOverride || (callStartTime ? 'completed' : 'missed');
+  if(notifyRemote !== false && currentCallId){
+    try{ await updateDoc(doc(db,'calls',currentCallId), { status:'ended' }); }catch(e){}
+  }
+  if(convoForLog) addCallLogMessage(convoForLog, typeForLog, status, durationSec);
+  cleanupCall();
+};
+
+function cleanupCall(){
+  if(pc){ try{ pc.close(); }catch(e){} pc = null; }
+  if(localStream){ localStream.getTracks().forEach(tr => tr.stop()); localStream = null; }
+  if(callDocUnsub){ callDocUnsub(); callDocUnsub = null; }
+  if(iceCandUnsub){ iceCandUnsub(); iceCandUnsub = null; }
+  currentCallId = null; currentCallConvoId = null; callStartTime = null;
+  micMuted = false; camOff = false;
+  const muteBtn = document.getElementById('muteBtn');
+  const camBtn = document.getElementById('camBtn');
+  if(muteBtn){ muteBtn.classList.remove('muted'); muteBtn.textContent = '🎤'; }
+  if(camBtn){ camBtn.classList.remove('muted'); camBtn.textContent = '📹'; }
+  hideCallOverlay();
+}
+
+window.toggleMute = function(){
+  if(!localStream) return;
+  micMuted = !micMuted;
+  localStream.getAudioTracks().forEach(tr => tr.enabled = !micMuted);
+  const btn = document.getElementById('muteBtn');
+  btn.classList.toggle('muted', micMuted);
+  btn.textContent = micMuted ? '🔇' : '🎤';
+};
+window.toggleCamera = function(){
+  if(!localStream) return;
+  camOff = !camOff;
+  localStream.getVideoTracks().forEach(tr => tr.enabled = !camOff);
+  const btn = document.getElementById('camBtn');
+  btn.classList.toggle('muted', camOff);
+};
+
 // ================= PHASE 4: Groups =================
 let myGroups = new Set();
 let groupsMembershipUnsub = null;
@@ -2141,7 +2507,6 @@ window.renderGroupsList = async function(){
     </div>`;
   }).join('');
 };
-
 window.openGroupModal = function(){
   document.getElementById('newGroupName').value = '';
   document.getElementById('newGroupDesc').value = '';
@@ -2444,7 +2809,6 @@ function startNotificationsListener(){
     }
   });
 }
-
 window.navigateNotifications = async function(){
   setView('notificationsView');
   const q = query(collection(db,'notifications'), where('to','==',currentUser.uid), orderBy('createdAt','desc'), limit(30));
@@ -2607,7 +2971,7 @@ window.renderAdminUsers = async function(){
         <div class="sub">${escapeHtml(u.bio||'')}</div>
       </div>
       <div class="actions">
-      <button class="fbtn subtle" onclick="adminToggleSuspend('${u.uid}',${!!u.suspended})">${t(u.suspended?'unsuspend':'suspend')}</button>
+        <button class="fbtn subtle" onclick="adminToggleSuspend('${u.uid}',${!!u.suspended})">${t(u.suspended?'unsuspend':'suspend')}</button>
         <button class="fbtn subtle" onclick="adminToggleAdmin('${u.uid}',${!!u.isAdmin})">${u.isAdmin?t('removeAdmin'):t('makeAdmin')}</button>
       </div>
     </div>`).join('');
