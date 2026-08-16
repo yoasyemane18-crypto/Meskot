@@ -106,6 +106,7 @@
   .auth-sub{color:var(--muted);font-size:13.5px;margin:0 0 22px;}
   .field{margin-bottom:14px;}
   .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em;}
+  .pw-hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.4;}
   .field input,.field textarea{
     width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--line);background:#fff;
     font-size:14px;font-family:inherit;color:var(--ink);
@@ -569,6 +570,40 @@
   .call-log-label{font-size:13px;font-weight:600;}
   .call-log-sub{font-size:11px;color:var(--muted);}
   .bubble-row.mine .call-log-sub{color:rgba(255,255,255,0.65);}
+
+  /* ===== phase 11: sharing + comment likes/replies ===== */
+  .shared-tag{padding:0 16px;font-size:12px;color:var(--muted);font-weight:600;margin-top:-4px;margin-bottom:6px;}
+  .shared-post-box{
+    margin:0 16px 12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;background:var(--paper);
+  }
+  .shared-post-head{display:flex;align-items:center;gap:8px;padding:10px 12px 6px;}
+  .shared-post-text{padding:0 12px 10px;font-size:13.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
+
+  .comment-actions-row{display:flex;gap:14px;margin:3px 0 0 12px;font-size:11.5px;color:var(--muted);}
+  .comment-actions-row button{background:none;border:none;font-size:11.5px;font-weight:700;color:var(--muted);}
+  .comment-actions-row button.liked{color:var(--cross);}
+  .comment-reply-form{display:flex;gap:6px;margin:6px 0 0 12px;}
+  .comment-reply-form input{flex:1;border:1px solid var(--line);border-radius:14px;padding:6px 12px;font-size:12.5px;font-family:inherit;}
+  .comment-reply-form button{background:var(--ink);color:#fff;border:none;border-radius:14px;padding:6px 12px;font-size:11.5px;font-weight:600;}
+  .comment-replies{margin-left:30px;margin-top:6px;display:flex;flex-direction:column;gap:8px;}
+
+  /* ===== phase 12: Menu + Saved ===== */
+  .menu-nav-btn{
+    width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--card);
+    font-size:16px;display:flex;align-items:center;justify-content:center;
+  }
+  .menu-profile-row{
+    display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:14px;margin-bottom:16px;box-shadow:var(--shadow);cursor:pointer;
+  }
+  .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .menu-card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 12px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    text-align:center;font-size:13px;font-weight:600;box-shadow:var(--shadow);min-height:84px;cursor:pointer;
+  }
+  .menu-card-icon{font-size:22px;}
+  .save-btn.saved{color:var(--gold-deep);}
 </style></head>
 <body>
 
@@ -587,6 +622,7 @@
       <button id="langEn" class="active" onclick="setLang('en')">EN</button>
       <button id="langAm" onclick="setLang('am')">አማ</button>
     </div>
+    <button id="menuNavBtn" class="menu-nav-btn" onclick="navigateMenu()" style="display:none;" title="Menu">☰</button>
     <div id="navAuthArea"></div>
   </div>
 </nav>
@@ -640,7 +676,7 @@
       <p class="auth-sub" data-t="joinSub">Create your window onto the community</p>
       <div class="field"><label data-t="fullName">Full name</label><input type="text" id="suName" autocomplete="name"></div>
       <div class="field"><label data-t="email">Email</label><input type="email" id="suEmail" autocomplete="email"></div>
-      <div class="field"><label data-t="password">Password</label><input type="password" id="suPass" autocomplete="new-password"></div>
+      <div class="field"><label data-t="password">Password</label><input type="password" id="suPass" autocomplete="new-password"><div class="pw-hint" data-t="pwHint">7–49 characters, with upper/lowercase letters, a number, and a symbol.</div></div>
       <button class="btn gold" style="width:100%;" onclick="doSignup()" data-t="createAccount">Create account</button>
       <div class="auth-switch">
         <span data-t="hasAccount">Already have an account?</span>
@@ -872,6 +908,39 @@
         <div id="adminGroupsList"></div>
       </div>
     </div>
+
+    <!-- MENU -->
+    <div id="menuView" class="view-panel">
+      <button class="back-link" onclick="navigateFeed()">← <span data-t="backToFeed">Back to feed</span></button>
+      <h2 class="section-title" data-t="menuTitle">Menu</h2>
+      <div class="menu-profile-row clickable-id" onclick="navigateProfile(currentUser && currentUser.uid)">
+        <div class="avatar" id="menuAvatar" style="width:52px;height:52px;font-size:19px;"></div>
+        <div>
+          <div class="name" id="menuName" style="font-size:15.5px;"></div>
+          <div class="sub" data-t="viewProfile">View your profile</div>
+        </div>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-card" onclick="navigateUserDashboard()"><span class="menu-card-icon">📊</span><span data-t="myDashboard">Dashboard</span></div>
+        <div class="menu-card" onclick="navigateMessages()"><span class="menu-card-icon">💬</span><span data-t="navMessages">Messages</span></div>
+        <div class="menu-card" onclick="navigateGroups()"><span class="menu-card-icon">👪</span><span data-t="navGroups">Groups</span></div>
+        <div class="menu-card" onclick="navigateFriends()"><span class="menu-card-icon">👥</span><span data-t="navFriends">Friends</span></div>
+        <div class="menu-card" onclick="navigatePhotos(currentUser && currentUser.uid)"><span class="menu-card-icon">🖼️</span><span data-t="navPhotos">Photos</span></div>
+        <div class="menu-card" onclick="navigateNotifications()"><span class="menu-card-icon">🔔</span><span data-t="notifications">Notifications</span></div>
+        <div class="menu-card" onclick="navigateSaved()"><span class="menu-card-icon">🔖</span><span data-t="saved">Saved</span></div>
+        <div class="menu-card" onclick="openProfileModal()"><span class="menu-card-icon">⚙️</span><span data-t="settingsPrivacy">Settings & privacy</span></div>
+        <div class="menu-card" id="menuAdminCard" onclick="navigateAdmin()" style="display:none;"><span class="menu-card-icon">🛡️</span><span data-t="navAdmin">Admin</span></div>
+      </div>
+      <button class="btn ghost" style="width:100%;margin-top:16px;" onclick="doLogout()" data-t="logout">Log out</button>
+    </div>
+
+    <!-- SAVED POSTS -->
+    <div id="savedView" class="view-panel">
+      <button class="back-link" onclick="navigateMenu()">← <span data-t="backToMenu">Back to menu</span></button>
+      <h2 class="section-title" data-t="saved">Saved</h2>
+      <div id="savedPostsList"></div>
+      <div id="savedEmpty" class="empty-small" style="display:none;" data-t="noSaved">Nothing saved yet.</div>
+    </div>
   </main>
 </div>
 <div class="modal-bg" id="groupModalBg">
@@ -1057,7 +1126,14 @@ const dict = {
     reactLike:"Like", reactLove:"Love", reactHaha:"Haha", reactWow:"Wow", reactSad:"Sad", reactAngry:"Angry",
     verifyTitle:"Verify your email", verifySub:"We sent a verification link to:",
     ivVerified:"I've verified — Continue", resendEmail:"Resend email", useAnotherAccount:"Use a different account",
-    verifyEmailSent:"Verification email sent — check your inbox.", notYetVerified:"Not verified yet — check your inbox and spam folder."
+    verifyEmailSent:"Verification email sent — check your inbox.", notYetVerified:"Not verified yet — check your inbox and spam folder.",
+    pwHint:"7–49 characters, with upper/lowercase letters, a number, and a symbol.",
+    pwTooShort:"Password must be longer than 6 characters.", pwTooLong:"Password must be shorter than 50 characters.",
+    pwTooWeak:"Password must include an uppercase letter, a lowercase letter, a number, and a symbol.",
+    share:"Share", sharedAPost:"shared a post", postShared:"Shared to your feed.",
+    reply:"Reply", writeReply:"Write a reply…", notifShareSuffix:"shared your post",
+    menuTitle:"Menu", viewProfile:"View your profile", settingsPrivacy:"Settings & privacy",
+    saved:"Saved", noSaved:"Nothing saved yet.", backToMenu:"Back to menu"
   },
   am: {
     welcomeBack:"እንኳን ደህና መጡ", loginSub:"ማህበረሰብዎ ምን እያካፈለ እንደሆነ ለማየት ይግቡ",
@@ -1104,7 +1180,14 @@ const dict = {
     reactLike:"ውደድ", reactLove:"ውደድ በጣም", reactHaha:"ሳቅ", reactWow:"ዋው", reactSad:"አዝኗል", reactAngry:"ተናደደ",
     verifyTitle:"ኢሜይልዎን ያረጋግጡ", verifySub:"የማረጋገጫ ማገናኛ ልከናል ወደ:",
     ivVerified:"አረጋግጫለሁ — ቀጥል", resendEmail:"እንደገና ላክ", useAnotherAccount:"ሌላ አካውንት ተጠቀም",
-    verifyEmailSent:"የማረጋገጫ ኢሜይል ተልኳል — የገቢ መልእክት ሳጥንዎን ይመልከቱ።", notYetVerified:"እስካሁን አልተረጋገጠም — የገቢ መልእክት ሳጥንዎን (እና ስፓም ማህደርን) ይመልከቱ።"
+    verifyEmailSent:"የማረጋገጫ ኢሜይል ተልኳል — የገቢ መልእክት ሳጥንዎን ይመልከቱ።", notYetVerified:"እስካሁን አልተረጋገጠም — የገቢ መልእክት ሳጥንዎን (እና ስፓም ማህደርን) ይመልከቱ።",
+    pwHint:"ከ7 እስከ 49 ፊደላት፣ አቢይ እና ንዑስ ፊደላት፣ ቁጥር እና ምልክት ሊኖረው ይገባል።",
+    pwTooShort:"የይለፍ ቃል ከ6 ፊደላት በላይ መሆን አለበት።", pwTooLong:"የይለፍ ቃል ከ50 ፊደላት በታች መሆን አለበት።",
+    pwTooWeak:"የይለፍ ቃል አቢይ ፊደል፣ ንዑስ ፊደል፣ ቁጥር እና ምልክት ሊኖረው ይገባል።",
+    share:"አጋራ", sharedAPost:"ልጥፍ አጋርቷል", postShared:"ወደ ገጽዎ ተጋርቷል።",
+    reply:"መልስ", writeReply:"መልስ ይጻፉ…", notifShareSuffix:"ልጥፍዎን አጋርቷል",
+    menuTitle:"ማውጫ", viewProfile:"መገለጫዎን ይመልከቱ", settingsPrivacy:"ቅንብሮች እና ግላዊነት",
+    saved:"የተቀመጡ", noSaved:"እስካሁን ምንም አልተቀመጠም።", backToMenu:"ወደ ማውጫ ተመለስ"
   }
 };
 let lang = localStorage.getItem('meskot_lang') || 'en';
@@ -1186,12 +1269,20 @@ window.doForgotPassword = async function(){
   finally{ btn.disabled = false; }
 };
 
+function passwordStrengthError(pass){
+  if(pass.length <= 6) return t('pwTooShort');
+  if(pass.length >= 50) return t('pwTooLong');
+  if(!/[a-z]/.test(pass) || !/[A-Z]/.test(pass) || !/\d/.test(pass) || !/[^A-Za-z0-9]/.test(pass)) return t('pwTooWeak');
+  return null;
+}
 window.doSignup = async function(){
   if (!configured) return toast(t('notConfigured'));
   const name = document.getElementById('suName').value.trim();
   const email = document.getElementById('suEmail').value.trim();
   const pass = document.getElementById('suPass').value;
   if(!name || !email || !pass) return showAuthError(t('fillFields'));
+  const pwErr = passwordStrengthError(pass);
+  if(pwErr) return showAuthError(pwErr);
   try{
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
@@ -1233,6 +1324,7 @@ window.checkVerifiedStatus = async function(){
       renderSidebar();
       renderNavAuthArea();
       document.getElementById('iconNav').style.display = 'flex';
+      document.getElementById('menuNavBtn').style.display = 'flex';
       startFeedListener();
       startFriendsListeners();
       startMessagesListener();
@@ -1240,6 +1332,7 @@ window.checkVerifiedStatus = async function(){
       startNotificationsListener();
       startPresenceHeartbeat();
       startIncomingCallListener();
+      startSavedListener();
       navigateFeed();
     } else {
       toast(t('notYetVerified'));
@@ -1269,6 +1362,7 @@ if (configured) {
         document.getElementById('authWrap').style.display = 'none';
         document.getElementById('app').classList.remove('show');
         document.getElementById('iconNav').style.display = 'none';
+        document.getElementById('menuNavBtn').style.display = 'none';
         document.getElementById('verifyEmailWrap').style.display = 'flex';
         document.getElementById('verifyEmailAddress').textContent = user.email || '';
         return;
@@ -1300,6 +1394,7 @@ if (configured) {
       startNotificationsListener();
       startPresenceHeartbeat();
       startIncomingCallListener();
+      startSavedListener();
       navigateFeed();
     } else {
       currentProfile = null;
@@ -1323,6 +1418,8 @@ if (configured) {
       stopPresenceHeartbeat();
       if(incomingCallUnsub) incomingCallUnsub();
       cleanupCall();
+      if(savedPostsUnsub) savedPostsUnsub();
+      mySavedPostKeys = new Set();
       myFriends = new Set(); outgoingReq = new Set(); incomingReq = new Map();
       allUsersCache = null; currentProfileUid = null;
       conversations = new Map(); convoUsersCache = new Map();
@@ -1414,6 +1511,36 @@ function mediaUploadTimeout(files){
   return Math.min(Math.max(sizeBased, base), 600000); // cap at 10 minutes
 }
 
+window.sharePost = async function(id, col){
+  if(!currentUser) return;
+  try{
+    const snap = await getDoc(doc(db,col,id));
+    if(!snap.exists()) return toast('Post no longer exists.');
+    const p = snap.data();
+    const sourcePostId = p.sharedFrom ? p.sharedFrom.postId : id;
+    const sourceCol = p.sharedFrom ? p.sharedFrom.col : col;
+    const sourceUid = p.sharedFrom ? p.sharedFrom.uid : p.uid;
+    const sourceAuthorName = p.sharedFrom ? p.sharedFrom.authorName : p.authorName;
+    const sourceAuthorPhoto = p.sharedFrom ? p.sharedFrom.authorPhoto : p.authorPhoto;
+    const sourceText = p.sharedFrom ? p.sharedFrom.text : (p.text || '');
+    const sourceMedia = p.sharedFrom ? (p.sharedFrom.media||[]) : ((p.media && p.media.length) ? p.media : (p.imageURL ? [{url:p.imageURL,type:'image'}] : []));
+    const sourceCreatedAt = p.sharedFrom ? p.sharedFrom.createdAt : p.createdAt;
+    await addDoc(collection(db,'posts'), {
+      uid: currentUser.uid,
+      authorName: currentProfile.displayName || 'User',
+      authorPhoto: currentProfile.photoURL || '',
+      text: '', media: [],
+      sharedFrom: {
+        postId: sourcePostId, col: sourceCol, uid: sourceUid,
+        authorName: sourceAuthorName || 'User', authorPhoto: sourceAuthorPhoto || '',
+        text: sourceText || '', media: sourceMedia, createdAt: sourceCreatedAt || null
+      },
+      likes: [], reactions: {}, commentCount: 0, createdAt: serverTimestamp()
+    });
+    if(sourceUid) addNotification(sourceUid, 'share', { postId: sourcePostId });
+    toast(t('postShared'));
+  }catch(e){ toast(e.message); }
+};
 window.submitPost = async function(){
   const textEl = document.getElementById('postText');
   const text = textEl.value.trim();
@@ -1477,6 +1604,21 @@ function reactionSummary(map){
   return { total, top, counts };
 }
 
+function sharedPostBoxHTML(sf){
+  if(!sf) return '';
+  const media = sf.media || [];
+  return `<div class="shared-post-box" onclick="event.stopPropagation();navigateProfile('${sf.uid}')">
+    <div class="shared-post-head">
+      <div class="avatar" style="width:30px;height:30px;font-size:12px;">${avatarHTML(sf.authorPhoto, sf.authorName)}</div>
+      <div>
+        <div class="name" style="font-size:13px;">${escapeHtml(sf.authorName||'User')}</div>
+        <div class="time" style="font-size:10.5px;">${timeAgo(sf.createdAt)}</div>
+      </div>
+    </div>
+    ${sf.text ? `<div class="shared-post-text">${escapeHtml(sf.text)}</div>` : ''}
+    ${postMediaGridHTML(media)}
+  </div>`;
+}
 function renderPost(id, p, col){
   col = col || 'posts';
   const reactionMap = getReactionMap(p);
@@ -1491,6 +1633,7 @@ function renderPost(id, p, col){
   const isMine = currentUser && p.uid === currentUser.uid;
   const editBtn = isMine ? `<button class="mini-edit-btn" onclick="event.stopPropagation();toggleEditPost('${id}','${col}')" title="Edit">✏️</button>` : '';
   const deleteBtn = isMine ? `<button class="mini-edit-btn mini-delete-btn" onclick="event.stopPropagation();deleteOwnPost('${id}','${col}')" title="Delete">🗑️</button>` : '';
+  const sharedTag = p.sharedFrom ? `<div class="shared-tag">🔁 ${t('sharedAPost')}</div>` : '';
   return `
     <div class="post" id="post-${col}-${id}">
       <div class="post-arch"></div>
@@ -1502,6 +1645,7 @@ function renderPost(id, p, col){
         </div>
         ${editBtn}${deleteBtn}
       </div>
+      ${sharedTag}
       ${p.text ? `<div class="post-body" id="postBody-${col}-${id}">${escapeHtml(p.text)}</div>` : `<div class="post-body" id="postBody-${col}-${id}" style="display:none;"></div>`}
       <div class="post-edit-form" id="postEditForm-${col}-${id}" style="display:none;">
         <textarea id="postEditInput-${col}-${id}" rows="3"></textarea>
@@ -1510,7 +1654,7 @@ function renderPost(id, p, col){
           <button class="btn gold" onclick="savePostEdit('${id}','${col}')">${t('save')}</button>
         </div>
       </div>
-      ${postMediaGridHTML(media)}
+      ${p.sharedFrom ? sharedPostBoxHTML(p.sharedFrom) : postMediaGridHTML(media)}
       ${summary.total > 0 ? `<div class="post-reactions-line"><span class="reaction-icons">${summary.top.map(k=>`<span>${REACTIONS[k].emoji}</span>`).join('')}</span> ${summary.total} ${t('likesLabel')}</div>` : ''}
       <div class="post-actions">
         <div class="react-wrap"
@@ -1523,6 +1667,8 @@ function renderPost(id, p, col){
             ontouchmove="cancelPressTimer('${col}-${id}')">${btnIcon} ${btnLabel}</button>
         </div>
         <button onclick="toggleComments('${id}','${col}')">💬 ${t('comment')} ${p.commentCount ? `· ${p.commentCount}` : ''}</button>
+        <button onclick="sharePost('${id}','${col}')">🔗 ${t('share')}</button>
+        <button class="save-btn ${mySavedPostKeys.has(col+'_'+id)?'saved':''}" id="saveBtn-${col}-${id}" onclick="toggleSavePost('${id}','${col}')">🔖</button>
       </div>
       <div class="comments" id="comments-${col}-${id}">
         <div id="commentList-${col}-${id}"></div>
@@ -1570,6 +1716,64 @@ window.deleteOwnPost = async function(id, col){
     if(el) el.remove();
     toast('Deleted');
   }catch(e){ toast(e.message); }
+};
+
+// ===== Saved posts + Menu =====
+function startSavedListener(){
+  if(!currentUser) return;
+  if(savedPostsUnsub) savedPostsUnsub();
+  savedPostsUnsub = onSnapshot(collection(db,'users',currentUser.uid,'savedPosts'), (snap) => {
+    mySavedPostKeys = new Set(snap.docs.map(d => d.id));
+    document.querySelectorAll('[id^="saveBtn-"]').forEach(btn => {
+      const key = btn.id.slice('saveBtn-'.length).replace('-', '_');
+      btn.classList.toggle('saved', mySavedPostKeys.has(key));
+    });
+  });
+}
+window.toggleSavePost = async function(id, col){
+  if(!currentUser) return;
+  const key = col+'_'+id;
+  const btn = document.getElementById(`saveBtn-${col}-${id}`);
+  const ref_ = doc(db,'users',currentUser.uid,'savedPosts',key);
+  try{
+    if(mySavedPostKeys.has(key)){
+      await deleteDoc(ref_);
+      mySavedPostKeys.delete(key);
+      if(btn) btn.classList.remove('saved');
+    } else {
+      await setDoc(ref_, { postId:id, col, savedAt: serverTimestamp() });
+      mySavedPostKeys.add(key);
+      if(btn) btn.classList.add('saved');
+    }
+  }catch(e){ toast(e.message); }
+};
+window.navigateMenu = function(){
+  setView('menuView');
+  if(currentProfile){
+    document.getElementById('menuAvatar').innerHTML = avatarHTML(currentProfile.photoURL, currentProfile.displayName);
+    document.getElementById('menuName').textContent = currentProfile.displayName || 'User';
+    document.getElementById('menuAdminCard').style.display = currentProfile.isAdmin ? 'flex' : 'none';
+  }
+};
+window.navigateSaved = async function(){
+  setView('savedView');
+  const list = document.getElementById('savedPostsList');
+  const empty = document.getElementById('savedEmpty');
+  list.innerHTML = `<div class="loading">${t('loadingFeed')}</div>`;
+  empty.style.display = 'none';
+  try{
+    const snap = await getDocs(collection(db,'users',currentUser.uid,'savedPosts'));
+    if(snap.empty){ list.innerHTML=''; empty.style.display='block'; return; }
+    const items = snap.docs.map(d => d.data())
+      .sort((a,b) => (b.savedAt?.toMillis?.()||0) - (a.savedAt?.toMillis?.()||0));
+    const postSnaps = await Promise.all(items.map(it => getDoc(doc(db, it.col, it.postId))));
+    const rows = postSnaps.map((s,i) => s.exists() ? renderPost(s.id, s.data(), items[i].col) : '').filter(Boolean);
+    if(rows.length === 0){ list.innerHTML=''; empty.style.display='block'; return; }
+    list.innerHTML = rows.join('');
+  }catch(e){
+    list.innerHTML = '';
+    toast(e.message);
+  }
 };
 function postMediaGridHTML(media){
   if(!media || !media.length) return '';
@@ -1692,6 +1896,38 @@ window.toggleComments = function(postId, col){
     listenComments(postId, col);
   }
 };
+function commentRowHTML(postId, col, cid, c, isReply){
+  const key = col+'-'+postId;
+  commentTextCache[key+'-'+cid] = c.text || '';
+  const isMine = currentUser && c.uid === currentUser.uid;
+  const editBtn = isMine ? `<button class="mini-edit-btn" onclick="toggleEditComment('${postId}','${col}','${cid}')" title="Edit">✏️</button>` : '';
+  const deleteBtn = isMine ? `<button class="mini-edit-btn mini-delete-btn" onclick="deleteOwnComment('${postId}','${col}','${cid}')" title="Delete">🗑️</button>` : '';
+  const likes = c.likes || {};
+  const myLiked = currentUser && !!likes[currentUser.uid];
+  const likeCount = Object.keys(likes).length;
+  return `<div class="comment-row">
+    <div class="avatar" style="width:${isReply?24:28}px;height:${isReply?24:28}px;font-size:${isReply?10:11}px;">${avatarHTML(c.authorPhoto,c.authorName)}</div>
+    <div style="flex:1;min-width:0;">
+      <div class="comment-bubble" id="commentBubble-${key}-${cid}">
+        <div class="cname">${escapeHtml(c.authorName||'User')} ${editBtn}${deleteBtn}</div>
+        <span id="commentText-${key}-${cid}">${escapeHtml(c.text)}</span>${c.editedAt ? ' <span style="font-size:10.5px;color:var(--muted);">· edited</span>' : ''}
+      </div>
+      <div class="comment-edit-form" id="commentEditForm-${key}-${cid}" style="display:none;">
+        <input type="text" id="commentEditInput-${key}-${cid}">
+        <button onclick="saveCommentEdit('${postId}','${col}','${cid}')">${t('save')}</button>
+      </div>
+      <div class="comment-actions-row">
+        <button class="${myLiked?'liked':''}" onclick="toggleCommentLike('${postId}','${col}','${cid}')">${t('like')}${likeCount ? ` · ${likeCount}` : ''}</button>
+        ${!isReply ? `<button onclick="toggleCommentReplyForm('${postId}','${col}','${cid}')">${t('reply')}</button>` : ''}
+      </div>
+      ${!isReply ? `<div class="comment-reply-form" id="commentReplyForm-${key}-${cid}" style="display:none;">
+        <input type="text" id="commentReplyInput-${key}-${cid}" placeholder="${t('writeReply')}" onkeydown="if(event.key==='Enter')submitCommentReply('${postId}','${col}','${cid}')">
+        <button onclick="submitCommentReply('${postId}','${col}','${cid}')">${t('send')}</button>
+      </div>
+      <div class="comment-replies" id="commentReplies-${key}-${cid}"></div>` : ''}
+    </div>
+  </div>`;
+}
 function listenComments(postId, col){
   col = col || 'posts';
   const key = col+'-'+postId;
@@ -1699,29 +1935,67 @@ function listenComments(postId, col){
   commentUnsubs[key] = onSnapshot(q, (snap) => {
     const list = document.getElementById('commentList-'+key);
     if(!list) return;
-    list.innerHTML = snap.docs.map(d => {
-      const c = d.data();
-      const cid = d.id;
-      commentTextCache[key+'-'+cid] = c.text || '';
-      const isMine = currentUser && c.uid === currentUser.uid;
-      const editBtn = isMine ? `<button class="mini-edit-btn" onclick="toggleEditComment('${postId}','${col}','${cid}')" title="Edit">✏️</button>` : '';
-      const deleteBtn = isMine ? `<button class="mini-edit-btn mini-delete-btn" onclick="deleteOwnComment('${postId}','${col}','${cid}')" title="Delete">🗑️</button>` : '';
-      return `<div class="comment-row">
-        <div class="avatar" style="width:28px;height:28px;font-size:11px;">${avatarHTML(c.authorPhoto,c.authorName)}</div>
-        <div style="flex:1;min-width:0;">
-          <div class="comment-bubble" id="commentBubble-${key}-${cid}">
-            <div class="cname">${escapeHtml(c.authorName||'User')} ${editBtn}${deleteBtn}</div>
-            <span id="commentText-${key}-${cid}">${escapeHtml(c.text)}</span>${c.editedAt ? ' <span style="font-size:10.5px;color:var(--muted);">· edited</span>' : ''}
-          </div>
-          <div class="comment-edit-form" id="commentEditForm-${key}-${cid}" style="display:none;">
-            <input type="text" id="commentEditInput-${key}-${cid}">
-            <button onclick="saveCommentEdit('${postId}','${col}','${cid}')">${t('save')}</button>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
+    const all = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    const topLevel = all.filter(c => !c.parentId);
+    const repliesByParent = {};
+    all.filter(c => c.parentId).forEach(c => {
+      if(!repliesByParent[c.parentId]) repliesByParent[c.parentId] = [];
+      repliesByParent[c.parentId].push(c);
+    });
+    list.innerHTML = topLevel.map(c => commentRowHTML(postId, col, c.id, c, false)).join('');
+    topLevel.forEach(c => {
+      const repliesEl = document.getElementById(`commentReplies-${key}-${c.id}`);
+      const kids = repliesByParent[c.id] || [];
+      if(repliesEl && kids.length){
+        repliesEl.innerHTML = kids.map(r => commentRowHTML(postId, col, r.id, r, true)).join('');
+      }
+    });
   });
 }
+window.toggleCommentReplyForm = function(postId, col, cid){
+  const key = col+'-'+postId;
+  const formEl = document.getElementById(`commentReplyForm-${key}-${cid}`);
+  if(!formEl) return;
+  const opening = formEl.style.display === 'none';
+  formEl.style.display = opening ? 'flex' : 'none';
+  if(opening) document.getElementById(`commentReplyInput-${key}-${cid}`).focus();
+};
+window.submitCommentReply = async function(postId, col, cid){
+  const key = col+'-'+postId;
+  const input = document.getElementById(`commentReplyInput-${key}-${cid}`);
+  const text = input.value.trim();
+  if(!text || !currentUser) return;
+  input.value = '';
+  try{
+    await addDoc(collection(db,col,postId,'comments'), {
+      uid: currentUser.uid,
+      authorName: currentProfile.displayName || 'User',
+      authorPhoto: currentProfile.photoURL || '',
+      text, parentId: cid,
+      createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db,col,postId), { commentCount: increment(1) });
+    const parentSnap = await getDoc(doc(db,col,postId,'comments',cid));
+    if(parentSnap.exists() && parentSnap.data().uid) addNotification(parentSnap.data().uid, 'comment', { postId, groupId: null });
+  }catch(e){ toast(e.message); }
+};
+window.toggleCommentLike = async function(postId, col, cid){
+  if(!currentUser) return;
+  const ref_ = doc(db,col,postId,'comments',cid);
+  try{
+    const snap = await getDoc(ref_);
+    if(!snap.exists()) return;
+    const c = snap.data();
+    const liked = c.likes && c.likes[currentUser.uid];
+    const field = `likes.${currentUser.uid}`;
+    if(liked){
+      await updateDoc(ref_, { [field]: deleteField() });
+    } else {
+      await updateDoc(ref_, { [field]: true });
+      if(c.uid) addNotification(c.uid, 'comment', { postId, groupId: null });
+    }
+  }catch(e){ toast(e.message); }
+};
 window.toggleEditComment = function(postId, col, cid){
   const key = col+'-'+postId;
   const bubbleEl = document.getElementById(`commentBubble-${key}-${cid}`);
@@ -1782,6 +2056,8 @@ window.submitComment = async function(postId, col){
 };
 
 let myFriends = new Set();
+let mySavedPostKeys = new Set();
+let savedPostsUnsub = null;
 let outgoingReq = new Set();
 let incomingReq = new Map();
 let friendsUnsub = null, requestsOutUnsub = null, requestsInUnsub = null;
@@ -1863,7 +2139,8 @@ function setView(id){
     feedView:'feed', friendsView:'friends', messagesView:'messages',
     groupsView:'groups', groupPageView:'groups',
     photosView:'photos', albumView:'photos',
-    notificationsView:'notifications', userDashboardView:'userdash', adminView:'admin'
+    notificationsView:'notifications', userDashboardView:'userdash', adminView:'admin',
+    menuView:'menu', savedView:'menu'
   };
   const activeTab = tabMap[id] || null;
   document.querySelectorAll('.inav-btn').forEach(btn => {
@@ -2901,13 +3178,14 @@ function renderNotifications(docs){
   Promise.all(docs.map(async d => {
     const n = d.data();
     const u = await getUserCached(n.fromUid);
-    const icons = { like:'♥', comment:'💬', friend_request:'👥', friend_accept:'✓', message:'✉', reaction:(n.reactionType && REACTIONS[n.reactionType] ? REACTIONS[n.reactionType].emoji : '👍') };
+    const icons = { like:'♥', comment:'💬', friend_request:'👥', friend_accept:'✓', message:'✉', share:'🔗', reaction:(n.reactionType && REACTIONS[n.reactionType] ? REACTIONS[n.reactionType].emoji : '👍') };
     const texts = {
       like: t('notifLikeSuffix'),
       comment: t('notifCommentSuffix'),
       friend_request: t('notifReqSuffix'),
       friend_accept: t('notifAcceptSuffix'),
       message: t('notifMsgSuffix'),
+      share: t('notifShareSuffix'),
       reaction: t('notifReactSuffix')
     };
     return `<div class="notif-row ${n.read?'':'unread'}" onclick="handleNotifClick('${n.type}','${n.postId||''}','${n.convoId||''}','${n.fromUid}')">
@@ -2927,7 +3205,7 @@ function renderNotifications(docs){
 }
 
 window.handleNotifClick = function(type, postId, convoId, fromUid){
-  if(type==='like' || type==='comment' || type==='reaction'){
+  if(type==='like' || type==='comment' || type==='reaction' || type==='share'){
     navigateFeed();
   } else if(type==='friend_request' || type==='friend_accept'){
     navigateProfile(fromUid);
