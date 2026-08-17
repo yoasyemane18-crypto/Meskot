@@ -543,7 +543,7 @@
   .call-overlay video#remoteMedia{
     position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0F1611;
   }
-  .call-overlay video#remoteMedia:not([data-active="1"]){display:none;}
+  .call-overlay video#remoteMedia:not([data-active="1"]){opacity:0;pointer-events:none;}
   .local-video-pip{
     position:absolute;top:20px;right:20px;width:110px;height:150px;border-radius:12px;
     object-fit:cover;border:2px solid rgba(255,255,255,0.3);z-index:2;display:none;
@@ -604,6 +604,67 @@
   }
   .menu-card-icon{font-size:22px;}
   .save-btn.saved{color:var(--gold-deep);}
+
+  /* ===== phase 13: Facebook-style full composer + privacy selector ===== */
+  .composer-trigger-text{color:var(--muted);font-size:14.5px;}
+  .composer-modal-bg{
+    position:fixed;inset:0;background:var(--paper);z-index:400;display:none;flex-direction:column;
+  }
+  .composer-modal-bg.show{display:flex;}
+  .composer-modal{display:flex;flex-direction:column;height:100%;max-width:640px;margin:0 auto;width:100%;}
+  .composer-modal-header{
+    display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);flex-shrink:0;
+  }
+  .composer-modal-close{background:none;border:none;font-size:20px;color:var(--ink);width:34px;height:34px;}
+  .composer-modal-title{font-family:'Fraunces',serif;font-weight:600;font-size:16px;}
+  .composer-modal-profile{display:flex;align-items:center;gap:10px;padding:14px 16px 6px;flex-shrink:0;}
+  .privacy-pill{
+    display:inline-flex;align-items:center;gap:4px;background:var(--paper-2);border:1px solid var(--line);
+    border-radius:14px;padding:3px 10px;font-size:12px;font-weight:600;margin-top:2px;
+  }
+  .composer-modal-body{flex:1;overflow-y:auto;padding:10px 16px;display:flex;}
+  .composer-modal-body textarea{
+    flex:1;border:none;background:transparent;resize:none;font-family:inherit;font-size:20px;
+    line-height:1.5;color:var(--ink);outline:none;min-height:160px;
+  }
+  .composer-modal-body textarea.big-centered{
+    color:#fff;font-size:26px;font-weight:600;text-align:center;display:flex;align-items:center;
+    text-shadow:0 1px 4px rgba(0,0,0,0.25);
+  }
+  .composer-modal-body textarea.big-centered::placeholder{color:rgba(255,255,255,0.85);}
+  .composer-bg-swatches{display:flex;gap:8px;padding:6px 16px 10px;flex-shrink:0;overflow-x:auto;}
+  .bg-swatch{
+    width:40px;height:40px;border-radius:9px;border:2px solid transparent;flex-shrink:0;font-weight:700;font-size:14px;
+    color:var(--ink);
+  }
+  .bg-swatch.none{background:var(--paper-2);border-color:var(--line);}
+  .bg-swatch.active{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold);}
+  .composer-modal-actions-row{padding:8px 16px;border-top:1px solid var(--line);flex-shrink:0;}
+  .composer-modal-action-btn{
+    display:flex;align-items:center;gap:10px;background:none;border:none;font-size:14.5px;font-weight:600;
+    color:var(--ink);padding:8px 4px;width:100%;
+  }
+  .composer-modal-post-btn{margin:10px 16px 16px;flex-shrink:0;}
+
+  .privacy-modal h3{margin-bottom:6px;}
+  .privacy-sub{font-size:12.5px;color:var(--muted);margin:0 0 18px;line-height:1.5;}
+  .privacy-option{display:flex;align-items:center;gap:14px;padding:12px 0;cursor:pointer;}
+  .privacy-icon{font-size:20px;width:26px;text-align:center;}
+  .privacy-option .name{font-weight:600;font-size:14.5px;}
+  .privacy-option .sub{font-size:12px;color:var(--muted);}
+  .privacy-option .radio{
+    margin-left:auto;width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;position:relative;
+  }
+  .privacy-option .radio.checked{border-color:var(--gold);}
+  .privacy-option .radio.checked::after{
+    content:"";position:absolute;inset:3px;border-radius:50%;background:var(--gold);
+  }
+
+  .post-bg-body{
+    margin:0 16px 12px;border-radius:12px;min-height:200px;display:flex;align-items:center;justify-content:center;
+    text-align:center;padding:24px;color:#fff;font-size:24px;font-weight:600;line-height:1.5;
+    text-shadow:0 1px 4px rgba(0,0,0,0.25);word-break:break-word;white-space:pre-wrap;
+  }
 </style></head>
 <body>
 
@@ -724,20 +785,12 @@
   <main class="feed-col">
     <!-- FEED VIEW -->
     <div id="feedView" class="view-panel active">
-      <div class="composer">
+      <div class="composer" onclick="openComposerModal('feed')">
         <div class="composer-top">
           <div class="avatar" id="composerAvatar"></div>
-          <div class="composer-pill" onclick="document.getElementById('postText').focus()">
-            <textarea id="postText" data-tph="composerPh" placeholder="What's on your mind?"></textarea>
+          <div class="composer-pill">
+            <span class="composer-trigger-text" data-tph="composerPh">What's on your mind?</span>
           </div>
-        </div>
-        <div id="composerImgPreview"></div>
-        <div class="composer-bottom">
-          <button class="img-btn" onclick="document.getElementById('postImgInput').click()">
-            <span class="img-btn-icon">🖼️</span> <span data-t="addPhoto">Add photo</span>
-          </button>
-          <input type="file" id="postImgInput" accept="image/*,video/*" multiple style="display:none;" onchange="handleImgSelect(event)">
-          <button class="btn" onclick="submitPost()" id="postBtn" data-t="post">Post</button>
         </div>
       </div>
 
@@ -1017,6 +1070,67 @@
   </div>
 </div>
 
+<!-- full-screen composer, Facebook-style -->
+<div class="composer-modal-bg" id="composerModalBg">
+  <div class="composer-modal">
+    <div class="composer-modal-header">
+      <button class="composer-modal-close" onclick="closeComposerModal()">✕</button>
+      <div class="composer-modal-title" data-t="createPost">Create post</div>
+      <div style="width:34px;"></div>
+    </div>
+    <div class="composer-modal-profile">
+      <div class="avatar" id="composerModalAvatar"></div>
+      <div>
+        <div class="name" id="composerModalName"></div>
+        <button class="privacy-pill" id="composerPrivacyPill" onclick="openPrivacySelector()"></button>
+      </div>
+    </div>
+    <div class="composer-modal-body" id="composerModalBody">
+      <textarea id="postText" data-tph="composerModalPh" placeholder="What's on your mind?"></textarea>
+    </div>
+    <div class="composer-bg-swatches" id="composerBgSwatches">
+      <button class="bg-swatch none active" onclick="pickComposerBg('', this)">Aa</button>
+      <button class="bg-swatch" style="background:linear-gradient(135deg,#8C2F39,#B8863A);" onclick="pickComposerBg('linear-gradient(135deg,#8C2F39,#B8863A)', this)"></button>
+      <button class="bg-swatch" style="background:linear-gradient(135deg,#1B2A22,#2A4838);" onclick="pickComposerBg('linear-gradient(135deg,#1B2A22,#2A4838)', this)"></button>
+      <button class="bg-swatch" style="background:linear-gradient(135deg,#335577,#5A8FBE);" onclick="pickComposerBg('linear-gradient(135deg,#335577,#5A8FBE)', this)"></button>
+      <button class="bg-swatch" style="background:linear-gradient(135deg,#4A3B5C,#8C5CA8);" onclick="pickComposerBg('linear-gradient(135deg,#4A3B5C,#8C5CA8)', this)"></button>
+      <button class="bg-swatch" style="background:linear-gradient(135deg,#B8863A,#E8B94F);" onclick="pickComposerBg('linear-gradient(135deg,#B8863A,#E8B94F)', this)"></button>
+    </div>
+    <div id="composerImgPreview"></div>
+    <div class="composer-modal-actions-row">
+      <button class="composer-modal-action-btn" onclick="document.getElementById('postImgInput').click()">
+        <span>🖼️</span> <span data-t="addPhoto">Photos/videos</span>
+      </button>
+      <input type="file" id="postImgInput" accept="image/*,video/*" multiple style="display:none;" onchange="handleImgSelect(event)">
+    </div>
+    <button class="btn gold composer-modal-post-btn" onclick="submitPost()" id="postBtn" data-t="post">Post</button>
+  </div>
+</div>
+
+<!-- privacy selector, Facebook-style -->
+<div class="modal-bg" id="privacyModalBg">
+  <div class="modal privacy-modal">
+    <h3 data-t="whoCanSee">Who can see your post?</h3>
+    <p class="privacy-sub" data-t="whoCanSeeSub">Your post will show up in your feed, on your profile, and in search results.</p>
+    <div class="privacy-option" data-val="public" onclick="selectPrivacy('public')">
+      <span class="privacy-icon">🌍</span>
+      <div><div class="name" data-t="public">Public</div><div class="sub" data-t="publicSub">Anyone on Meskot</div></div>
+      <span class="radio"></span>
+    </div>
+    <div class="privacy-option" data-val="friends" onclick="selectPrivacy('friends')">
+      <span class="privacy-icon">👥</span>
+      <div><div class="name" data-t="friendsLabel">Friends</div><div class="sub" data-t="friendsSub">Your friends on Meskot</div></div>
+      <span class="radio"></span>
+    </div>
+    <div class="privacy-option" data-val="onlyme" onclick="selectPrivacy('onlyme')">
+      <span class="privacy-icon">🔒</span>
+      <div><div class="name" data-t="onlyMe">Only me</div><div class="sub" data-t="onlyMeSub">Only visible to you</div></div>
+      <span class="radio"></span>
+    </div>
+    <button class="btn gold" style="width:100%;margin-top:16px;" onclick="closePrivacyModal()" data-t="done">Done</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -1133,7 +1247,11 @@ const dict = {
     share:"Share", sharedAPost:"shared a post", postShared:"Shared to your feed.",
     reply:"Reply", writeReply:"Write a reply…", notifShareSuffix:"shared your post",
     menuTitle:"Menu", viewProfile:"View your profile", settingsPrivacy:"Settings & privacy",
-    saved:"Saved", noSaved:"Nothing saved yet.", backToMenu:"Back to menu"
+    saved:"Saved", noSaved:"Nothing saved yet.", backToMenu:"Back to menu",
+    createPost:"Create post", composerModalPh:"What's on your mind?",
+    whoCanSee:"Who can see your post?", whoCanSeeSub:"Your post will show up in your feed, on your profile, and in search results.",
+    public:"Public", publicSub:"Anyone on Meskot", friendsSub:"Your friends on Meskot",
+    onlyMe:"Only me", onlyMeSub:"Only visible to you", done:"Done"
   },
   am: {
     welcomeBack:"እንኳን ደህና መጡ", loginSub:"ማህበረሰብዎ ምን እያካፈለ እንደሆነ ለማየት ይግቡ",
@@ -1187,7 +1305,11 @@ const dict = {
     share:"አጋራ", sharedAPost:"ልጥፍ አጋርቷል", postShared:"ወደ ገጽዎ ተጋርቷል።",
     reply:"መልስ", writeReply:"መልስ ይጻፉ…", notifShareSuffix:"ልጥፍዎን አጋርቷል",
     menuTitle:"ማውጫ", viewProfile:"መገለጫዎን ይመልከቱ", settingsPrivacy:"ቅንብሮች እና ግላዊነት",
-    saved:"የተቀመጡ", noSaved:"እስካሁን ምንም አልተቀመጠም።", backToMenu:"ወደ ማውጫ ተመለስ"
+    saved:"የተቀመጡ", noSaved:"እስካሁን ምንም አልተቀመጠም።", backToMenu:"ወደ ማውጫ ተመለስ",
+    createPost:"ልጥፍ ይፍጠሩ", composerModalPh:"ምን እያሰቡ ነው?",
+    whoCanSee:"ልጥፍዎን ማን ማየት ይችላል?", whoCanSeeSub:"ልጥፍዎ በዜና ምግብዎ፣ በመገለጫዎ እና በፍለጋ ውጤቶች ውስጥ ይታያል።",
+    public:"ሁሉም", publicSub:"በመስኮት ላይ ያለ ማንኛውም ሰው", friendsSub:"በመስኮት ላይ ያሉ ጓደኞችዎ",
+    onlyMe:"እኔ ብቻ", onlyMeSub:"ለእርስዎ ብቻ የሚታይ", done:"ተጠናቋል"
   }
 };
 let lang = localStorage.getItem('meskot_lang') || 'en';
@@ -1467,6 +1589,67 @@ window.saveProfile = async function(){
   }catch(e){ toast(e.message); }
 };
 
+// ===== full-screen composer + privacy selector =====
+let composerContext = 'feed'; // 'feed' or {type:'group', gid}
+let composerBg = '';
+let postVisibility = 'public';
+
+window.openComposerModal = function(context){
+  composerContext = context || 'feed';
+  document.getElementById('composerModalAvatar').innerHTML = avatarHTML(currentProfile.photoURL, currentProfile.displayName);
+  document.getElementById('composerModalName').textContent = currentProfile.displayName || 'User';
+  document.getElementById('postText').value = '';
+  pendingMediaFiles = [];
+  renderComposerMediaPreview();
+  document.querySelectorAll('.bg-swatch').forEach(b => b.classList.remove('active'));
+  document.querySelector('.bg-swatch.none').classList.add('active');
+  pickComposerBg('', document.querySelector('.bg-swatch.none'));
+  renderComposerPrivacyPill();
+  document.getElementById('composerModalBg').classList.add('show');
+  setTimeout(() => document.getElementById('postText').focus(), 60);
+};
+window.closeComposerModal = function(){
+  document.getElementById('composerModalBg').classList.remove('show');
+};
+window.pickComposerBg = function(bg, btnEl){
+  composerBg = bg;
+  document.querySelectorAll('.bg-swatch').forEach(b => b.classList.remove('active'));
+  if(btnEl) btnEl.classList.add('active');
+  const ta = document.getElementById('postText');
+  const body = document.getElementById('composerModalBody');
+  if(bg){ ta.classList.add('big-centered'); body.style.background = bg; }
+  else { ta.classList.remove('big-centered'); body.style.background = ''; }
+};
+function renderComposerPrivacyPill(){
+  const map = { public: '🌍 '+t('public'), friends: '👥 '+t('friendsLabel'), onlyme: '🔒 '+t('onlyMe') };
+  const el = document.getElementById('composerPrivacyPill');
+  if(el) el.textContent = (map[postVisibility] || map.public) + ' ▾';
+}
+window.openPrivacySelector = function(){
+  document.querySelectorAll('.privacy-option').forEach(el => {
+    el.querySelector('.radio').classList.toggle('checked', el.dataset.val === postVisibility);
+  });
+  document.getElementById('privacyModalBg').classList.add('show');
+};
+window.selectPrivacy = function(val){
+  postVisibility = val;
+  document.querySelectorAll('.privacy-option').forEach(el => {
+    el.querySelector('.radio').classList.toggle('checked', el.dataset.val === val);
+  });
+};
+window.closePrivacyModal = function(){
+  document.getElementById('privacyModalBg').classList.remove('show');
+  renderComposerPrivacyPill();
+};
+function canViewPost(p){
+  if(!p.visibility || p.visibility === 'public') return true;
+  if(!currentUser) return false;
+  if(p.uid === currentUser.uid) return true;
+  if(p.visibility === 'friends') return myFriends.has(p.uid);
+  if(p.visibility === 'onlyme') return false;
+  return true;
+}
+
 let pendingMediaFiles = [];
 window.handleImgSelect = function(evt){
   const files = Array.from(evt.target.files || []);
@@ -1547,47 +1730,66 @@ window.submitPost = async function(){
   if(!text && !pendingMediaFiles.length) return;
   const btn = document.getElementById('postBtn');
   btn.disabled = true;
+  const targetCol = (composerContext && composerContext.type === 'group') ? 'groupPosts' : 'posts';
+  const bgToSave = composerBg;
   try{
     await withTimeout((async () => {
       const media = [];
-      for(const file of pendingMediaFiles){
-        const isVideo = file.type.startsWith('video/');
-        const r = ref(storage, `posts/${currentUser.uid}/${Date.now()}_${file.name}`);
-        await uploadBytes(r, file);
-        const url = await getDownloadURL(r);
-        media.push({ url, type: isVideo ? 'video' : 'image' });
+      if(!bgToSave){
+        for(const file of pendingMediaFiles){
+          const isVideo = file.type.startsWith('video/');
+          const r = ref(storage, `posts/${currentUser.uid}/${Date.now()}_${file.name}`);
+          await uploadBytes(r, file);
+          const url = await getDownloadURL(r);
+          media.push({ url, type: isVideo ? 'video' : 'image' });
+        }
       }
-      await addDoc(collection(db,'posts'), {
+      const postData = {
         uid: currentUser.uid,
         authorName: currentProfile.displayName || 'User',
         authorPhoto: currentProfile.photoURL || '',
         text, media,
         imageURL: (media.find(m => m.type==='image') || {}).url || '',
+        visibility: postVisibility,
+        bgColor: bgToSave || null,
         likes: [],
         reactions: {},
         commentCount: 0,
         createdAt: serverTimestamp()
-      });
+      };
+      if(targetCol === 'groupPosts'){
+        postData.groupId = composerContext.gid;
+      }
+      await addDoc(collection(db,targetCol), postData);
     })(), mediaUploadTimeout(pendingMediaFiles), 'Post');
     textEl.value = '';
     clearImgPreview();
+    composerBg = '';
+    closeComposerModal();
     toast(t('posted'));
   }catch(e){ toast(e.message || t('postFailed')); console.error(e); }
   finally{ btn.disabled = false; }
 };
 
+let lastFeedDocs = [];
 function startFeedListener(){
   const q = query(collection(db,'posts'), orderBy('createdAt','desc'));
   unsubFeed = onSnapshot(q, (snap) => {
     document.getElementById('feedLoading').style.display = 'none';
-    const list = document.getElementById('feedList');
-    const emptyEl = document.getElementById('feedEmpty');
-    if(snap.empty){ list.innerHTML=''; emptyEl.style.display='block'; return; }
-    emptyEl.style.display = 'none';
-    list.innerHTML = snap.docs.map(d => renderPost(d.id, d.data())).join('');
+    lastFeedDocs = snap.docs;
+    renderFeedFromCache();
   }, (err) => {
     document.getElementById('feedLoading').textContent = err.message;
   });
+}
+function renderFeedFromCache(){
+  const list = document.getElementById('feedList');
+  const emptyEl = document.getElementById('feedEmpty');
+  if(!list) return;
+  const visibleDocs = lastFeedDocs.filter(d => canViewPost(d.data()));
+  if(visibleDocs.length === 0){ list.innerHTML=''; emptyEl.style.display='block'; return; }
+  emptyEl.style.display = 'none';
+  list.innerHTML = visibleDocs.map(d => renderPost(d.id, d.data())).join('');
 }
 
 function getReactionMap(p){
@@ -1646,7 +1848,10 @@ function renderPost(id, p, col){
         ${editBtn}${deleteBtn}
       </div>
       ${sharedTag}
-      ${p.text ? `<div class="post-body" id="postBody-${col}-${id}">${escapeHtml(p.text)}</div>` : `<div class="post-body" id="postBody-${col}-${id}" style="display:none;"></div>`}
+      ${p.bgColor
+        ? `<div class="post-bg-body" id="postBody-${col}-${id}" style="background:${p.bgColor};">${escapeHtml(p.text)}</div>`
+        : (p.text ? `<div class="post-body" id="postBody-${col}-${id}">${escapeHtml(p.text)}</div>` : `<div class="post-body" id="postBody-${col}-${id}" style="display:none;"></div>`)
+      }
       <div class="post-edit-form" id="postEditForm-${col}-${id}" style="display:none;">
         <textarea id="postEditInput-${col}-${id}" rows="3"></textarea>
         <div class="post-edit-actions">
@@ -1717,7 +1922,6 @@ window.deleteOwnPost = async function(id, col){
     toast('Deleted');
   }catch(e){ toast(e.message); }
 };
-
 // ===== Saved posts + Menu =====
 function startSavedListener(){
   if(!currentUser) return;
@@ -2074,6 +2278,7 @@ function startFriendsListeners(){
     if(currentFriendsTab==='mine') renderMyFriendsTab();
     if(currentFriendsTab==='discover') renderDiscover();
     if(currentProfileUid) renderProfileAction(currentProfileUid);
+    renderFeedFromCache();
   });
   requestsOutUnsub = onSnapshot(query(collection(db,'friendRequests'), where('from','==',currentUser.uid), where('status','==','pending')), (snap) => {
     outgoingReq = new Set(snap.docs.map(d => d.data().to));
@@ -2175,7 +2380,6 @@ async function fetchAllUsers(){
   allUsersCache = snap.docs.map(d => ({ uid:d.id, ...d.data() })).filter(u => u.uid !== currentUser.uid);
   return allUsersCache;
 }
-
 function personRowHTML(u){
   const status = myFriends.has(u.uid) ? 'friends' : outgoingReq.has(u.uid) ? 'outgoing' : incomingReq.has(u.uid) ? 'incoming' : 'none';
   let actions = '';
@@ -2304,10 +2508,11 @@ async function loadProfileView(uid){
   try{
     const q = query(collection(db,'posts'), where('uid','==',uid), orderBy('createdAt','desc'));
     const psnap = await getDocs(q);
-    if(psnap.empty){
+    const visibleDocs = psnap.docs.filter(d => canViewPost(d.data()));
+    if(visibleDocs.length === 0){
       document.getElementById('profPostsEmpty').style.display = 'block';
     } else {
-      document.getElementById('profPostsList').innerHTML = psnap.docs.map(d => renderPost(d.id, d.data())).join('');
+      document.getElementById('profPostsList').innerHTML = visibleDocs.map(d => renderPost(d.id, d.data())).join('');
     }
   }catch(e){ console.error(e); }
 }
@@ -2339,7 +2544,6 @@ function renderProfileAction(uid, cachedUser){
 }
 
 function convoId(uidA, uidB){ return [uidA, uidB].sort().join('_'); }
-
 // ===== presence (lightweight "Active Xh ago") =====
 let presenceInterval = null;
 function startPresenceHeartbeat(){
@@ -2565,15 +2769,20 @@ window.sendMessage = async function(){
 };
 
 // ================= PHASE 10: Audio/Video Calling (WebRTC + Firestore signaling) =================
-// NOTE: uses public STUN servers only (no TURN). Calls work reliably on WiFi-to-WiFi and most
-// networks, but may fail to connect across some strict carrier NATs since no relay server is configured.
+// Uses STUN for NAT discovery plus a public TURN relay (openrelay.metered.ca) as a fallback path.
+// Without TURN, two devices on different networks/mobile carriers can often complete signaling
+// (offer/answer/ICE exchange all succeed) while the actual audio/video packets never get through —
+// that's exactly the "timer runs but no sound" symptom. TURN gives a relay path so media flows
+// even when a direct peer-to-peer route can't be established.
 const RTC_CONFIG = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' }
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
   ]
 };
-
 let pc = null;
 let localStream = null;
 let remoteStream = null;
@@ -2591,6 +2800,26 @@ let camOff = false;
 let ringAudioCtx = null;
 let ringIntervalId = null;
 let callTimerInterval = null;
+let callConnectedFired = false;
+
+function attachConnectionStateHandlers(){
+  if(!pc) return;
+  const onStateChange = () => {
+    if(!pc) return;
+    const state = pc.connectionState || pc.iceConnectionState;
+    if((state === 'connected' || state === 'completed') && !callConnectedFired){
+      callConnectedFired = true;
+      stopRingtone();
+      callStartTime = Date.now();
+      startCallTimer();
+    } else if(state === 'failed'){
+      toast('Call failed to connect — check your connection and try again.');
+      endCall(true, 'missed');
+    }
+  };
+  pc.onconnectionstatechange = onStateChange;
+  pc.oniceconnectionstatechange = onStateChange;
+}
 
 function formatCallDuration(sec){
   sec = Math.max(0, Math.round(sec));
@@ -2687,11 +2916,17 @@ window.startCall = async function(type){
   startRingtone(false);
 
   pc = new RTCPeerConnection(RTC_CONFIG);
+  callConnectedFired = false;
   localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
   if(type==='video') document.getElementById('localMedia').srcObject = localStream;
-  remoteStream = new MediaStream();
-  document.getElementById('remoteMedia').srcObject = remoteStream;
-  pc.ontrack = (event) => { event.streams[0].getTracks().forEach(tr => remoteStream.addTrack(tr)); };
+  pc.ontrack = (event) => {
+    const remoteEl = document.getElementById('remoteMedia');
+    if(remoteEl.srcObject !== event.streams[0]){
+      remoteEl.srcObject = event.streams[0];
+      remoteEl.play().catch(()=>{});
+    }
+  };
+  attachConnectionStateHandlers();
 
   const callRef = doc(collection(db,'calls'));
   currentCallId = callRef.id;
@@ -2717,8 +2952,7 @@ window.startCall = async function(type){
       try{
         await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
         stopRingtone();
-        callStartTime = Date.now();
-        startCallTimer();
+        setCallStatusText('Connecting…');
       }catch(e){ console.error(e); }
     }
   });
@@ -2770,11 +3004,17 @@ window.acceptIncomingCall = async function(){
   showCallOverlay(data.type, 'Connecting…');
 
   pc = new RTCPeerConnection(RTC_CONFIG);
+  callConnectedFired = false;
   localStream.getTracks().forEach(tr => pc.addTrack(tr, localStream));
   if(data.type==='video') document.getElementById('localMedia').srcObject = localStream;
-  remoteStream = new MediaStream();
-  document.getElementById('remoteMedia').srcObject = remoteStream;
-  pc.ontrack = (event) => { event.streams[0].getTracks().forEach(tr => remoteStream.addTrack(tr)); };
+  pc.ontrack = (event) => {
+    const remoteEl = document.getElementById('remoteMedia');
+    if(remoteEl.srcObject !== event.streams[0]){
+      remoteEl.srcObject = event.streams[0];
+      remoteEl.play().catch(()=>{});
+    }
+  };
+  attachConnectionStateHandlers();
 
   const calleeCandidates = collection(db,'calls',callId,'calleeCandidates');
   pc.onicecandidate = (event) => { if(event.candidate) addDoc(calleeCandidates, event.candidate.toJSON()).catch(()=>{}); };
@@ -2786,9 +3026,7 @@ window.acceptIncomingCall = async function(){
     await updateDoc(doc(db,'calls',callId), {
       status:'accepted', answer: { sdp: answerDescription.sdp, type: answerDescription.type }
     });
-    callStartTime = Date.now();
-    setCallStatusText('Connected');
-    startCallTimer();
+    setCallStatusText('Connecting…');
   }catch(e){ toast(e.message); cleanupCall(); return; }
 
   callDocUnsub = onSnapshot(doc(db,'calls',callId), (snap) => {
@@ -2832,6 +3070,7 @@ function cleanupCall(){
   if(callDocUnsub){ callDocUnsub(); callDocUnsub = null; }
   if(iceCandUnsub){ iceCandUnsub(); iceCandUnsub = null; }
   currentCallId = null; currentCallConvoId = null; callStartTime = null;
+  callConnectedFired = false;
   micMuted = false; camOff = false;
   const muteBtn = document.getElementById('muteBtn');
   const camBtn = document.getElementById('camBtn');
@@ -2879,7 +3118,6 @@ window.switchGroupsTab = function(tab){
   document.getElementById('tabMyGroups').classList.toggle('active', tab==='mine');
   renderGroupsList();
 };
-
 window.renderGroupsList = async function(){
   const list = document.getElementById('groupsList');
   const emptyEl = document.getElementById('groupsEmpty');
@@ -3068,7 +3306,6 @@ let currentAlbumOwnerUid = null;
 let currentAlbumId = null;
 let currentAlbumItems = [];
 let lightboxIndex = 0;
-
 window.navigatePhotos = function(uid){
   if(!uid) uid = currentUser.uid;
   currentAlbumOwnerUid = uid;
@@ -3297,7 +3534,6 @@ window.navigateUserDashboard = function(){
   document.getElementById('userDashSub').textContent = `${myFriends.size} ${t('friendsLabel')}`;
   loadUserDashboard();
 };
-
 async function loadUserDashboard(){
   const grid = document.getElementById('userDashStatGrid');
   grid.innerHTML = `<div class="loading">${t('loadingFeed')}</div>`;
