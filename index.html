@@ -1922,6 +1922,7 @@ window.deleteOwnPost = async function(id, col){
     toast('Deleted');
   }catch(e){ toast(e.message); }
 };
+
 // ===== Saved posts + Menu =====
 function startSavedListener(){
   if(!currentUser) return;
@@ -2090,7 +2091,7 @@ window.toggleComments = function(postId, col){
   const key = col+'-'+postId;
   const el = document.getElementById('comments-'+key);
   const isOpen = el.classList.contains('show');
-  if(isOpen){
+if(isOpen){
     el.classList.remove('show');
     openComments.delete(key);
     if(commentUnsubs[key]){ commentUnsubs[key](); delete commentUnsubs[key]; }
@@ -2302,7 +2303,6 @@ function updateReqBadges(){
     el.style.display = n > 0 ? 'inline-block' : 'none';
   });
 }
-
 window.navigateFeed = function(){
   currentProfileUid = null;
   setView('feedView');
@@ -2380,6 +2380,7 @@ async function fetchAllUsers(){
   allUsersCache = snap.docs.map(d => ({ uid:d.id, ...d.data() })).filter(u => u.uid !== currentUser.uid);
   return allUsersCache;
 }
+
 function personRowHTML(u){
   const status = myFriends.has(u.uid) ? 'friends' : outgoingReq.has(u.uid) ? 'outgoing' : incomingReq.has(u.uid) ? 'incoming' : 'none';
   let actions = '';
@@ -2493,7 +2494,6 @@ window.unfriend = async function(uid){
     await deleteDoc(doc(db,'users',uid,'friends',currentUser.uid));
   }catch(e){ toast(e.message); }
 };
-
 async function loadProfileView(uid){
   document.getElementById('profPostsList').innerHTML = '';
   document.getElementById('profPostsEmpty').style.display = 'none';
@@ -2544,6 +2544,7 @@ function renderProfileAction(uid, cachedUser){
 }
 
 function convoId(uidA, uidB){ return [uidA, uidB].sort().join('_'); }
+
 // ===== presence (lightweight "Active Xh ago") =====
 let presenceInterval = null;
 function startPresenceHeartbeat(){
@@ -2783,6 +2784,7 @@ const RTC_CONFIG = {
     { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
   ]
 };
+
 let pc = null;
 let localStream = null;
 let remoteStream = null;
@@ -2801,6 +2803,34 @@ let ringAudioCtx = null;
 let ringIntervalId = null;
 let callTimerInterval = null;
 let callConnectedFired = false;
+let pendingIceCandidates = [];
+let connectTimeoutId = null;
+
+function queueOrAddIceCandidate(candidateData){
+  if(!pc) return;
+  if(pc.remoteDescription && pc.remoteDescription.type){
+    pc.addIceCandidate(new RTCIceCandidate(candidateData)).catch(e => console.error('addIceCandidate failed:', e));
+  } else {
+    pendingIceCandidates.push(candidateData);
+  }
+}
+function flushPendingIceCandidates(){
+  if(!pc) return;
+  pendingIceCandidates.forEach(c => pc.addIceCandidate(new RTCIceCandidate(c)).catch(e => console.error('addIceCandidate (flush) failed:', e)));
+  pendingIceCandidates = [];
+}
+function startConnectTimeout(){
+  clearConnectTimeout();
+  connectTimeoutId = setTimeout(() => {
+    if(!callConnectedFired){
+      toast('Could not connect the call — please check your connection and try again.');
+      endCall(true, 'missed');
+    }
+  }, 25000);
+}
+function clearConnectTimeout(){
+  if(connectTimeoutId){ clearTimeout(connectTimeoutId); connectTimeoutId = null; }
+}
 
 function attachConnectionStateHandlers(){
   if(!pc) return;
@@ -2809,6 +2839,7 @@ function attachConnectionStateHandlers(){
     const state = pc.connectionState || pc.iceConnectionState;
     if((state === 'connected' || state === 'completed') && !callConnectedFired){
       callConnectedFired = true;
+      clearConnectTimeout();
       stopRingtone();
       callStartTime = Date.now();
       startCallTimer();
@@ -2917,6 +2948,7 @@ window.startCall = async function(type){
 
   pc = new RTCPeerConnection(RTC_CONFIG);
   callConnectedFired = false;
+  pendingIceCandidates = [];
   localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
   if(type==='video') document.getElementById('localMedia').srcObject = localStream;
   pc.ontrack = (event) => {
@@ -2951,14 +2983,16 @@ window.startCall = async function(type){
     if(data.status === 'accepted' && data.answer && pc && !pc.currentRemoteDescription){
       try{
         await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+        flushPendingIceCandidates();
         stopRingtone();
         setCallStatusText('Connecting…');
+        startConnectTimeout();
       }catch(e){ console.error(e); }
     }
   });
   iceCandUnsub = onSnapshot(collection(db,'calls',currentCallId,'calleeCandidates'), (snap) => {
     snap.docChanges().forEach(change => {
-      if(change.type === 'added' && pc){ pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(()=>{}); }
+      if(change.type === 'added') queueOrAddIceCandidate(change.doc.data());
     });
   });
 };
@@ -3005,6 +3039,7 @@ window.acceptIncomingCall = async function(){
 
   pc = new RTCPeerConnection(RTC_CONFIG);
   callConnectedFired = false;
+  pendingIceCandidates = [];
   localStream.getTracks().forEach(tr => pc.addTrack(tr, localStream));
   if(data.type==='video') document.getElementById('localMedia').srcObject = localStream;
   pc.ontrack = (event) => {
@@ -3027,6 +3062,7 @@ window.acceptIncomingCall = async function(){
       status:'accepted', answer: { sdp: answerDescription.sdp, type: answerDescription.type }
     });
     setCallStatusText('Connecting…');
+    startConnectTimeout();
   }catch(e){ toast(e.message); cleanupCall(); return; }
 
   callDocUnsub = onSnapshot(doc(db,'calls',callId), (snap) => {
@@ -3035,7 +3071,7 @@ window.acceptIncomingCall = async function(){
   });
   iceCandUnsub = onSnapshot(collection(db,'calls',callId,'callerCandidates'), (snap) => {
     snap.docChanges().forEach(change => {
-      if(change.type === 'added' && pc){ pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(()=>{}); }
+      if(change.type === 'added') queueOrAddIceCandidate(change.doc.data());
     });
   });
 };
@@ -3065,12 +3101,14 @@ window.endCall = async function(notifyRemote, statusOverride){
 function cleanupCall(){
   stopRingtone();
   stopCallTimer();
+  clearConnectTimeout();
   if(pc){ try{ pc.close(); }catch(e){} pc = null; }
   if(localStream){ localStream.getTracks().forEach(tr => tr.stop()); localStream = null; }
   if(callDocUnsub){ callDocUnsub(); callDocUnsub = null; }
   if(iceCandUnsub){ iceCandUnsub(); iceCandUnsub = null; }
   currentCallId = null; currentCallConvoId = null; callStartTime = null;
   callConnectedFired = false;
+  pendingIceCandidates = [];
   micMuted = false; camOff = false;
   const muteBtn = document.getElementById('muteBtn');
   const camBtn = document.getElementById('camBtn');
@@ -3118,6 +3156,7 @@ window.switchGroupsTab = function(tab){
   document.getElementById('tabMyGroups').classList.toggle('active', tab==='mine');
   renderGroupsList();
 };
+
 window.renderGroupsList = async function(){
   const list = document.getElementById('groupsList');
   const emptyEl = document.getElementById('groupsEmpty');
@@ -3298,7 +3337,6 @@ window.submitGroupPost = async function(gid){
   }catch(e){ toast(e.message || t('postFailed')); }
   finally{ btn.disabled = false; }
 };
-
 // ================= PHASE 5: Photos & Videos =================
 let albumsUnsub = null;
 let mediaUnsub = null;
@@ -3306,6 +3344,7 @@ let currentAlbumOwnerUid = null;
 let currentAlbumId = null;
 let currentAlbumItems = [];
 let lightboxIndex = 0;
+
 window.navigatePhotos = function(uid){
   if(!uid) uid = currentUser.uid;
   currentAlbumOwnerUid = uid;
@@ -3534,6 +3573,7 @@ window.navigateUserDashboard = function(){
   document.getElementById('userDashSub').textContent = `${myFriends.size} ${t('friendsLabel')}`;
   loadUserDashboard();
 };
+
 async function loadUserDashboard(){
   const grid = document.getElementById('userDashStatGrid');
   grid.innerHTML = `<div class="loading">${t('loadingFeed')}</div>`;
@@ -3577,15 +3617,14 @@ window.switchAdminTab = function(tab){
   else if(tab==='posts') renderAdminPosts();
   else if(tab==='groups') renderAdminGroups();
 };
-
-async function loadAdminOverview(){
-  try{
+async function loadAdminOverview() {
+  try {
     const [uSnap, pSnap, gpSnap, gSnap, aSnap] = await Promise.all([
-      getCountFromServer(collection(db,'users')),
-      getCountFromServer(collection(db,'posts')),
-      getCountFromServer(collection(db,'groupPosts')),
-      getCountFromServer(collection(db,'groups')),
-      getCountFromServer(collection(db,'albums'))
+      getCountFromServer(collection(db, 'users')),
+      getCountFromServer(collection(db, 'posts')),
+      getCountFromServer(collection(db, 'groupPosts')),
+      getCountFromServer(collection(db, 'groups')),
+      getCountFromServer(collection(db, 'albums'))
     ]);
     document.getElementById('statGrid').innerHTML = `
       <div class="stat-card"><div class="num">${uSnap.data().count}</div><div class="lbl">${t('statUsers')}</div></div>
@@ -3594,15 +3633,15 @@ async function loadAdminOverview(){
       <div class="stat-card"><div class="num">${gSnap.data().count}</div><div class="lbl">${t('statGroupsAdmin')}</div></div>
       <div class="stat-card"><div class="num">${aSnap.data().count}</div><div class="lbl">${t('statAlbums')}</div></div>
     `;
-  }catch(e){ console.error(e); }
+  } catch (e) { console.error(e); }
 }
 
-window.renderAdminUsers = async function(){
+window.renderAdminUsers = async function() {
   const list = document.getElementById('adminUsersList');
   const term = (document.getElementById('adminUserSearch').value || '').trim().toLowerCase();
-  const snap = await getDocs(collection(db,'users'));
-  const users = snap.docs.map(d => ({ uid:d.id, ...d.data() }));
-  const filtered = users.filter(u => !term || (u.displayName||'').toLowerCase().includes(term));
+  const snap = await getDocs(collection(db, 'users'));
+  const users = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+  const filtered = users.filter(u => !term || (u.displayName || '').toLowerCase().includes(term));
   list.innerHTML = filtered.map(u => `
     <div class="admin-row">
       <div class="avatar">${avatarHTML(u.photoURL, u.displayName)}</div>
@@ -3617,25 +3656,25 @@ window.renderAdminUsers = async function(){
     </div>`).join('');
 };
 
-window.adminToggleSuspend = async function(uid, isSuspended){
-  try{
-    await updateDoc(doc(db,'users',uid), { suspended: !isSuspended });
+window.adminToggleSuspend = async function(uid, isSuspended) {
+  try {
+    await updateDoc(doc(db, 'users', uid), { suspended: !isSuspended });
     renderAdminUsers();
     toast('Updated');
-  }catch(e){ toast(e.message); }
+  } catch (e) { toast(e.message); }
 };
 
-window.adminToggleAdmin = async function(uid, isAdmin){
-  try{
-    await updateDoc(doc(db,'users',uid), { isAdmin: !isAdmin });
+window.adminToggleAdmin = async function(uid, isAdmin) {
+  try {
+    await updateDoc(doc(db, 'users', uid), { isAdmin: !isAdmin });
     renderAdminUsers();
     toast('Updated');
-  }catch(e){ toast(e.message); }
+  } catch (e) { toast(e.message); }
 };
 
-async function renderAdminPosts(){
+async function renderAdminPosts() {
   const list = document.getElementById('adminPostsList');
-  const snap = await getDocs(query(collection(db,'posts'), orderBy('createdAt','desc'), limit(50)));
+  const snap = await getDocs(query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(50)));
   list.innerHTML = snap.docs.map(d => {
     const p = d.id;
     const dat = d.data();
@@ -3649,18 +3688,18 @@ async function renderAdminPosts(){
   }).join('');
 }
 
-window.adminDeletePost = async function(id, col){
-  if(!confirm(t('confirmDeletePost'))) return;
-  try{
-    await deleteDoc(doc(db,col,id));
+window.adminDeletePost = async function(id, col) {
+  if (!confirm(t('confirmDeletePost'))) return;
+  try {
+    await deleteDoc(doc(db, col, id));
     toast('Deleted');
-    if(currentAdminTab==='posts') renderAdminPosts();
-  }catch(e){ toast(e.message); }
+    if (currentAdminTab === 'posts') renderAdminPosts();
+  } catch (e) { toast(e.message); }
 };
 
-async function renderAdminGroups(){
+async function renderAdminGroups() {
   const list = document.getElementById('adminGroupsList');
-  const snap = await getDocs(collection(db,'groups'));
+  const snap = await getDocs(collection(db, 'groups'));
   list.innerHTML = snap.docs.map(d => {
     const g = d.data();
     return `<div class="admin-row">
@@ -3673,14 +3712,14 @@ async function renderAdminGroups(){
   }).join('');
 }
 
-window.adminDeleteGroup = async function(gid){
-  if(!confirm(t('confirmDeleteGroup'))) return;
-  try{
-    await deleteDoc(doc(db,'groups',gid));
+window.adminDeleteGroup = async function(gid) {
+  if (!confirm(t('confirmDeleteGroup'))) return;
+  try {
+    await deleteDoc(doc(db, 'groups', gid));
     toast('Deleted');
     renderAdminGroups();
-  }catch(e){ toast(e.message); }
+  } catch (e) { toast(e.message); }
 };
-</script>
-</body>
+</script> 
+</body> 
 </html>
