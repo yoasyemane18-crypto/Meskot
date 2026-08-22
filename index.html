@@ -252,18 +252,21 @@
 
   .people-list{display:flex;flex-direction:column;gap:10px;}
   .person-row{
-    display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);
+    display:flex;align-items:flex-start;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);
   }
   .person-row .who{flex:1;min-width:0;}
+  .person-row .who-col{flex:1;min-width:0;align-self:stretch;}
+  .who-col .who{margin-bottom:10px;}
   .person-row .name{font-weight:600;font-size:14px;}
   .person-row .sub{font-size:11.5px;color:var(--muted);}
   .fbtn{
-    padding:7px 13px;border-radius:8px;font-size:12.5px;font-weight:600;border:1px solid var(--ink);background:var(--ink);color:#fff;white-space:nowrap;
+    padding:8px 13px;border-radius:8px;font-size:12.5px;font-weight:600;border:1px solid var(--ink);background:var(--ink);color:#fff;white-space:nowrap;
   }
   .fbtn.outline{background:transparent;color:var(--ink);}
   .fbtn.gold{background:var(--gold);border-color:var(--gold);}
   .fbtn.subtle{background:var(--paper-2);border-color:var(--line);color:var(--ink);}
-  .fbtn-row{display:flex;gap:6px;}
+  .fbtn-row{display:flex;gap:8px;}
+  .fbtn-row .fbtn, .fbtn-row .msg-btn{flex:1;text-align:center;}
 
   .profile-header{
     background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 22px;margin-bottom:18px;
@@ -391,6 +394,13 @@
   .stat-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;box-shadow:var(--shadow);}
   .stat-card .num{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--gold-deep);}
   .stat-card .lbl{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .dash-period-label{font-size:12.5px;color:var(--muted);margin:-4px 0 14px;}
+  .dash-content-row{
+    display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);cursor:pointer;
+  }
+  .dash-content-text{font-size:13.5px;font-weight:600;}
+  .dash-content-meta{display:flex;gap:12px;font-size:11.5px;color:var(--muted);margin-top:4px;}
   .admin-row{
     display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;
     padding:11px 14px;margin-bottom:8px;box-shadow:var(--shadow);
@@ -550,6 +560,17 @@
   }
   .local-video-pip.show{display:block;}
   .call-info{position:relative;z-index:1;text-align:center;color:#EEF2ED;margin-top:60px;}
+  .enable-sound-btn{
+    position:absolute;top:20px;left:50%;transform:translateX(-50%);z-index:3;
+    background:var(--gold);color:#fff;border:none;border-radius:20px;padding:10px 18px;
+    font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.35);
+  }
+  .tip-amount-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+  .tip-amount-chip{
+    flex:1 1 calc(50% - 8px);padding:12px 10px;border-radius:10px;border:1.5px solid var(--line);
+    background:#fff;font-weight:700;font-size:14px;color:var(--ink);
+  }
+  .tip-amount-chip.selected{border-color:var(--gold);background:var(--gold);color:#fff;}
   .call-avatar{width:110px;height:110px;font-size:38px;margin:0 auto 16px;border:3px solid rgba(255,255,255,0.2);}
   .call-name{font-family:'Fraunces',serif;font-size:23px;font-weight:600;}
   .call-status{font-size:14px;opacity:.75;margin-top:6px;}
@@ -665,6 +686,13 @@
     text-align:center;padding:24px;color:#fff;font-size:24px;font-weight:600;line-height:1.5;
     text-shadow:0 1px 4px rgba(0,0,0,0.25);word-break:break-word;white-space:pre-wrap;
   }
+  .post-body-clamped{
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .see-more-btn{
+    display:block;width:100%;text-align:left;background:none;border:none;padding:0 16px 12px;
+    margin-top:-8px;color:var(--muted);font-weight:700;font-size:13.5px;
+  }
 </style></head>
 <body>
 
@@ -679,14 +707,17 @@
     <div class="brand-name">Meskot<small lang-am>መስኮት · መስኮትህ ለማህበረሰብህ</small></div>
   </div>
   <div class="nav-right">
-    <div class="lang-toggle">
-      <button id="langEn" class="active" onclick="setLang('en')">EN</button>
-      <button id="langAm" onclick="setLang('am')">አማ</button>
-    </div>
-    <button id="menuNavBtn" class="menu-nav-btn" onclick="navigateMenu()" style="display:none;" title="Menu">☰</button>
-    <div id="navAuthArea"></div>
+  <div class="lang-toggle">
+    <button id="langEn" class="active" onclick="setLang('en')">EN</button>
+    <button id="langAm" onclick="setLang('am')">አማ</button>
   </div>
+  <button id="composerNavBtn" class="menu-nav-btn" onclick="openComposerModal('feed')" style="display:none;" title="Create post">➕</button>
+  <button id="searchNavBtn" class="menu-nav-btn" onclick="openSearchNav()" style="display:none;" title="Search">🔍</button>
+  <button id="menuNavBtn" class="menu-nav-btn" onclick="navigateMenu()" style="display:none;" title="Menu">☰</button>
+  <div id="navAuthArea"></div>
+</div>
 </nav>
+
 
 <nav class="icon-nav" id="iconNav" style="display:none;">
   <button class="inav-btn active" data-view="feed" onclick="navigateFeed()" title="Feed">
@@ -933,8 +964,27 @@
         <h2 id="userDashName"></h2>
         <p id="userDashSub"></p>
       </div>
-      <h2 class="section-title" data-t="myDashboard">Dashboard</h2>
-      <div class="stat-grid" id="userDashStatGrid"></div>
+      <div class="tabs">
+        <button class="tab active" id="tabDashHome" onclick="switchDashTab('home')" data-t="tabOverview">Home</button>
+        <button class="tab" id="tabDashInsights" onclick="switchDashTab('insights')" data-t="tabInsights">Insights</button>
+        <button class="tab" id="tabDashContent" onclick="switchDashTab('content')" data-t="tabContent">Content</button>
+        <button class="tab" id="tabDashEngagement" onclick="switchDashTab('engagement')" data-t="tabEngagementDash">Engagement</button>
+      </div>
+      <div id="dashHomePanel">
+        <div class="stat-grid" id="userDashStatGrid"></div>
+      </div>
+      <div id="dashInsightsPanel" style="display:none;">
+        <p class="dash-period-label" data-t="last28Days">Last 28 days</p>
+        <div class="stat-grid" id="dashInsightsGrid"></div>
+      </div>
+      <div id="dashContentPanel" style="display:none;">
+        <div id="dashContentList"></div>
+        <div id="dashContentEmpty" class="empty-small" style="display:none;" data-t="noPostsYet">No posts yet.</div>
+      </div>
+      <div id="dashEngagementPanel" style="display:none;">
+        <div id="dashEngagementList"></div>
+        <div id="dashEngagementEmpty" class="empty-small" style="display:none;" data-t="noEngagementYet">No engagement yet.</div>
+      </div>
     </div>
 
     <!-- ADMIN DASHBOARD -->
@@ -1040,10 +1090,34 @@
   </div>
 </div>
 
+<!-- tip / support modal -->
+<div class="modal-bg" id="tipModalBg">
+  <div class="modal">
+    <h3 data-t="supportCreator">Support this creator</h3>
+    <p class="auth-sub" data-t="supportSub" style="margin-bottom:16px;">100% goes to them via Chapa — Meskot takes no cut.</p>
+    <div class="tip-amount-row" id="tipAmountRow">
+      <button class="tip-amount-chip" onclick="selectTipAmount(10, this)">10 ETB</button>
+      <button class="tip-amount-chip" onclick="selectTipAmount(25, this)">25 ETB</button>
+      <button class="tip-amount-chip" onclick="selectTipAmount(50, this)">50 ETB</button>
+      <button class="tip-amount-chip" onclick="selectTipAmount(100, this)">100 ETB</button>
+    </div>
+    <div class="field">
+      <label data-t="customAmount">Custom amount (ETB)</label>
+      <input type="number" id="tipCustomAmount" min="5" placeholder="e.g. 30">
+    </div>
+    <div id="tipErr" class="auth-error" style="display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeTipModal()" data-t="cancel">Cancel</button>
+      <button class="btn gold" id="tipConfirmBtn" onclick="confirmTip()" data-t="continueToPay">Continue to pay</button>
+    </div>
+  </div>
+</div>
+
 <!-- full-screen call overlay -->
 <div class="call-overlay" id="callOverlay">
   <video id="remoteMedia" autoplay playsinline></video>
   <video id="localMedia" autoplay playsinline muted class="local-video-pip"></video>
+  <button id="enableSoundBtn" class="enable-sound-btn" style="display:none;" onclick="enableCallSound()">🔊 Tap to enable sound</button>
   <div class="call-info">
     <div class="avatar call-avatar" id="callAvatar"></div>
     <div class="call-name" id="callName"></div>
@@ -1158,6 +1232,10 @@ const firebaseConfig = {
   measurementId: "G-VXMRY8JGTE"
 };
 
+// Fill this in after deploying the Cloud Function — see DEPLOY_GUIDE.md.
+// Example: "https://us-central1-meskot-b1a69.cloudfunctions.net/initializeTip"
+const TIP_ENDPOINT_URL = "YOUR_INITIALIZE_TIP_FUNCTION_URL";
+
 let fbApp, auth, db, storage, configured = true;
 try {
   if (firebaseConfig.apiKey === "YOUR_API_KEY") throw new Error("not configured");
@@ -1251,7 +1329,16 @@ const dict = {
     createPost:"Create post", composerModalPh:"What's on your mind?",
     whoCanSee:"Who can see your post?", whoCanSeeSub:"Your post will show up in your feed, on your profile, and in search results.",
     public:"Public", publicSub:"Anyone on Meskot", friendsSub:"Your friends on Meskot",
-    onlyMe:"Only me", onlyMeSub:"Only visible to you", done:"Done"
+    onlyMe:"Only me", onlyMeSub:"Only visible to you", done:"Done",
+    seeMore:"… See more", seeLess:"See less",
+    tabInsights:"Insights", tabContent:"Content", tabEngagementDash:"Engagement",
+    last28Days:"Last 28 days", postsMade:"Posts made", reactionsGot:"Reactions received",
+    commentsGot:"Comments received", newFriends:"New friends", noEngagementYet:"No engagement yet.",
+    mediaPost:"[Media post]",
+    support:"Support", supportCreator:"Support this creator",
+    supportSub:"100% goes to them via Chapa — Meskot takes no cut.",
+    customAmount:"Custom amount (ETB)", continueToPay:"Continue to pay",
+    etbReceived:"ETB received", notifTipSuffix:"sent you a tip"
   },
   am: {
     welcomeBack:"እንኳን ደህና መጡ", loginSub:"ማህበረሰብዎ ምን እያካፈለ እንደሆነ ለማየት ይግቡ",
@@ -1309,7 +1396,16 @@ const dict = {
     createPost:"ልጥፍ ይፍጠሩ", composerModalPh:"ምን እያሰቡ ነው?",
     whoCanSee:"ልጥፍዎን ማን ማየት ይችላል?", whoCanSeeSub:"ልጥፍዎ በዜና ምግብዎ፣ በመገለጫዎ እና በፍለጋ ውጤቶች ውስጥ ይታያል።",
     public:"ሁሉም", publicSub:"በመስኮት ላይ ያለ ማንኛውም ሰው", friendsSub:"በመስኮት ላይ ያሉ ጓደኞችዎ",
-    onlyMe:"እኔ ብቻ", onlyMeSub:"ለእርስዎ ብቻ የሚታይ", done:"ተጠናቋል"
+    onlyMe:"እኔ ብቻ", onlyMeSub:"ለእርስዎ ብቻ የሚታይ", done:"ተጠናቋል",
+    seeMore:"… ተጨማሪ ይመልከቱ", seeLess:"አሳንስ",
+    tabInsights:"ግንዛቤዎች", tabContent:"ይዘት", tabEngagementDash:"ተሳትፎ",
+    last28Days:"ያለፉት 28 ቀናት", postsMade:"የተለጠፉ ልጥፎች", reactionsGot:"የተገኙ ምላሾች",
+    commentsGot:"የተገኙ አስተያየቶች", newFriends:"አዲስ ጓደኞች", noEngagementYet:"እስካሁን ምንም ተሳትፎ የለም።",
+    mediaPost:"[የሚዲያ ልጥፍ]",
+    support:"ድጋፍ", supportCreator:"ይህን ፈጣሪ ይደግፉ",
+    supportSub:"100% ገንዘቡ በቻፓ በኩል ወደ እነሱ ይሄዳል — መስኮት ምንም አይወስድም።",
+    customAmount:"ሌላ መጠን (ብር)", continueToPay:"ወደ ክፍያ ይቀጥሉ",
+    etbReceived:"ብር ተገኝቷል", notifTipSuffix:"ስጦታ ልኮልዎታል"
   }
 };
 let lang = localStorage.getItem('meskot_lang') || 'en';
@@ -1446,7 +1542,9 @@ window.checkVerifiedStatus = async function(){
       renderSidebar();
       renderNavAuthArea();
       document.getElementById('iconNav').style.display = 'flex';
-      document.getElementById('menuNavBtn').style.display = 'flex';
+document.getElementById('composerNavBtn').style.display = 'flex';
+document.getElementById('searchNavBtn').style.display = 'flex';
+document.getElementById('menuNavBtn').style.display = 'flex';
       startFeedListener();
       startFriendsListeners();
       startMessagesListener();
@@ -1455,6 +1553,7 @@ window.checkVerifiedStatus = async function(){
       startPresenceHeartbeat();
       startIncomingCallListener();
       startSavedListener();
+      checkTipReturnParam();
       navigateFeed();
     } else {
       toast(t('notYetVerified'));
@@ -1509,6 +1608,9 @@ if (configured) {
       renderSidebar();
       renderNavAuthArea();
       document.getElementById('iconNav').style.display = 'flex';
+      document.getElementById('composerNavBtn').style.display = 'flex';
+      document.getElementById('searchNavBtn').style.display = 'flex';
+      document.getElementById('menuNavBtn').style.display = 'flex';
       startFeedListener();
       startFriendsListeners();
       startMessagesListener();
@@ -1517,6 +1619,7 @@ if (configured) {
       startPresenceHeartbeat();
       startIncomingCallListener();
       startSavedListener();
+      checkTipReturnParam();
       navigateFeed();
     } else {
       currentProfile = null;
@@ -1524,7 +1627,10 @@ if (configured) {
       document.getElementById('verifyEmailWrap').style.display = 'none';
       document.getElementById('app').classList.remove('show');
       renderNavAuthArea();
-      document.getElementById('iconNav').style.display = 'none';
+document.getElementById('iconNav').style.display = 'none';
+document.getElementById('composerNavBtn').style.display = 'none';
+document.getElementById('searchNavBtn').style.display = 'none';
+document.getElementById('menuNavBtn').style.display = 'none';
       if(suspendedFlag){ showAuthError(t('accountSuspended')); suspendedFlag = false; }
       if(unsubFeed) unsubFeed();
       if(friendsUnsub) friendsUnsub();
@@ -1694,6 +1800,78 @@ function mediaUploadTimeout(files){
   return Math.min(Math.max(sizeBased, base), 600000); // cap at 10 minutes
 }
 
+// ===== Tipping (Chapa) =====
+let pendingTipTarget = null; // { postId, col, toUid }
+let selectedTipAmount = null;
+
+window.openTipModal = function(postId, col, toUid){
+  if(!currentUser) return;
+  if(TIP_ENDPOINT_URL === "YOUR_INITIALIZE_TIP_FUNCTION_URL"){
+    toast("Tipping isn't set up yet — see DEPLOY_GUIDE.md.");
+    return;
+  }
+  pendingTipTarget = { postId, col, toUid };
+  selectedTipAmount = null;
+  document.querySelectorAll('.tip-amount-chip').forEach(el => el.classList.remove('selected'));
+  document.getElementById('tipCustomAmount').value = '';
+  document.getElementById('tipErr').style.display = 'none';
+  document.getElementById('tipModalBg').classList.add('show');
+};
+window.closeTipModal = function(){
+  document.getElementById('tipModalBg').classList.remove('show');
+  pendingTipTarget = null;
+};
+window.selectTipAmount = function(amount, btnEl){
+  selectedTipAmount = amount;
+  document.getElementById('tipCustomAmount').value = '';
+  document.querySelectorAll('.tip-amount-chip').forEach(el => el.classList.remove('selected'));
+  btnEl.classList.add('selected');
+};
+window.confirmTip = async function(){
+  if(!pendingTipTarget || !currentUser) return;
+  const customVal = parseFloat(document.getElementById('tipCustomAmount').value);
+  const amount = customVal > 0 ? customVal : selectedTipAmount;
+  const errEl = document.getElementById('tipErr');
+  if(!amount || amount < 5){
+    errEl.textContent = 'Please choose or enter at least 5 ETB.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  const btn = document.getElementById('tipConfirmBtn');
+  btn.disabled = true;
+  try{
+    const idToken = await currentUser.getIdToken();
+    const resp = await fetch(TIP_ENDPOINT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+      body: JSON.stringify({ postId: pendingTipTarget.postId, col: pendingTipTarget.col, toUid: pendingTipTarget.toUid, amount })
+    });
+    const data = await resp.json();
+    if(!resp.ok || !data.checkoutUrl){
+      errEl.textContent = data.error || 'Could not start payment.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      return;
+    }
+    window.location.href = data.checkoutUrl;
+  }catch(e){
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+  }
+};
+function checkTipReturnParam(){
+  const params = new URLSearchParams(window.location.search);
+  const txRef = params.get('tip');
+  if(txRef){
+    toast('Thanks for your support! 💰 (payment confirming…)');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('tip');
+    window.history.replaceState({}, '', url);
+  }
+}
+
 window.sharePost = async function(id, col){
   if(!currentUser) return;
   try{
@@ -1821,6 +1999,27 @@ function sharedPostBoxHTML(sf){
     ${postMediaGridHTML(media)}
   </div>`;
 }
+const SEE_MORE_THRESHOLD = 140; // roughly two lines of body text on a phone screen
+function renderPostBodyHTML(text, col, id){
+  const escaped = escapeHtml(text);
+  if(text.length <= SEE_MORE_THRESHOLD){
+    return `<div class="post-body" id="postBody-${col}-${id}">${escaped}</div>`;
+  }
+  return `<div class="post-body post-body-clamped" id="postBody-${col}-${id}">${escaped}</div>
+    <button class="see-more-btn" id="seeMoreBtn-${col}-${id}" onclick="event.stopPropagation();toggleSeeMore('${col}','${id}')">${t('seeMore')}</button>`;
+}
+window.toggleSeeMore = function(col, id){
+  const bodyEl = document.getElementById(`postBody-${col}-${id}`);
+  const btn = document.getElementById(`seeMoreBtn-${col}-${id}`);
+  if(!bodyEl || !btn) return;
+  if(bodyEl.classList.contains('post-body-clamped')){
+    bodyEl.classList.remove('post-body-clamped');
+    btn.textContent = t('seeLess');
+  } else {
+    bodyEl.classList.add('post-body-clamped');
+    btn.textContent = t('seeMore');
+  }
+};
 function renderPost(id, p, col){
   col = col || 'posts';
   const reactionMap = getReactionMap(p);
@@ -1850,7 +2049,7 @@ function renderPost(id, p, col){
       ${sharedTag}
       ${p.bgColor
         ? `<div class="post-bg-body" id="postBody-${col}-${id}" style="background:${p.bgColor};">${escapeHtml(p.text)}</div>`
-        : (p.text ? `<div class="post-body" id="postBody-${col}-${id}">${escapeHtml(p.text)}</div>` : `<div class="post-body" id="postBody-${col}-${id}" style="display:none;"></div>`)
+        : (p.text ? renderPostBodyHTML(p.text, col, id) : `<div class="post-body" id="postBody-${col}-${id}" style="display:none;"></div>`)
       }
       <div class="post-edit-form" id="postEditForm-${col}-${id}" style="display:none;">
         <textarea id="postEditInput-${col}-${id}" rows="3"></textarea>
@@ -1860,7 +2059,10 @@ function renderPost(id, p, col){
         </div>
       </div>
       ${p.sharedFrom ? sharedPostBoxHTML(p.sharedFrom) : postMediaGridHTML(media)}
-      ${summary.total > 0 ? `<div class="post-reactions-line"><span class="reaction-icons">${summary.top.map(k=>`<span>${REACTIONS[k].emoji}</span>`).join('')}</span> ${summary.total} ${t('likesLabel')}</div>` : ''}
+      ${(summary.total > 0 || (p.tipTotal||0) > 0) ? `<div class="post-reactions-line">
+        ${summary.total > 0 ? `<span class="reaction-icons">${summary.top.map(k=>`<span>${REACTIONS[k].emoji}</span>`).join('')}</span> ${summary.total} ${t('likesLabel')}` : ''}
+        ${(p.tipTotal||0) > 0 ? `<span style="margin-left:auto;">💰 ${p.tipTotal} ${t('etbReceived')}</span>` : ''}
+      </div>` : ''}
       <div class="post-actions">
         <div class="react-wrap"
              onmouseenter="showReactPicker('${col}-${id}')" onmouseleave="hideReactPickerDelay('${col}-${id}')">
@@ -1874,6 +2076,7 @@ function renderPost(id, p, col){
         <button onclick="toggleComments('${id}','${col}')">💬 ${t('comment')} ${p.commentCount ? `· ${p.commentCount}` : ''}</button>
         <button onclick="sharePost('${id}','${col}')">🔗 ${t('share')}</button>
         <button class="save-btn ${mySavedPostKeys.has(col+'_'+id)?'saved':''}" id="saveBtn-${col}-${id}" onclick="toggleSavePost('${id}','${col}')">🔖</button>
+        ${(!isMine) ? `<button onclick="openTipModal('${id}','${col}','${p.uid}')">💰 ${t('support')}</button>` : ''}
       </div>
       <div class="comments" id="comments-${col}-${id}">
         <div id="commentList-${col}-${id}"></div>
@@ -1959,6 +2162,11 @@ window.navigateMenu = function(){
     document.getElementById('menuName').textContent = currentProfile.displayName || 'User';
     document.getElementById('menuAdminCard').style.display = currentProfile.isAdmin ? 'flex' : 'none';
   }
+};
+window.openSearchNav = function() {
+  navigateFriends();
+  switchFriendsTab('discover');
+  setTimeout(() => { const inp = document.getElementById('peopleSearch'); if (inp) inp.focus(); }, 50);
 };
 window.navigateSaved = async function(){
   setView('savedView');
@@ -2091,7 +2299,7 @@ window.toggleComments = function(postId, col){
   const key = col+'-'+postId;
   const el = document.getElementById('comments-'+key);
   const isOpen = el.classList.contains('show');
-if(isOpen){
+  if(isOpen){
     el.classList.remove('show');
     openComments.delete(key);
     if(commentUnsubs[key]){ commentUnsubs[key](); delete commentUnsubs[key]; }
@@ -2303,6 +2511,7 @@ function updateReqBadges(){
     el.style.display = n > 0 ? 'inline-block' : 'none';
   });
 }
+
 window.navigateFeed = function(){
   currentProfileUid = null;
   setView('feedView');
@@ -2390,22 +2599,24 @@ function personRowHTML(u){
       <button class="fbtn subtle" onclick="unfriend('${u.uid}')">${t('unfriend')}</button>
     </div>`;
   } else if(status === 'outgoing'){
-    actions = `<button class="fbtn outline" onclick="cancelRequestTo('${u.uid}')">${t('requested')}</button>`;
+    actions = `<div class="fbtn-row"><button class="fbtn outline" onclick="cancelRequestTo('${u.uid}')">${t('requested')}</button></div>`;
   } else if(status === 'incoming'){
     actions = `<div class="fbtn-row">
       <button class="fbtn gold" onclick="acceptRequest('${u.uid}')">${t('accept')}</button>
       <button class="fbtn outline" onclick="declineRequestFrom('${u.uid}')">${t('decline')}</button>
     </div>`;
   } else {
-    actions = `<button class="fbtn gold" onclick="sendFriendRequest('${u.uid}')">${t('addFriend')}</button>`;
+    actions = `<div class="fbtn-row"><button class="fbtn gold" onclick="sendFriendRequest('${u.uid}')">${t('addFriend')}</button></div>`;
   }
   return `<div class="person-row">
     <div class="avatar clickable-id" onclick="navigateProfile('${u.uid}')">${avatarHTML(u.photoURL,u.displayName)}</div>
-    <div class="who clickable-id" onclick="navigateProfile('${u.uid}')">
-      <div class="name">${escapeHtml(u.displayName||'User')}</div>
-      <div class="sub">${escapeHtml(u.bio||'')}</div>
+    <div class="who-col">
+      <div class="who clickable-id" onclick="navigateProfile('${u.uid}')">
+        <div class="name">${escapeHtml(u.displayName||'User')}</div>
+        <div class="sub">${escapeHtml(u.bio||'')}</div>
+      </div>
+      ${actions}
     </div>
-    ${actions}
   </div>`;
 }
 
@@ -2494,6 +2705,7 @@ window.unfriend = async function(uid){
     await deleteDoc(doc(db,'users',uid,'friends',currentUser.uid));
   }catch(e){ toast(e.message); }
 };
+
 async function loadProfileView(uid){
   document.getElementById('profPostsList').innerHTML = '';
   document.getElementById('profPostsEmpty').style.display = 'none';
@@ -2864,16 +3076,47 @@ function showCallOverlay(type, statusText){
   document.getElementById('camBtn').style.display = type==='video' ? 'flex' : 'none';
   document.getElementById('localMedia').classList.toggle('show', type==='video');
   document.getElementById('remoteMedia').dataset.active = type==='video' ? '1' : '0';
+  document.getElementById('enableSoundBtn').style.display = 'none';
 }
 function hideCallOverlay(){
   document.getElementById('callOverlay').classList.remove('show');
   document.getElementById('localMedia').srcObject = null;
   document.getElementById('remoteMedia').srcObject = null;
+  document.getElementById('enableSoundBtn').style.display = 'none';
 }
 function setCallStatusText(txt){
   const el = document.getElementById('callStatusText');
   if(el) el.textContent = txt;
 }
+
+// Attaches the remote peer's stream and attempts playback. Mobile browsers frequently block
+// unmuted autoplay unless it's tied directly to a user tap — when that happens, play() rejects
+// silently by default, which is exactly why audio can be missing even though the call "connects."
+// We surface a visible "Tap to enable sound" button as a guaranteed-to-work fallback in that case.
+function attachRemoteStream(stream){
+  const remoteEl = document.getElementById('remoteMedia');
+  if(remoteEl.srcObject !== stream){
+    remoteEl.srcObject = stream;
+  }
+  const playPromise = remoteEl.play();
+  if(playPromise && playPromise.catch){
+    playPromise.then(() => {
+      document.getElementById('enableSoundBtn').style.display = 'none';
+    }).catch((err) => {
+      console.error('Remote media autoplay blocked:', err);
+      document.getElementById('enableSoundBtn').style.display = 'block';
+    });
+  }
+}
+window.enableCallSound = function(){
+  const remoteEl = document.getElementById('remoteMedia');
+  remoteEl.muted = false;
+  remoteEl.play().then(() => {
+    document.getElementById('enableSoundBtn').style.display = 'none';
+  }).catch((e) => {
+    toast('Could not enable sound: ' + e.message);
+  });
+};
 
 // Synthesized ringtone (no external audio file needed) — dual-tone burst repeated on an interval.
 // isIncoming=true uses a faster classic "ring-ring" cadence for the receiver;
@@ -2951,13 +3194,7 @@ window.startCall = async function(type){
   pendingIceCandidates = [];
   localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
   if(type==='video') document.getElementById('localMedia').srcObject = localStream;
-  pc.ontrack = (event) => {
-    const remoteEl = document.getElementById('remoteMedia');
-    if(remoteEl.srcObject !== event.streams[0]){
-      remoteEl.srcObject = event.streams[0];
-      remoteEl.play().catch(()=>{});
-    }
-  };
+  pc.ontrack = (event) => { attachRemoteStream(event.streams[0]); };
   attachConnectionStateHandlers();
 
   const callRef = doc(collection(db,'calls'));
@@ -3042,13 +3279,7 @@ window.acceptIncomingCall = async function(){
   pendingIceCandidates = [];
   localStream.getTracks().forEach(tr => pc.addTrack(tr, localStream));
   if(data.type==='video') document.getElementById('localMedia').srcObject = localStream;
-  pc.ontrack = (event) => {
-    const remoteEl = document.getElementById('remoteMedia');
-    if(remoteEl.srcObject !== event.streams[0]){
-      remoteEl.srcObject = event.streams[0];
-      remoteEl.play().catch(()=>{});
-    }
-  };
+  pc.ontrack = (event) => { attachRemoteStream(event.streams[0]); };
   attachConnectionStateHandlers();
 
   const calleeCandidates = collection(db,'calls',callId,'calleeCandidates');
@@ -3337,6 +3568,7 @@ window.submitGroupPost = async function(gid){
   }catch(e){ toast(e.message || t('postFailed')); }
   finally{ btn.disabled = false; }
 };
+
 // ================= PHASE 5: Photos & Videos =================
 let albumsUnsub = null;
 let mediaUnsub = null;
@@ -3510,7 +3742,7 @@ function renderNotifications(docs){
   Promise.all(docs.map(async d => {
     const n = d.data();
     const u = await getUserCached(n.fromUid);
-    const icons = { like:'♥', comment:'💬', friend_request:'👥', friend_accept:'✓', message:'✉', share:'🔗', reaction:(n.reactionType && REACTIONS[n.reactionType] ? REACTIONS[n.reactionType].emoji : '👍') };
+    const icons = { like:'♥', comment:'💬', friend_request:'👥', friend_accept:'✓', message:'✉', share:'🔗', tip:'💰', reaction:(n.reactionType && REACTIONS[n.reactionType] ? REACTIONS[n.reactionType].emoji : '👍') };
     const texts = {
       like: t('notifLikeSuffix'),
       comment: t('notifCommentSuffix'),
@@ -3518,6 +3750,7 @@ function renderNotifications(docs){
       friend_accept: t('notifAcceptSuffix'),
       message: t('notifMsgSuffix'),
       share: t('notifShareSuffix'),
+      tip: (n.amount ? `${t('notifTipSuffix')} (${n.amount} ETB)` : t('notifTipSuffix')),
       reaction: t('notifReactSuffix')
     };
     return `<div class="notif-row ${n.read?'':'unread'}" onclick="handleNotifClick('${n.type}','${n.postId||''}','${n.convoId||''}','${n.fromUid}')">
@@ -3537,7 +3770,7 @@ function renderNotifications(docs){
 }
 
 window.handleNotifClick = function(type, postId, convoId, fromUid){
-  if(type==='like' || type==='comment' || type==='reaction' || type==='share'){
+  if(type==='like' || type==='comment' || type==='reaction' || type==='share' || type==='tip'){
     navigateFeed();
   } else if(type==='friend_request' || type==='friend_accept'){
     navigateProfile(fromUid);
@@ -3571,10 +3804,23 @@ window.navigateUserDashboard = function(){
   document.getElementById('userDashAvatar').innerHTML = avatarHTML(currentProfile.photoURL, currentProfile.displayName);
   document.getElementById('userDashName').textContent = currentProfile.displayName || 'User';
   document.getElementById('userDashSub').textContent = `${myFriends.size} ${t('friendsLabel')}`;
-  loadUserDashboard();
+  switchDashTab('home');
 };
 
-async function loadUserDashboard(){
+window.switchDashTab = function(tab){
+  ['home','insights','content','engagement'].forEach(k => {
+    const tabId = 'tabDash' + k[0].toUpperCase() + k.slice(1);
+    const panelId = 'dash' + k[0].toUpperCase() + k.slice(1) + 'Panel';
+    document.getElementById(tabId).classList.toggle('active', k===tab);
+    document.getElementById(panelId).style.display = k===tab ? 'block' : 'none';
+  });
+  if(tab==='home') loadDashHome();
+  else if(tab==='insights') loadDashInsights();
+  else if(tab==='content') loadDashContent();
+  else if(tab==='engagement') loadDashEngagement();
+};
+
+async function loadDashHome(){
   const grid = document.getElementById('userDashStatGrid');
   grid.innerHTML = `<div class="loading">${t('loadingFeed')}</div>`;
   try{
@@ -3594,6 +3840,99 @@ async function loadUserDashboard(){
     `;
   }catch(e){
     grid.innerHTML = `<div class="empty-small">${e.message}</div>`;
+  }
+}
+
+async function loadDashInsights(){
+  const grid = document.getElementById('dashInsightsGrid');
+  grid.innerHTML = `<div class="loading">${t('loadingFeed')}</div>`;
+  try{
+    const cutoff = new Date(Date.now() - 28*24*60*60*1000);
+    const snap = await getDocs(query(collection(db,'posts'), where('uid','==',currentUser.uid)));
+    let postsIn28 = 0, reactionsIn28 = 0, commentsIn28 = 0;
+    snap.docs.forEach(d => {
+      const p = d.data();
+      const created = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate() : null;
+      if(created && created >= cutoff){
+        postsIn28++;
+        reactionsIn28 += Object.keys(getReactionMap(p)).length;
+        commentsIn28 += p.commentCount || 0;
+      }
+    });
+    const friendsSnap = await getDocs(collection(db,'users',currentUser.uid,'friends'));
+    let newFriends = 0;
+    friendsSnap.docs.forEach(d => {
+      const since = d.data().since;
+      const sinceDate = since && since.toDate ? since.toDate() : null;
+      if(sinceDate && sinceDate >= cutoff) newFriends++;
+    });
+    grid.innerHTML = `
+      <div class="stat-card"><div class="num">${postsIn28}</div><div class="lbl">${t('postsMade')}</div></div>
+      <div class="stat-card"><div class="num">${reactionsIn28}</div><div class="lbl">${t('reactionsGot')}</div></div>
+      <div class="stat-card"><div class="num">${commentsIn28}</div><div class="lbl">${t('commentsGot')}</div></div>
+      <div class="stat-card"><div class="num">${newFriends}</div><div class="lbl">${t('newFriends')}</div></div>
+    `;
+  }catch(e){
+    grid.innerHTML = `<div class="empty-small">${e.message}</div>`;
+  }
+}
+
+async function loadDashContent(){
+  const list = document.getElementById('dashContentList');
+  const empty = document.getElementById('dashContentEmpty');
+  list.innerHTML = `<div class="loading">${t('loadingFeed')}</div>`;
+  empty.style.display = 'none';
+  try{
+    const snap = await getDocs(query(collection(db,'posts'), where('uid','==',currentUser.uid)));
+    if(snap.empty){ list.innerHTML = ''; empty.style.display = 'block'; return; }
+    const items = snap.docs.map(d => {
+      const p = d.data();
+      const reactions = Object.keys(getReactionMap(p)).length;
+      const comments = p.commentCount || 0;
+      return { id: d.id, text: p.text || '', reactions, comments, createdAt: p.createdAt, score: reactions + comments };
+    }).sort((a,b) => b.score - a.score);
+    list.innerHTML = items.map(it => `
+      <div class="dash-content-row" onclick="navigateProfile('${currentUser.uid}')">
+        <div style="flex:1;min-width:0;">
+          <div class="dash-content-text">${escapeHtml(it.text ? (it.text.length > 80 ? it.text.slice(0,80)+'…' : it.text) : t('mediaPost'))}</div>
+          <div class="dash-content-meta">
+            <span>${timeAgo(it.createdAt)}</span>
+            <span>👍 ${it.reactions}</span>
+            <span>💬 ${it.comments}</span>
+          </div>
+        </div>
+      </div>`).join('');
+  }catch(e){
+    list.innerHTML = '';
+    toast(e.message);
+  }
+}
+
+async function loadDashEngagement(){
+  const list = document.getElementById('dashEngagementList');
+  const empty = document.getElementById('dashEngagementEmpty');
+  list.innerHTML = `<div class="loading">${t('loadingFeed')}</div>`;
+  empty.style.display = 'none';
+  try{
+    const snap = await getDocs(query(collection(db,'notifications'), where('to','==',currentUser.uid), orderBy('createdAt','desc'), limit(30)));
+    const relevant = snap.docs.filter(d => ['like','comment','reaction'].includes(d.data().type));
+    if(relevant.length === 0){ list.innerHTML = ''; empty.style.display = 'block'; return; }
+    const rows = await Promise.all(relevant.map(async d => {
+      const n = d.data();
+      const u = await getUserCached(n.fromUid);
+      const verb = n.type === 'comment' ? t('notifCommentSuffix') : t('notifReactSuffix');
+      return `<div class="dash-content-row" onclick="navigateProfile('${n.fromUid}')">
+        <div class="avatar" style="width:32px;height:32px;font-size:12px;">${avatarHTML(u.photoURL,u.displayName)}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="dash-content-text"><b>${escapeHtml(u.displayName||'User')}</b> ${verb}</div>
+          <div class="dash-content-meta"><span>${timeAgo(n.createdAt)}</span></div>
+        </div>
+      </div>`;
+    }));
+    list.innerHTML = rows.join('');
+  }catch(e){
+    list.innerHTML = '';
+    toast(e.message);
   }
 }
 
@@ -3617,14 +3956,15 @@ window.switchAdminTab = function(tab){
   else if(tab==='posts') renderAdminPosts();
   else if(tab==='groups') renderAdminGroups();
 };
-async function loadAdminOverview() {
-  try {
+
+async function loadAdminOverview(){
+  try{
     const [uSnap, pSnap, gpSnap, gSnap, aSnap] = await Promise.all([
-      getCountFromServer(collection(db, 'users')),
-      getCountFromServer(collection(db, 'posts')),
-      getCountFromServer(collection(db, 'groupPosts')),
-      getCountFromServer(collection(db, 'groups')),
-      getCountFromServer(collection(db, 'albums'))
+      getCountFromServer(collection(db,'users')),
+      getCountFromServer(collection(db,'posts')),
+      getCountFromServer(collection(db,'groupPosts')),
+      getCountFromServer(collection(db,'groups')),
+      getCountFromServer(collection(db,'albums'))
     ]);
     document.getElementById('statGrid').innerHTML = `
       <div class="stat-card"><div class="num">${uSnap.data().count}</div><div class="lbl">${t('statUsers')}</div></div>
@@ -3633,15 +3973,15 @@ async function loadAdminOverview() {
       <div class="stat-card"><div class="num">${gSnap.data().count}</div><div class="lbl">${t('statGroupsAdmin')}</div></div>
       <div class="stat-card"><div class="num">${aSnap.data().count}</div><div class="lbl">${t('statAlbums')}</div></div>
     `;
-  } catch (e) { console.error(e); }
+  }catch(e){ console.error(e); }
 }
 
-window.renderAdminUsers = async function() {
+window.renderAdminUsers = async function(){
   const list = document.getElementById('adminUsersList');
   const term = (document.getElementById('adminUserSearch').value || '').trim().toLowerCase();
-  const snap = await getDocs(collection(db, 'users'));
-  const users = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
-  const filtered = users.filter(u => !term || (u.displayName || '').toLowerCase().includes(term));
+  const snap = await getDocs(collection(db,'users'));
+  const users = snap.docs.map(d => ({ uid:d.id, ...d.data() }));
+  const filtered = users.filter(u => !term || (u.displayName||'').toLowerCase().includes(term));
   list.innerHTML = filtered.map(u => `
     <div class="admin-row">
       <div class="avatar">${avatarHTML(u.photoURL, u.displayName)}</div>
@@ -3656,25 +3996,25 @@ window.renderAdminUsers = async function() {
     </div>`).join('');
 };
 
-window.adminToggleSuspend = async function(uid, isSuspended) {
-  try {
-    await updateDoc(doc(db, 'users', uid), { suspended: !isSuspended });
+window.adminToggleSuspend = async function(uid, isSuspended){
+  try{
+    await updateDoc(doc(db,'users',uid), { suspended: !isSuspended });
     renderAdminUsers();
     toast('Updated');
-  } catch (e) { toast(e.message); }
+  }catch(e){ toast(e.message); }
 };
 
-window.adminToggleAdmin = async function(uid, isAdmin) {
-  try {
-    await updateDoc(doc(db, 'users', uid), { isAdmin: !isAdmin });
+window.adminToggleAdmin = async function(uid, isAdmin){
+  try{
+    await updateDoc(doc(db,'users',uid), { isAdmin: !isAdmin });
     renderAdminUsers();
     toast('Updated');
-  } catch (e) { toast(e.message); }
+  }catch(e){ toast(e.message); }
 };
 
-async function renderAdminPosts() {
+async function renderAdminPosts(){
   const list = document.getElementById('adminPostsList');
-  const snap = await getDocs(query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(50)));
+  const snap = await getDocs(query(collection(db,'posts'), orderBy('createdAt','desc'), limit(50)));
   list.innerHTML = snap.docs.map(d => {
     const p = d.id;
     const dat = d.data();
@@ -3688,18 +4028,18 @@ async function renderAdminPosts() {
   }).join('');
 }
 
-window.adminDeletePost = async function(id, col) {
-  if (!confirm(t('confirmDeletePost'))) return;
-  try {
-    await deleteDoc(doc(db, col, id));
+window.adminDeletePost = async function(id, col){
+  if(!confirm(t('confirmDeletePost'))) return;
+  try{
+    await deleteDoc(doc(db,col,id));
     toast('Deleted');
-    if (currentAdminTab === 'posts') renderAdminPosts();
-  } catch (e) { toast(e.message); }
+    if(currentAdminTab==='posts') renderAdminPosts();
+  }catch(e){ toast(e.message); }
 };
 
-async function renderAdminGroups() {
+async function renderAdminGroups(){
   const list = document.getElementById('adminGroupsList');
-  const snap = await getDocs(collection(db, 'groups'));
+  const snap = await getDocs(collection(db,'groups'));
   list.innerHTML = snap.docs.map(d => {
     const g = d.data();
     return `<div class="admin-row">
@@ -3712,14 +4052,14 @@ async function renderAdminGroups() {
   }).join('');
 }
 
-window.adminDeleteGroup = async function(gid) {
-  if (!confirm(t('confirmDeleteGroup'))) return;
-  try {
-    await deleteDoc(doc(db, 'groups', gid));
+window.adminDeleteGroup = async function(gid){
+  if(!confirm(t('confirmDeleteGroup'))) return;
+  try{
+    await deleteDoc(doc(db,'groups',gid));
     toast('Deleted');
     renderAdminGroups();
-  } catch (e) { toast(e.message); }
+  }catch(e){ toast(e.message); }
 };
-</script> 
-</body> 
+</script>
+</body>
 </html>
