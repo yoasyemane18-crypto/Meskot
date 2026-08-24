@@ -112,6 +112,15 @@
     font-size:14px;font-family:inherit;color:var(--ink);
   }
   .field input:focus,.field textarea:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .pw-field-wrap{position:relative;}
+  .pw-field-wrap input{padding-right:42px;}
+  .pw-toggle-btn{
+    position:absolute;top:50%;right:6px;transform:translateY(-50%);
+    background:none;border:none;padding:6px;display:flex;align-items:center;justify-content:center;
+    color:var(--muted);border-radius:6px;
+  }
+  .pw-toggle-btn:hover{background:var(--paper-2);color:var(--ink);}
+  .pw-toggle-btn svg{width:19px;height:19px;display:block;}
   .auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
   .auth-switch button{background:none;border:none;color:var(--gold-deep);font-weight:600;text-decoration:underline;font-size:13px;}
   .auth-error{background:#FBEAEA;color:var(--cross);border:1px solid #F0C6C9;padding:9px 12px;border-radius:8px;font-size:12.5px;margin-bottom:14px;}
@@ -693,6 +702,15 @@
     display:block;width:100%;text-align:left;background:none;border:none;padding:0 16px 12px;
     margin-top:-8px;color:var(--muted);font-weight:700;font-size:13.5px;
   }
+
+  /* ===== phase 14: post options menu (Facebook-style "...") ===== */
+  .post-menu-btn{
+    margin-left:auto;font-size:20px;line-height:1;padding:4px 8px;border-radius:8px;flex-shrink:0;
+  }
+  .post-menu-btn:hover{background:var(--paper-2);}
+  .post-menu-modal .privacy-option{gap:16px;}
+  .post-menu-modal .privacy-option:hover{background:var(--paper);border-radius:10px;}
+  .post-menu-modal .privacy-option.danger .name{color:var(--cross);}
 </style></head>
 <body>
 
@@ -755,7 +773,14 @@
       <h2 class="auth-title" data-t="welcomeBack">Welcome back</h2>
       <p class="auth-sub" data-t="loginSub">Log in to see what your circle is sharing</p>
       <div class="field"><label data-t="email">Email</label><input type="email" id="loginEmail" autocomplete="email"></div>
-      <div class="field"><label data-t="password">Password</label><input type="password" id="loginPass" autocomplete="current-password"></div>
+      <div class="field"><label data-t="password">Password</label>
+        <div class="pw-field-wrap">
+          <input type="password" id="loginPass" autocomplete="current-password">
+          <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('loginPass', this)" aria-label="Show password">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+      </div>
       <div class="forgot-link-row"><button onclick="showForgotPassword()" data-t="forgotPassword">Forgot password?</button></div>
       <button class="btn gold" style="width:100%;" onclick="doLogin()" data-t="logIn">Log in</button>
       <div class="auth-switch">
@@ -768,7 +793,15 @@
       <p class="auth-sub" data-t="joinSub">Create your window onto the community</p>
       <div class="field"><label data-t="fullName">Full name</label><input type="text" id="suName" autocomplete="name"></div>
       <div class="field"><label data-t="email">Email</label><input type="email" id="suEmail" autocomplete="email"></div>
-      <div class="field"><label data-t="password">Password</label><input type="password" id="suPass" autocomplete="new-password"><div class="pw-hint" data-t="pwHint">7–49 characters, with upper/lowercase letters, a number, and a symbol.</div></div>
+      <div class="field"><label data-t="password">Password</label>
+        <div class="pw-field-wrap">
+          <input type="password" id="suPass" autocomplete="new-password">
+          <button type="button" class="pw-toggle-btn" onclick="togglePwVisibility('suPass', this)" aria-label="Show password">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+        <div class="pw-hint" data-t="pwHint">7–49 characters, with upper/lowercase letters, a number, and a symbol.</div>
+      </div>
       <button class="btn gold" style="width:100%;" onclick="doSignup()" data-t="createAccount">Create account</button>
       <div class="auth-switch">
         <span data-t="hasAccount">Already have an account?</span>
@@ -1205,6 +1238,13 @@
   </div>
 </div>
 
+<!-- post options menu, Facebook-style "..." sheet -->
+<div class="modal-bg" id="postMenuModalBg" onclick="if(event.target===this)closePostMenu()">
+  <div class="modal post-menu-modal">
+    <div id="postMenuOptions"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -1338,7 +1378,18 @@ const dict = {
     support:"Support", supportCreator:"Support this creator",
     supportSub:"100% goes to them via Chapa — Meskot takes no cut.",
     customAmount:"Custom amount (ETB)", continueToPay:"Continue to pay",
-    etbReceived:"ETB received", notifTipSuffix:"sent you a tip"
+    etbReceived:"ETB received", notifTipSuffix:"sent you a tip",
+    interested:"Interested", interestedSub:"More of your posts will be like this.",
+    notInterested:"Not interested", notInterestedSub:"Less of your posts will be like this.",
+    savePostAction:"Save post", unsavePostAction:"Unsave post", savePostSub:"Add this to your saved items.",
+    tagPhoto:"Tag Photo",
+    dontWantSee:"I don't want to see this",
+    reportPostAction:"Report post", reportPostSub:"We won't let them know who reported this.",
+    turnOnNotifs:"Turn on notifications for this post", turnOffNotifs:"Turn off notifications for this post",
+    copyLink:"Copy link", linkCopied:"Link copied.",
+    editPostAction:"Edit post",
+    postHidden:"You won't see this post again.", reportSubmitted:"Post reported. Thank you for letting us know.",
+    notifTurnedOn:"Notifications turned on for this post.", notifTurnedOff:"Notifications turned off for this post."
   },
   am: {
     welcomeBack:"እንኳን ደህና መጡ", loginSub:"ማህበረሰብዎ ምን እያካፈለ እንደሆነ ለማየት ይግቡ",
@@ -1405,7 +1456,18 @@ const dict = {
     support:"ድጋፍ", supportCreator:"ይህን ፈጣሪ ይደግፉ",
     supportSub:"100% ገንዘቡ በቻፓ በኩል ወደ እነሱ ይሄዳል — መስኮት ምንም አይወስድም።",
     customAmount:"ሌላ መጠን (ብር)", continueToPay:"ወደ ክፍያ ይቀጥሉ",
-    etbReceived:"ብር ተገኝቷል", notifTipSuffix:"ስጦታ ልኮልዎታል"
+    etbReceived:"ብር ተገኝቷል", notifTipSuffix:"ስጦታ ልኮልዎታል",
+    interested:"ፍላጎት አለኝ", interestedSub:"ተጨማሪ የእርስዎ ልጥፎች እንደዚህ ይሆናሉ።",
+    notInterested:"ፍላጎት የለኝም", notInterestedSub:"ያነሱ የእርስዎ ልጥፎች እንደዚህ ይሆናሉ።",
+    savePostAction:"ልጥፍ አስቀምጥ", unsavePostAction:"ከተቀመጡት አስወግድ", savePostSub:"ወደ የተቀመጡ ንጥሎችዎ ይጨምሩ።",
+    tagPhoto:"ፎቶ መለያ ያድርጉ",
+    dontWantSee:"ይህን ማየት አልፈልግም",
+    reportPostAction:"ልጥፍ ሪፖርት አድርግ", reportPostSub:"ማን እንደሪፖርት እንዳደረገ አናሳውቃቸውም።",
+    turnOnNotifs:"ለዚህ ልጥፍ ማሳወቂያዎችን አብራ", turnOffNotifs:"ለዚህ ልጥፍ ማሳወቂያዎችን አጥፋ",
+    copyLink:"አገናኝ ቅዳ", linkCopied:"አገናኝ ተቀድቷል።",
+    editPostAction:"ልጥፍ አርትዕ",
+    postHidden:"ይህን ልጥፍ እንደገና አያዩትም።", reportSubmitted:"ልጥፉ ሪፖርት ተደርጓል። እናመሰግናለን።",
+    notifTurnedOn:"ለዚህ ልጥፍ ማሳወቂያዎች በርተዋል።", notifTurnedOff:"ለዚህ ልጥፍ ማሳወቂያዎች ጠፍተዋል።"
   }
 };
 let lang = localStorage.getItem('meskot_lang') || 'en';
@@ -1440,6 +1502,16 @@ function timeAgo(ts){
   return Math.floor(diff/86400)+t('dayAgo');
 }
 
+const EYE_OPEN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+const EYE_CLOSED_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-7-11-7a19.68 19.68 0 0 1 4.22-5.44M9.9 4.24A9.13 9.13 0 0 1 12 4c7 0 11 7 11 7a19.6 19.6 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+window.togglePwVisibility = function(inputId, btnEl){
+  const input = document.getElementById(inputId);
+  if(!input) return;
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  btnEl.innerHTML = isHidden ? EYE_CLOSED_SVG : EYE_OPEN_SVG;
+  btnEl.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+};
 window.toggleAuth = function(showLogin){
   document.getElementById('loginForm').style.display = showLogin ? 'block' : 'none';
   document.getElementById('signupForm').style.display = showLogin ? 'none' : 'block';
@@ -1964,7 +2036,7 @@ function renderFeedFromCache(){
   const list = document.getElementById('feedList');
   const emptyEl = document.getElementById('feedEmpty');
   if(!list) return;
-  const visibleDocs = lastFeedDocs.filter(d => canViewPost(d.data()));
+  const visibleDocs = lastFeedDocs.filter(d => canViewPost(d.data()) && !hiddenPostKeys.has('posts_'+d.id));
   if(visibleDocs.length === 0){ list.innerHTML=''; emptyEl.style.display='block'; return; }
   emptyEl.style.display = 'none';
   list.innerHTML = visibleDocs.map(d => renderPost(d.id, d.data())).join('');
@@ -2032,8 +2104,6 @@ function renderPost(id, p, col){
   const pickerBtns = REACTION_ORDER.map(k => `<button title="${t(REACTIONS[k].labelKey)}" onclick="event.stopPropagation();setReaction('${id}','${col}','${k}')">${REACTIONS[k].emoji}</button>`).join('');
   postTextCache[col+'-'+id] = p.text || '';
   const isMine = currentUser && p.uid === currentUser.uid;
-  const editBtn = isMine ? `<button class="mini-edit-btn" onclick="event.stopPropagation();toggleEditPost('${id}','${col}')" title="Edit">✏️</button>` : '';
-  const deleteBtn = isMine ? `<button class="mini-edit-btn mini-delete-btn" onclick="event.stopPropagation();deleteOwnPost('${id}','${col}')" title="Delete">🗑️</button>` : '';
   const sharedTag = p.sharedFrom ? `<div class="shared-tag">🔁 ${t('sharedAPost')}</div>` : '';
   return `
     <div class="post" id="post-${col}-${id}">
@@ -2044,7 +2114,7 @@ function renderPost(id, p, col){
           <div class="name">${escapeHtml(p.authorName||'User')}</div>
           <div class="time">${timeAgo(p.createdAt)}${p.editedAt ? ' · edited' : ''}</div>
         </div>
-        ${editBtn}${deleteBtn}
+        <button class="mini-edit-btn post-menu-btn" onclick="event.stopPropagation();openPostMenu('${id}','${col}',${isMine?'true':'false'})" title="More">⋯</button>
       </div>
       ${sharedTag}
       ${p.bgColor
@@ -2124,6 +2194,119 @@ window.deleteOwnPost = async function(id, col){
     if(el) el.remove();
     toast('Deleted');
   }catch(e){ toast(e.message); }
+};
+
+// ===== Post options menu (Facebook-style "...") =====
+let hiddenPostKeys = new Set();
+let currentPostMenuTarget = null;
+
+function postMenuRowHTML(icon, label, fnName, isDanger){
+  return `<div class="privacy-option${isDanger?' danger':''}" onclick="${fnName}()">
+    <span class="privacy-icon">${icon}</span>
+    <div><div class="name">${label}</div></div>
+  </div>`;
+}
+window.openPostMenu = function(id, col, isMine){
+  currentPostMenuTarget = { id, col, isMine: !!isMine };
+  const key = col+'_'+id;
+  const isSaved = mySavedPostKeys.has(key);
+  let rows = '';
+  if(!isMine){
+    rows += postMenuRowHTML('➕', t('interested'), 'menuInterested');
+    rows += postMenuRowHTML('➖', t('notInterested'), 'menuNotInterested');
+  }
+  rows += postMenuRowHTML('🔖', isSaved ? t('unsavePostAction') : t('savePostAction'), 'menuToggleSave');
+  rows += postMenuRowHTML('🔗', t('share'), 'menuSharePost');
+  if(isMine){
+    rows += postMenuRowHTML('✏️', t('editPostAction'), 'menuEditPost');
+    rows += postMenuRowHTML('🗑️', t('deletePost'), 'menuDeletePost', true);
+  } else {
+    rows += postMenuRowHTML('🚫', t('dontWantSee'), 'menuHidePost');
+    rows += postMenuRowHTML('⚠️', t('reportPostAction'), 'menuReportPost', true);
+  }
+  rows += postMenuRowHTML('🔔', t('turnOnNotifs'), 'menuToggleNotif');
+  rows += postMenuRowHTML('📋', t('copyLink'), 'menuCopyLink');
+  document.getElementById('postMenuOptions').innerHTML = rows;
+  document.getElementById('postMenuModalBg').classList.add('show');
+};
+window.closePostMenu = function(){
+  document.getElementById('postMenuModalBg').classList.remove('show');
+};
+window.menuToggleSave = function(){
+  if(currentPostMenuTarget) toggleSavePost(currentPostMenuTarget.id, currentPostMenuTarget.col);
+  closePostMenu();
+};
+window.menuSharePost = function(){
+  if(currentPostMenuTarget) sharePost(currentPostMenuTarget.id, currentPostMenuTarget.col);
+  closePostMenu();
+};
+window.menuEditPost = function(){
+  if(currentPostMenuTarget) toggleEditPost(currentPostMenuTarget.id, currentPostMenuTarget.col);
+  closePostMenu();
+};
+window.menuDeletePost = function(){
+  const target = currentPostMenuTarget;
+  closePostMenu();
+  if(target) deleteOwnPost(target.id, target.col);
+};
+window.menuHidePost = function(){
+  if(currentPostMenuTarget){
+    const key = currentPostMenuTarget.col+'_'+currentPostMenuTarget.id;
+    hiddenPostKeys.add(key);
+    const el = document.getElementById(`post-${currentPostMenuTarget.col}-${currentPostMenuTarget.id}`);
+    if(el) el.remove();
+    toast(t('postHidden'));
+  }
+  closePostMenu();
+};
+window.menuReportPost = async function(){
+  const target = currentPostMenuTarget;
+  closePostMenu();
+  if(target && currentUser){
+    try{
+      await addDoc(collection(db,'reports'), {
+        postId: target.id, col: target.col,
+        reportedBy: currentUser.uid, createdAt: serverTimestamp()
+      });
+      toast(t('reportSubmitted'));
+    }catch(e){ toast(e.message); }
+  }
+};
+window.menuInterested = function(){ toast(t('interested')); closePostMenu(); };
+window.menuNotInterested = function(){
+  if(currentPostMenuTarget){
+    const key = currentPostMenuTarget.col+'_'+currentPostMenuTarget.id;
+    hiddenPostKeys.add(key);
+    const el = document.getElementById(`post-${currentPostMenuTarget.col}-${currentPostMenuTarget.id}`);
+    if(el) el.remove();
+  }
+  toast(t('notInterested'));
+  closePostMenu();
+};
+let notifOnPostKeys = new Set();
+window.menuToggleNotif = function(){
+  if(currentPostMenuTarget){
+    const key = currentPostMenuTarget.col+'_'+currentPostMenuTarget.id;
+    if(notifOnPostKeys.has(key)){
+      notifOnPostKeys.delete(key);
+      toast(t('notifTurnedOff'));
+    } else {
+      notifOnPostKeys.add(key);
+      toast(t('notifTurnedOn'));
+    }
+  }
+  closePostMenu();
+};
+window.menuCopyLink = function(){
+  const target = currentPostMenuTarget;
+  closePostMenu();
+  if(!target) return;
+  const url = `${window.location.origin}${window.location.pathname}?post=${target.col}_${target.id}`;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>toast(t('linkCopied'))).catch(()=>toast(url));
+  } else {
+    toast(url);
+  }
 };
 
 // ===== Saved posts + Menu =====
