@@ -3383,7 +3383,14 @@ window.startCall = async function(type){
   const callRef = doc(collection(db,'calls'));
   currentCallId = callRef.id;
   const callerCandidates = collection(db,'calls',currentCallId,'callerCandidates');
-  pc.onicecandidate = (event) => { if(event.candidate) addDoc(callerCandidates, event.candidate.toJSON()).catch(()=>{}); };
+  pc.onicecandidate = (event) => {
+  if (event.candidate) {
+    addDoc(callerCandidates, event.candidate.toJSON()).catch(e => {
+      console.error('Failed to write ICE candidate:', e);
+      toast('Connection issue: ' + e.message);
+    });
+  }
+};
 
   try{
     const offerDescription = await pc.createOffer();
@@ -3466,7 +3473,14 @@ window.acceptIncomingCall = async function(){
   attachConnectionStateHandlers();
 
   const calleeCandidates = collection(db,'calls',callId,'calleeCandidates');
-  pc.onicecandidate = (event) => { if(event.candidate) addDoc(calleeCandidates, event.candidate.toJSON()).catch(()=>{}); };
+  pc.onicecandidate = (event) => {
+  if (event.candidate) {
+    addDoc(calleeCandidates, event.candidate.toJSON()).catch(e => {
+      console.error('Failed to write ICE candidate:', e);
+      toast('Connection issue: ' + e.message);
+    });
+  }
+};
 
   try{
     await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
