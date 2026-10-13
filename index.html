@@ -1148,7 +1148,8 @@
 
 <!-- full-screen call overlay -->
 <div class="call-overlay" id="callOverlay">
-  <video id="remoteMedia" autoplay playsinline></video>
+  <video id="remoteMedia" autoplay playsinline muted></video>
+  <audio id="remoteAudio" autoplay playsinline></audio>
   <video id="localMedia" autoplay playsinline muted class="local-video-pip"></video>
   <button id="enableSoundBtn" class="enable-sound-btn" style="display:none;" onclick="enableCallSound()">🔊 Tap to enable sound</button>
   <div class="call-info">
@@ -3165,24 +3166,33 @@ window.sendMessage = async function(){
 };
 
 // ================= PHASE 10: Audio/Video Calling (WebRTC + Firestore signaling) =================
-// Uses STUN for NAT discovery plus a public TURN relay (openrelay.metered.ca) as a fallback path.
-// Without TURN, two devices on different networks/mobile carriers can often complete signaling
-// (offer/answer/ICE exchange all succeed) while the actual audio/video packets never get through —
-// that's exactly the "timer runs but no sound" symptom. TURN gives a relay path so media flows
-// even when a direct peer-to-peer route can't be established.
+// ---- TURN SETUP -------------------------------------------------------------------------------
+// Calls between different networks (e.g. Wi-Fi <-> mobile data) need a TURN relay or the audio
+// never arrives. Create a free account at https://www.metered.ca, then paste your credentials here.
+// While these stay as placeholders, the app falls back to the shared public relay (unreliable).
+const TURN_USERNAME = 'YOUR_USERNAME';
+const TURN_CREDENTIAL = 'YOUR_CREDENTIAL';
+const TURN_CONFIGURED = TURN_USERNAME !== 'YOUR_USERNAME' && TURN_CREDENTIAL !== 'YOUR_CREDENTIAL';
 const RTC_CONFIG = {
-  iceServers: [
+  iceServers: TURN_CONFIGURED ? [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun.relay.metered.ca:80' },
+    { urls: 'turn:global.relay.metered.ca:80',  username: TURN_USERNAME, credential: TURN_CREDENTIAL },
+    { urls: 'turn:global.relay.metered.ca:443', username: TURN_USERNAME, credential: TURN_CREDENTIAL },
+    { urls: 'turns:global.relay.metered.ca:443?transport=tcp', username: TURN_USERNAME, credential: TURN_CREDENTIAL }
+  ] : [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
     { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
     { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
-  ]
+  ],
+  iceCandidatePoolSize: 4
 };
 
 let pc = null;
 let localStream = null;
-let remoteStream = null;
+let remoteStreamObj = null;
 let currentCallId = null;
 let currentCallType = 'audio';
 let currentCallConvoId = null;
@@ -3238,6 +3248,8 @@ function attachConnectionStateHandlers(){
       stopRingtone();
       callStartTime = Date.now();
       startCallTimer();
+      // Re-try playback once connected, in case the first attempt happened before media flowed.
+      if(remoteStreamObj) attachRemoteStream(remoteStreamObj);
     } else if(state === 'failed'){
       toast('Call failed to connect — check your connection and try again.');
       endCall(true, 'missed');
@@ -3265,6 +3277,7 @@ function hideCallOverlay(){
   document.getElementById('callOverlay').classList.remove('show');
   document.getElementById('localMedia').srcObject = null;
   document.getElementById('remoteMedia').srcObject = null;
+  document.getElementById('remoteAudio').srcObject = null;
   document.getElementById('enableSoundBtn').style.display = 'none';
 }
 function setCallStatusText(txt){
@@ -3272,34 +3285,50 @@ function setCallStatusText(txt){
   if(el) el.textContent = txt;
 }
 
-// Attaches the remote peer's stream and attempts playback. Mobile browsers frequently block
-// unmuted autoplay unless it's tied directly to a user tap — when that happens, play() rejects
-// silently by default, which is exactly why audio can be missing even though the call "connects."
-// We surface a visible "Tap to enable sound" button as a guaranteed-to-work fallback in that case.
+// Collects every incoming remote track into one MediaStream (some browsers deliver audio and
+// video as separate events, and event.streams can be empty).
+function handleRemoteTrack(event){
+  if(!remoteStreamObj) remoteStreamObj = new MediaStream();
+  const incoming = (event.streams && event.streams[0]) ? event.streams[0].getTracks() : [event.track];
+  incoming.forEach(tr => { if(!remoteStreamObj.getTracks().includes(tr)) remoteStreamObj.addTrack(tr); });
+  attachRemoteStream(remoteStreamObj);
+}
+
+// Sound goes through a dedicated <audio> element; the <video> element is muted and only shows
+// the picture. Mobile browsers often refuse to play sound from a hidden video element.
+// If autoplay is still blocked, a visible "Tap to enable sound" button is shown.
 function attachRemoteStream(stream){
-  const remoteEl = document.getElementById('remoteMedia');
-  if(remoteEl.srcObject !== stream){
-    remoteEl.srcObject = stream;
-  }
-  const playPromise = remoteEl.play();
-  if(playPromise && playPromise.catch){
-    playPromise.then(() => {
-      document.getElementById('enableSoundBtn').style.display = 'none';
-    }).catch((err) => {
-      console.error('Remote media autoplay blocked:', err);
-      document.getElementById('enableSoundBtn').style.display = 'block';
-    });
+  const videoEl = document.getElementById('remoteMedia');
+  const audioEl = document.getElementById('remoteAudio');
+  videoEl.muted = true;
+  if(videoEl.srcObject !== stream) videoEl.srcObject = stream;
+  videoEl.play().catch(()=>{});
+  if(audioEl.srcObject !== stream) audioEl.srcObject = stream;
+  audioEl.muted = false;
+  audioEl.volume = 1;
+  const p = audioEl.play();
+  if(p && p.then){
+    p.then(() => { document.getElementById('enableSoundBtn').style.display = 'none'; })
+     .catch((err) => {
+       console.error('Remote audio autoplay blocked:', err);
+       document.getElementById('enableSoundBtn').style.display = 'block';
+     });
   }
 }
 window.enableCallSound = function(){
-  const remoteEl = document.getElementById('remoteMedia');
-  remoteEl.muted = false;
-  remoteEl.play().then(() => {
+  const audioEl = document.getElementById('remoteAudio');
+  audioEl.muted = false;
+  audioEl.play().then(() => {
     document.getElementById('enableSoundBtn').style.display = 'none';
-  }).catch((e) => {
-    toast('Could not enable sound: ' + e.message);
-  });
+  }).catch(e => toast('Could not enable sound: ' + e.message));
 };
+// Called straight from the tap on call / accept, to get the audio element "unlocked" early.
+function primeAudioPlayback(){
+  const a = document.getElementById('remoteAudio');
+  a.muted = false;
+  const p = a.play();
+  if(p && p.catch) p.catch(()=>{});
+}
 
 // Synthesized ringtone (no external audio file needed) — dual-tone burst repeated on an interval.
 // isIncoming=true uses a faster classic "ring-ring" cadence for the receiver;
@@ -3308,6 +3337,7 @@ function startRingtone(isIncoming){
   stopRingtone();
   try{
     ringAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(ringAudioCtx.state === 'suspended') ringAudioCtx.resume().catch(()=>{});
   }catch(e){ return; }
   const playBurst = () => {
     if(!ringAudioCtx) return;
@@ -3358,12 +3388,16 @@ async function addCallLogMessage(convoId_, type, status, durationSec){
 }
 
 window.startCall = async function(type){
+  primeAudioPlayback();
   if(!activeChatUid || !activeConvoId) return;
   if(currentCallId) return toast('A call is already in progress.');
   currentCallType = type;
   currentCallConvoId = activeConvoId;
   try{
-    localStream = await navigator.mediaDevices.getUserMedia({ audio:true, video: type==='video' });
+    localStream = await navigator.mediaDevices.getUserMedia({
+      audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true },
+      video: type==='video'
+    });
   }catch(e){ return toast('Camera/mic permission denied or unavailable: ' + e.message); }
 
   const other = await getUserCached(activeChatUid);
@@ -3373,24 +3407,28 @@ window.startCall = async function(type){
   startRingtone(false);
 
   pc = new RTCPeerConnection(RTC_CONFIG);
+  remoteStreamObj = null;
   callConnectedFired = false;
   pendingIceCandidates = [];
   localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
   if(type==='video') document.getElementById('localMedia').srcObject = localStream;
-  pc.ontrack = (event) => { attachRemoteStream(event.streams[0]); };
+  pc.ontrack = handleRemoteTrack;
   attachConnectionStateHandlers();
 
   const callRef = doc(collection(db,'calls'));
   currentCallId = callRef.id;
   const callerCandidates = collection(db,'calls',currentCallId,'callerCandidates');
+
+  // Hold candidates back until the call document exists, so the writes can't be rejected
+  // by security rules that require the parent call to be there.
+  let callDocReady = false;
+  const bufferedCallerCands = [];
   pc.onicecandidate = (event) => {
-  if (event.candidate) {
-    addDoc(callerCandidates, event.candidate.toJSON()).catch(e => {
-      console.error('Failed to write ICE candidate:', e);
-      toast('Connection issue: ' + e.message);
-    });
-  }
-};
+    if(!event.candidate) return;
+    const data = event.candidate.toJSON();
+    if(!callDocReady){ bufferedCallerCands.push(data); return; }
+    addDoc(callerCandidates, data).catch(e => console.error('ICE write failed:', e));
+  };
 
   try{
     const offerDescription = await pc.createOffer();
@@ -3400,6 +3438,8 @@ window.startCall = async function(type){
       offer: { sdp: offerDescription.sdp, type: offerDescription.type },
       createdAt: serverTimestamp()
     });
+    callDocReady = true;
+    bufferedCallerCands.splice(0).forEach(c => addDoc(callerCandidates, c).catch(console.error));
   }catch(e){ toast(e.message); cleanupCall(); return; }
 
   callDocUnsub = onSnapshot(callRef, async (snap) => {
@@ -3447,13 +3487,17 @@ function startIncomingCallListener(){
 }
 
 window.acceptIncomingCall = async function(){
+  primeAudioPlayback();
   const callId = pendingIncomingCallId;
   const data = pendingIncomingCallData;
   document.getElementById('incomingCallModalBg').classList.remove('show');
   stopRingtone();
   if(!callId || !data) return;
   try{
-    localStream = await navigator.mediaDevices.getUserMedia({ audio:true, video: data.type==='video' });
+    localStream = await navigator.mediaDevices.getUserMedia({
+      audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true },
+      video: data.type==='video'
+    });
   }catch(e){ toast(e.message); return declineIncomingCall(); }
 
   currentCallId = callId; currentCallType = data.type; currentCallConvoId = data.convoId;
@@ -3465,22 +3509,19 @@ window.acceptIncomingCall = async function(){
   showCallOverlay(data.type, 'Connecting…');
 
   pc = new RTCPeerConnection(RTC_CONFIG);
+  remoteStreamObj = null;
   callConnectedFired = false;
   pendingIceCandidates = [];
   localStream.getTracks().forEach(tr => pc.addTrack(tr, localStream));
   if(data.type==='video') document.getElementById('localMedia').srcObject = localStream;
-  pc.ontrack = (event) => { attachRemoteStream(event.streams[0]); };
+  pc.ontrack = handleRemoteTrack;
   attachConnectionStateHandlers();
 
   const calleeCandidates = collection(db,'calls',callId,'calleeCandidates');
   pc.onicecandidate = (event) => {
-  if (event.candidate) {
-    addDoc(calleeCandidates, event.candidate.toJSON()).catch(e => {
-      console.error('Failed to write ICE candidate:', e);
-      toast('Connection issue: ' + e.message);
-    });
-  }
-};
+    if(!event.candidate) return;
+    addDoc(calleeCandidates, event.candidate.toJSON()).catch(e => console.error('ICE write failed:', e));
+  };
 
   try{
     await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
@@ -3536,6 +3577,7 @@ function cleanupCall(){
   if(iceCandUnsub){ iceCandUnsub(); iceCandUnsub = null; }
   currentCallId = null; currentCallConvoId = null; callStartTime = null;
   callConnectedFired = false;
+  remoteStreamObj = null;
   pendingIceCandidates = [];
   micMuted = false; camOff = false;
   const muteBtn = document.getElementById('muteBtn');
