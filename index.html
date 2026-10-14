@@ -568,6 +568,7 @@
     object-fit:cover;border:2px solid rgba(255,255,255,0.3);z-index:2;display:none;
   }
   .local-video-pip.show{display:block;}
+  .local-video-pip{transform:scaleX(-1);}
   .call-info{position:relative;z-index:1;text-align:center;color:#EEF2ED;margin-top:60px;}
   .enable-sound-btn{
     position:absolute;top:20px;left:50%;transform:translateX(-50%);z-index:3;
@@ -3250,6 +3251,7 @@ function attachConnectionStateHandlers(){
       startCallTimer();
       // Re-try playback once connected, in case the first attempt happened before media flowed.
       if(remoteStreamObj) attachRemoteStream(remoteStreamObj);
+      tuneSenders();
     } else if(state === 'failed'){
       toast('Call failed to connect — check your connection and try again.');
       endCall(true, 'missed');
@@ -3257,6 +3259,69 @@ function attachConnectionStateHandlers(){
   };
   pc.onconnectionstatechange = onStateChange;
   pc.oniceconnectionstatechange = onStateChange;
+}
+
+// ===== HD quality: capture constraints, Opus tuning and sender bitrates =====
+const HD_AUDIO = { echoCancellation:true, noiseSuppression:true, autoGainControl:true, channelCount:1, sampleRate:48000, sampleSize:16 };
+const HD_VIDEO = { width:{ ideal:1280 }, height:{ ideal:720 }, frameRate:{ ideal:30, max:30 }, facingMode:'user' };
+const VIDEO_MAX_BITRATE = 2500000; // 2.5 Mbps cap for 720p30 (the browser still lowers it on a weak network)
+const AUDIO_MAX_BITRATE = 128000;  // Opus, high-quality voice
+
+async function getCallMedia(type){
+  const wantVideo = type === 'video';
+  try{
+    return await navigator.mediaDevices.getUserMedia({ audio: HD_AUDIO, video: wantVideo ? HD_VIDEO : false });
+  }catch(e){
+    // Fall back to plain constraints if the device can't honour the HD ones.
+    if(e && (e.name === 'OverconstrainedError' || e.name === 'ConstraintNotSatisfiedError')){
+      return await navigator.mediaDevices.getUserMedia({
+        audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true },
+        video: wantVideo
+      });
+    }
+    throw e;
+  }
+}
+
+// Tunes the Opus audio codec: full 48 kHz band, higher bitrate, forward error correction on,
+// silence-suppression (DTX) off so quiet speech is never clipped.
+function tuneOpusSdp(sdp){
+  const m = sdp.match(/a=rtpmap:(\d+) opus\/48000\/2/);
+  if(!m) return sdp;
+  const pt = m[1];
+  const wanted = ['stereo=0','sprop-stereo=0','maxaveragebitrate=' + AUDIO_MAX_BITRATE,'maxplaybackrate=48000','useinbandfec=1','usedtx=0'];
+  const fmtp = new RegExp('a=fmtp:' + pt + ' ([^\\r\\n]*)');
+  if(fmtp.test(sdp)){
+    return sdp.replace(fmtp, (full, params) => {
+      const kept = params.split(';').map(x => x.trim()).filter(x => x && !/^(stereo|sprop-stereo|maxaveragebitrate|maxplaybackrate|useinbandfec|usedtx)=/.test(x));
+      return 'a=fmtp:' + pt + ' ' + kept.concat(wanted).join(';');
+    });
+  }
+  return sdp.replace(m[0], m[0] + '\r\na=fmtp:' + pt + ' ' + wanted.join(';'));
+}
+
+// Raises the send bitrate caps (browser defaults are conservative) and hints what each track is.
+function tuneSenders(){
+  if(!pc) return;
+  pc.getSenders().forEach(sender => {
+    const track = sender.track;
+    if(!track) return;
+    try{
+      track.contentHint = track.kind === 'video' ? 'motion' : 'speech';
+      const params = sender.getParameters();
+      if(!params.encodings || !params.encodings.length) params.encodings = [{}];
+      if(track.kind === 'video'){
+        params.encodings[0].maxBitrate = VIDEO_MAX_BITRATE;
+        params.encodings[0].maxFramerate = 30;
+        params.encodings[0].scaleResolutionDownBy = 1;
+      } else {
+        params.encodings[0].maxBitrate = AUDIO_MAX_BITRATE;
+        params.encodings[0].priority = 'high';
+        params.encodings[0].networkPriority = 'high';
+      }
+      sender.setParameters(params).catch(err => console.warn('setParameters failed:', err));
+    }catch(err){ console.warn('tuneSenders failed:', err); }
+  });
 }
 
 function formatCallDuration(sec){
@@ -3394,10 +3459,7 @@ window.startCall = async function(type){
   currentCallType = type;
   currentCallConvoId = activeConvoId;
   try{
-    localStream = await navigator.mediaDevices.getUserMedia({
-      audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true },
-      video: type==='video'
-    });
+    localStream = await getCallMedia(type);
   }catch(e){ return toast('Camera/mic permission denied or unavailable: ' + e.message); }
 
   const other = await getUserCached(activeChatUid);
@@ -3431,8 +3493,10 @@ window.startCall = async function(type){
   };
 
   try{
-    const offerDescription = await pc.createOffer();
+    const rawOffer = await pc.createOffer();
+    const offerDescription = { type: rawOffer.type, sdp: tuneOpusSdp(rawOffer.sdp) };
     await pc.setLocalDescription(offerDescription);
+    tuneSenders();
     await setDoc(callRef, {
       from: currentUser.uid, to: activeChatUid, type, status:'ringing', convoId: activeConvoId,
       offer: { sdp: offerDescription.sdp, type: offerDescription.type },
@@ -3451,6 +3515,7 @@ window.startCall = async function(type){
       try{
         await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
         flushPendingIceCandidates();
+        tuneSenders();
         stopRingtone();
         setCallStatusText('Connecting…');
         startConnectTimeout();
@@ -3494,10 +3559,7 @@ window.acceptIncomingCall = async function(){
   stopRingtone();
   if(!callId || !data) return;
   try{
-    localStream = await navigator.mediaDevices.getUserMedia({
-      audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true },
-      video: data.type==='video'
-    });
+    localStream = await getCallMedia(data.type);
   }catch(e){ toast(e.message); return declineIncomingCall(); }
 
   currentCallId = callId; currentCallType = data.type; currentCallConvoId = data.convoId;
@@ -3525,8 +3587,10 @@ window.acceptIncomingCall = async function(){
 
   try{
     await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-    const answerDescription = await pc.createAnswer();
+    const rawAnswer = await pc.createAnswer();
+    const answerDescription = { type: rawAnswer.type, sdp: tuneOpusSdp(rawAnswer.sdp) };
     await pc.setLocalDescription(answerDescription);
+    tuneSenders();
     await updateDoc(doc(db,'calls',callId), {
       status:'accepted', answer: { sdp: answerDescription.sdp, type: answerDescription.type }
     });
