@@ -1041,6 +1041,264 @@ body:not(:has(#adsCreateView.active)) .adf-foot{display:none;}
 @media(max-width:520px){.ax-ad .th{width:64px;height:64px;border-radius:18px}.ax-ad .nm b{font-size:19px}.ax-ad .nm span{font-size:14px}.ax-st{font-size:15px;padding:9px 10px;gap:6px}.ax-st svg{width:24px;height:24px}.ax-acts button{font-size:15px;padding:0 12px;height:56px;white-space:nowrap;gap:6px}.ax-acts button svg{width:22px;height:22px}.ax-kp .r b{font-size:17px}.ax-paid{font-size:15px}.ax-paid em{margin-left:0;width:100%}}
 @media(max-width:420px){.ax-bt .t{font-size:24px}.ax-live{padding:8px 12px;font-size:14px}.ax-opt b{font-size:19px}.ax-amt{gap:16px}.ax-amt .av b{font-size:36px}.ax-amt .av{min-width:140px}.ax-pm{padding:18px 12px;gap:12px}.ax-pm .rd{width:40px;height:40px}.ax-kp div b{font-size:19px}.ax-ad .top{gap:10px}.ax-st{padding:10px}}
 
+
+#chatPanel.cm{position:fixed;inset:0;z-index:430;background:#EFF1F7;flex-direction:column;color:#14281F;display:none;}
+#chatPanel.cm.open{display:flex!important;}
+.cm svg{width:24px;height:24px;fill:currentColor;}
+.cm-top{display:flex;align-items:center;gap:6px;padding:calc(8px + env(safe-area-inset-top)) 10px 8px 6px;background:#fff;border-bottom:1px solid #DDE0EA;flex:none;}
+.cm-ib{width:44px;height:44px;flex:none;border:0;background:none;color:#0F1A14;display:flex;align-items:center;justify-content:center;padding:0;border-radius:50%;}
+.cm-ib.back svg{fill:none;}
+.cm-who{display:flex;align-items:center;gap:12px;flex:1;min-width:0;}
+.cm-who .avatar{width:50px;height:50px;font-size:17px;flex:none;}
+.cm-who .nm{min-width:0;}
+.cm-who .name{font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-who .chat-status{font-size:12.5px;color:#76776B;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-search{display:flex;gap:8px;padding:8px 12px;background:#fff;border-bottom:1px solid #DDE0EA;}
+.cm-search input{flex:1;min-width:0;height:40px;border-radius:20px;border:1.5px solid #E6D9B8;padding:0 16px;font-size:15px;font-family:inherit;outline:none;}
+.cm-search button{border:0;background:none;color:#9A6B1E;font-weight:800;}
+.cm-list{flex:1;overflow-y:auto;padding:14px 14px 8px;display:flex;flex-direction:column;gap:2px;overscroll-behavior:contain;background:none;height:auto;}
+.cm-sep{align-self:center;margin:14px 0 10px;background:#E8EAF2;color:#6D7080;font-weight:700;font-size:13px;padding:8px 16px;border-radius:16px;}
+.cm-row{display:flex;flex-direction:column;align-items:flex-start;max-width:84%;margin:6px 0;}
+.cm-row.mine{align-self:flex-end;align-items:flex-end;}
+.cm-b{background:#fff;border:2px solid #EBDCC9;border-radius:26px;padding:12px 20px;font-size:17px;font-weight:600;line-height:1.35;word-break:break-word;white-space:pre-wrap;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.cm-row:not(.mine) .cm-b{border-color:#E1E4EE;}
+.cm-b a{color:#9A6B1E;text-decoration:underline;font-weight:800;}
+.cm-b.big{font-size:34px;padding:6px 14px;line-height:1.25;}
+.cm-b.media{padding:4px;border-radius:22px;}
+.cm-b img.cm-img{display:block;max-width:min(260px,64vw);max-height:340px;border-radius:18px;object-fit:cover;}
+.cm-b .cm-gal{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+.cm-b .cm-gal img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;display:block;}
+.cm-t{font-size:12.5px;font-weight:600;color:#8A7F72;margin:6px 10px 0;}
+.cm-t .seen{color:#9A6B1E;font-weight:800;}
+.cm-voice{display:flex;align-items:center;gap:12px;min-width:200px;}
+.cm-voice button{width:42px;height:42px;border-radius:50%;border:0;background:linear-gradient(135deg,#E8C86A,#A9741F);color:#fff;display:flex;align-items:center;justify-content:center;flex:none;padding:0;}
+.cm-voice button svg{width:20px;height:20px;}
+.cm-voice .bar{flex:1;height:5px;border-radius:3px;background:#EADFC4;overflow:hidden;}
+.cm-voice .bar i{display:block;height:100%;width:0;background:#B27F2B;}
+.cm-voice small{font-size:13px;color:#6D6A58;font-weight:700;}
+.cm-file{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none!important;min-width:180px;}
+.cm-file .fi{width:44px;height:44px;border-radius:12px;background:#F6EBD0;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none;}
+.cm-file b{display:block;font-size:15px;color:#14281F!important;text-decoration:none!important;max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-file small{color:#6D6A58;font-weight:600;}
+.cm-quote{border-left:4px solid #D9B14F;background:#FAF4E3;border-radius:10px;padding:6px 10px;margin:0 0 8px;font-size:14px;color:#6D6A58;font-weight:600;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-call{display:flex;align-items:center;gap:12px;}
+.cm-call .ci{width:42px;height:42px;border-radius:50%;background:#F6EBD0;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none;}
+.cm-call b{display:block;font-size:16px;}
+.cm-call small{color:#6D6A58;font-weight:600;}
+.cm-call.miss b{color:#8B1A2B;}
+.cm-empty{margin:auto;text-align:center;color:#76776B;font-weight:600;padding:30px;}
+.cm-banner{display:flex;align-items:center;gap:10px;padding:8px 14px;background:#fff;border-top:1px solid #DDE0EA;font-size:14px;color:#4D5C54;}
+.cm-banner b{color:#9A6B1E;}
+.cm-banner span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-banner button{border:0;background:none;font-size:18px;color:#6D6A58;}
+.cm-up{padding:8px 16px;background:#fff;font-size:13px;font-weight:700;color:#9A6B1E;}
+.cm-up i{display:block;height:4px;background:#EADFC4;border-radius:2px;margin-top:6px;overflow:hidden;}
+.cm-up i b{display:block;height:100%;width:0;background:linear-gradient(90deg,#E8C86A,#A9741F);transition:width .2s;}
+.cm-emoji{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding:8px 10px;background:#fff;border-top:1px solid #DDE0EA;max-height:190px;overflow-y:auto;}
+.cm-emoji button{border:0;background:none;font-size:25px;padding:6px 0;border-radius:10px;}
+.cm-emoji button:active{background:#F6EBD0;}
+.cm-bar,.cm-rec{display:flex;align-items:center;gap:6px;padding:10px 10px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #E6E8F0;flex:none;}
+.cm-ib2{width:44px;height:44px;flex:none;border:0;background:none;color:#C08A2E;display:flex;align-items:center;justify-content:center;padding:0;}
+.cm-ib2 svg{width:30px;height:30px;}
+.cm-field{flex:1;min-width:0;display:flex;align-items:center;background:#EFF1F7;border-radius:26px;padding:0 6px 0 18px;height:52px;}
+.cm-field input{flex:1;min-width:0;border:0;background:none;outline:none;font-size:17px;font-weight:600;font-family:inherit;color:#14281F;height:100%;}
+.cm-field input::placeholder{color:#8A8E9A;}
+.cm-emo{width:40px;height:40px;border:0;background:none;color:#C08A2E;padding:0;flex:none;display:flex;align-items:center;justify-content:center;}
+.cm-emo svg{width:30px;height:30px;fill:none;}
+.cm-act{width:46px;height:46px;border:0;background:none;color:#C08A2E;padding:0;flex:none;display:flex;align-items:center;justify-content:center;}
+.cm-act svg{width:34px;height:34px;}
+.cm-send{width:46px;height:46px;border-radius:50%;border:0;background:linear-gradient(135deg,#E8C86A,#A9741F);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;flex:none;}
+.cm-send svg{width:22px;height:22px;}
+.cm-rec .dot{width:12px;height:12px;border-radius:50%;background:#D8403B;animation:cmBlink 1s infinite;}
+@keyframes cmBlink{50%{opacity:.25}}
+.cm-rec b{font-size:17px;min-width:44px;}
+.cm-rec .hint{flex:1;color:#76776B;font-weight:600;}
+.cm-view{position:fixed;inset:0;z-index:470;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;}
+.cm-view.show{display:flex;}
+.cm-view img{max-width:100%;max-height:100%;object-fit:contain;}
+.cm-view button{position:absolute;top:calc(14px + env(safe-area-inset-top));right:14px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:22px;}
+/* conversation list */
+#convoListPanel .convo-row{border:2px solid #EADFC4;background:#FFFEFA;border-radius:24px;margin-bottom:10px;padding:12px 14px;}
+#convoListPanel .convo-row .name{font-weight:800;}
+#convoListPanel .convo-row .snippet{color:#6D6A58;font-weight:600;}
+#convoListPanel .convo-row.unread .name,#convoListPanel .convo-row.unread .snippet{color:#14281F;font-weight:800;}
+#convoListPanel .unread-dot{background:#9A6B1E;}
+
+
+#marketView.mkp{padding-top:0;}
+.mkp svg,.mkp-page svg,.mkp-you svg{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+.mkp-top{display:flex;align-items:center;gap:12px;padding:12px var(--gutter,12px) 8px;}
+.mkp-back,.mkp-pback{width:46px;height:46px;border-radius:50%;border:2.5px solid #E8C86A;background:#FBF8F0;color:#8F6524;display:flex;align-items:center;justify-content:center;flex:none;padding:0;}
+.mkp-back svg,.mkp-pback svg{width:22px;height:22px;}
+.mkp-top .tt{flex:1;min-width:0;}
+.mkp-top .t{font-size:21px;font-weight:800;line-height:1.15;color:#14281F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mkp-top .s{font-size:12.5px;font-weight:700;color:#9A6B1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mkp-fil{width:34px;height:46px;border-radius:17px;border:2.5px solid #E8C86A;background:#F6EBD0;color:#8F6524;display:flex;align-items:center;justify-content:center;flex:none;padding:0;}
+.mkp-fil svg{width:22px;height:22px;}
+.mkp-acts{display:flex;gap:10px;overflow-x:auto;padding:6px var(--gutter,12px) 8px;scrollbar-width:none;}
+.mkp-acts::-webkit-scrollbar,.mkp-chips::-webkit-scrollbar{display:none;}
+.mkp-pill{flex:none;height:46px;padding:0 22px;border-radius:24px;border:2px solid #EADFC4;background:#FFFEFA;color:#14281F;font-weight:800;font-size:16px;display:flex;align-items:center;gap:8px;font-family:inherit;}
+.mkp-pill svg{width:20px;height:20px;color:#9A6B1E;}
+.mkp-pill.gold{background:linear-gradient(90deg,#B27F2B,#9A6B1E);border-color:#9A6B1E;color:#fff;}
+.mkp-pill.active{background:#F6EBD0;border-color:#C99A42;color:#8F6524;}
+.mkp-pill .bdg{min-width:26px;height:26px;border-radius:13px;background:#8B1A2B;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0 7px;}
+.mkp-chips{padding:4px var(--gutter,12px) 10px;border-bottom:1px solid #EFE4C8;}
+.mkp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px var(--gutter,12px) 12px;}
+.mkp-head h3{margin:0;font-size:22px;font-weight:800;color:#14281F;}
+.mkp-head .sub{font-size:13px;color:#6D6A58;font-weight:600;margin-top:2px;}
+.mkp-loc{flex:none;height:44px;padding:0 16px;border-radius:22px;border:2px solid #EADFC4;background:#FFFEFA;font-weight:800;font-size:15px;color:#14281F;max-width:46%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit;}
+#marketView.mkp .mk-grid{grid-template-columns:1fr;gap:12px;padding:0 10px 90px;}
+@media(min-width:520px){#marketView.mkp .mk-grid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));}}
+#marketView.mkp .mk-img{aspect-ratio:1/1;}
+#marketView.mkp .mk-card{border-radius:22px;}
+.mkp-page{position:fixed;inset:0;z-index:440;background:#FBF8F0;display:none;flex-direction:column;color:#14281F;}
+.mkp-page.show{display:flex;}
+.mkp-ptop{display:flex;align-items:center;gap:14px;padding:calc(12px + env(safe-area-inset-top)) 14px 12px;}
+.mkp-ptop h2{margin:0;font-size:22px;font-weight:800;}
+.mkp-pback{border:0;background:none;color:#14281F;width:40px;}
+.mkp-pbody{flex:1;overflow-y:auto;padding:8px max(14px,calc((100% - 680px)/2 + 14px)) 30px;}
+.mkp-th{display:flex;align-items:center;gap:10px;min-width:0;flex:1;}
+.mkp-th img,.mkp-th .ph,.mkp-it img,.mkp-it .ph{width:46px;height:46px;border-radius:12px;object-fit:cover;background:#F6EBD0;flex:none;}
+.mkp-th b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+.mkp-th span{font-size:12.5px;color:#6D6A58;display:block;}
+.mkp-it{display:flex;align-items:center;gap:16px;border:2px solid #EADFC4;background:#FFFEFA;border-radius:22px;padding:14px;margin-bottom:12px;width:100%;text-align:left;font-family:inherit;color:inherit;}
+.mkp-it img,.mkp-it .ph{width:68px;height:68px;border-radius:16px;}
+.mkp-it .m{flex:1;min-width:0;}
+.mkp-it .m b{display:block;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mkp-it .m span{display:block;margin-top:4px;font-size:14px;color:#6D6A58;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mkp-it .chv{width:22px;height:22px;color:#6D6A58;flex:none;}
+.mkp-msgs{display:flex;flex-direction:column;gap:8px;}
+.mkp-msg{max-width:78%;padding:10px 14px;border-radius:18px;font-size:15px;line-height:1.4;background:#F1EAD6;align-self:flex-start;word-break:break-word;}
+.mkp-msg.me{align-self:flex-end;background:linear-gradient(90deg,#E8C86A,#B27F2B);color:#fff;}
+.mkp-msg small{display:block;font-size:11px;opacity:.7;margin-top:3px;}
+.mkp-reply{display:flex;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid #EADFC4;background:#FFFEFA;}
+.mkp-reply input{flex:1;min-width:0;height:46px;border-radius:23px;border:2px solid #EADFC4;background:#FAF7EE;padding:0 18px;font-size:16px;font-family:inherit;outline:none;}
+.mkp-reply button{height:46px;padding:0 22px;border:0;border-radius:23px;background:linear-gradient(90deg,#E8C86A,#B27F2B);color:#fff;font-weight:800;font-size:15px;}
+/* You sheet */
+.sl-sheet.mkp-you{max-height:92vh;}
+.mkp-me{display:flex;align-items:center;gap:18px;padding:20px 22px 6px;}
+.mkp-me .avatar{width:72px;height:72px;font-size:24px;flex:none;}
+.mkp-me b{display:block;font-size:24px;font-weight:800;}
+.mkp-me span{display:block;margin-top:4px;color:#6D6A58;font-weight:700;font-size:15px;}
+.mkp-btns{display:flex;gap:12px;padding:14px 22px;}
+.mkp-btns button{flex:1;min-height:60px;border-radius:30px;font-weight:800;font-size:16px;font-family:inherit;border:2px solid #EADFC4;background:#FFFEFA;color:#14281F;display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.1;}
+.mkp-btns button.gold{background:#9A6B1E;border-color:#9A6B1E;color:#fff;}
+.mkp-tabs{display:flex;gap:12px;padding:6px 22px 12px;}
+.mkp-tabs button{height:48px;padding:0 14px;white-space:nowrap;flex:1;border-radius:14px;border:2px solid #EADFC4;background:#FFFEFA;color:#4D5C54;font-weight:800;font-size:16px;font-family:inherit;}
+.mkp-tabs button.on{background:#F9ECCB;border-color:#F9ECCB;color:#9A6B1E;}
+.mkp-ml{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 22px 22px;overflow-y:auto;}
+.mkp-mc{position:relative;border:2px solid #EADFC4;background:#FFFEFA;border-radius:24px;overflow:hidden;display:flex;flex-direction:column;min-width:0;}
+.mkp-mc .im{aspect-ratio:1/0.9;background:#F6EBD0;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;}
+.mkp-mc .im img{width:100%;height:100%;object-fit:cover;}
+.mkp-mc .sold{position:absolute;left:12px;top:12px;background:#8B1A2B;color:#fff;font-weight:800;font-size:13px;padding:8px 14px;border-radius:14px;}
+.mkp-mc .p{padding:12px 14px 0;font-weight:800;font-size:18px;color:#9A6B1E;}
+.mkp-mc .n{padding:8px 14px 0;font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mkp-mc .a{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:14px 8px 14px 12px;}
+.mkp-mc .a button{white-space:nowrap;border:0;background:none;color:#9A6B1E;font-weight:800;font-size:13.5px;padding:4px 2px;font-family:inherit;}
+.mkp-mc .a button.del{color:#8B1A2B;}
+.mkp-mc .a button svg{width:22px;height:22px;}
+.mkp-empty{grid-column:1/-1;text-align:center;color:#6D6A58;padding:30px 10px;}
+/* sort & filter sheet */
+.mkp-f{padding:0 22px 20px;overflow-y:auto;}
+.mkp-f label{display:block;font-weight:800;color:#9A6B1E;font-size:14px;margin:16px 4px 8px;}
+.mkp-f input[type=text],.mkp-f input[type=number]{width:100%;box-sizing:border-box;height:50px;border-radius:25px;border:2px solid #EADFC4;background:#FAF7EE;padding:0 18px;font-size:16px;font-family:inherit;outline:none;}
+.mkp-f .two{display:flex;gap:10px;}
+.mkp-f .act{display:flex;gap:10px;margin-top:20px;}
+.mkp-f .act button{flex:1;height:52px;border-radius:26px;font-weight:800;font-size:16px;border:2px solid #EADFC4;background:#fff;font-family:inherit;}
+.mkp-f .act button.gold{background:linear-gradient(90deg,#E8C86A,#A9741F);border-color:#C99A42;color:#fff;}
+
+
+.sl{position:fixed;inset:0;z-index:440;display:none;flex-direction:column;background:#FBF8F0;color:#14281F;}
+.sl.show{display:flex;}
+.sl svg{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+.sl-top{display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top)) max(14px,calc((100% - 680px)/2 + 14px)) 10px;background:#FBF8F0;position:relative;}
+.sl-top::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#B8863A,#F2D88B 30%,#C99A42 58%,#8F6524);}
+.sl-back{width:46px;height:46px;border-radius:50%;border:2.5px solid #E8C86A;background:#FBF8F0;color:#8F6524;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;}
+.sl-back svg{width:22px;height:22px;}
+.sl-tt{flex:1;min-width:0;}
+.sl-tt .t{font-size:20px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sl-tt .s{font-size:13px;font-weight:700;color:#9A6B1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sl-pub{height:44px;padding:0 24px;border:0;border-radius:24px;background:linear-gradient(90deg,#E8C86A,#B27F2B);color:#fff;font-weight:800;font-size:16px;box-shadow:0 6px 14px rgba(143,101,36,.28);flex-shrink:0;}
+.sl-pub:disabled,.sl-pubbig:disabled{opacity:.6;}
+.sl-prog{height:7px;margin:4px max(14px,calc((100% - 680px)/2 + 14px)) 6px;border-radius:6px;background:#EADFC4;overflow:hidden;flex-shrink:0;}
+.sl-prog i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,#E8C86A,#A9741F);transition:width .3s;}
+.sl-scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:8px max(14px,calc((100% - 680px)/2 + 14px)) 0;-webkit-overflow-scrolling:touch;}
+.sl-card{position:relative;background:#FFFEFA;border:1.5px solid #E6D9B8;border-radius:30px;padding:20px 18px 18px;margin-bottom:16px;box-shadow:0 8px 22px rgba(120,90,30,.10);overflow:hidden;}
+.sl-card::before{content:"";position:absolute;left:10px;right:10px;top:0;height:7px;border-radius:0 0 8px 8px;background:linear-gradient(90deg,#E8C86A,#B27F2B);}
+.sl-card h3{font-size:20px;font-weight:800;margin:8px 0 12px;}
+.sl-ch{display:flex;align-items:center;justify-content:space-between;}
+.sl-count{background:#F4E8CB;color:#8F6524;font-weight:800;font-size:14px;padding:6px 14px;border-radius:16px;}
+.sl-l{display:block;font-size:14px;font-weight:800;color:#9A6B1E;margin:14px 6px 8px;letter-spacing:.01em;}
+.sl-in{width:100%;min-height:54px;border:2.5px solid #EADFC4;border-radius:27px;background:#FAF7EE;color:#14281F;font-size:16px;font-weight:500;padding:0 20px;font-family:inherit;outline:none;box-sizing:border-box;display:flex;align-items:center;gap:12px;text-align:left;}
+.sl-in:focus,.sl-in:focus-within{border-color:#D9B14F;background:#FFFCF3;}
+input.sl-in{display:block;}
+.sl-ta{display:block;min-height:140px;border-radius:24px;padding:16px 20px;resize:vertical;line-height:1.4;}
+.sl-in::placeholder{color:#8E8A78;}
+.sl-sel .v{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sl-sel .v.ph{color:#76735F;font-weight:600;}
+.sl-sel .chv{width:20px;height:20px;color:#14281F;flex-shrink:0;}
+.sl-sel .pin{font-size:18px;}
+.sl-cat{min-height:66px;background:#F6EBD0;}
+.sl-cat .ic{width:46px;height:46px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+.sl-cat .v{font-weight:700;font-size:16px;white-space:normal;line-height:1.25;}
+.sl-money{padding:0;}
+.sl-money .sl-cur{border:0;background:none;color:#9A6B1E;font-size:20px;font-weight:800;padding:0 0 0 20px;min-width:30px;}
+.sl-money input{flex:1;min-width:0;border:0;background:none;outline:none;font-size:16px;font-family:inherit;color:inherit;padding:0 20px 0 10px;height:50px;}
+.sl-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.sl-chip{border:2.5px solid #EADFC4;background:#FAF7EE;color:#14281F;font-weight:600;font-size:15.5px;border-radius:26px;padding:0 20px;height:48px;font-family:inherit;}
+.sl-chip.on{background:linear-gradient(90deg,#E8C86A,#B27F2B);border-color:#C99A42;color:#fff;font-weight:800;}
+#slAvail .sl-chip{flex:1 1 auto;}
+.sl-row{display:flex;align-items:flex-start;gap:14px;padding:16px 0;border-top:1.5px solid #EFE4C8;}
+.sl-row:first-of-type{border-top:0;padding-top:6px;}
+.sl-row .tx{flex:1;min-width:0;}
+.sl-row b{display:block;font-size:17px;font-weight:800;margin-bottom:4px;}
+.sl-row span{display:block;font-size:14.5px;color:#6D6A58;line-height:1.55;}
+.sl-more{display:inline-block;margin-top:6px;color:#9A6B1E;font-weight:800;font-size:15px;text-decoration:underline;}
+.sl-sw{flex:none;width:62px;height:36px;border-radius:20px;border:0;background:#EADFC4;position:relative;padding:0;transition:background .2s;margin-top:4px;}
+.sl-sw i{position:absolute;left:4px;top:4px;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25);transition:transform .2s;}
+.sl-sw.on{background:linear-gradient(90deg,#E8C86A,#B27F2B);}
+.sl-sw.on i{transform:translateX(26px);}
+.sl-policy{text-align:center;color:#6D6A58;font-size:13.5px;line-height:1.6;margin:8px 10px 0;}
+.sl-foot{position:absolute;left:0;right:0;bottom:0;padding:14px max(14px,calc((100% - 680px)/2 + 14px)) calc(16px + env(safe-area-inset-bottom));background:linear-gradient(0deg,#FBF8F0 60%,rgba(251,248,240,0));pointer-events:none;}
+.sl-pubbig{pointer-events:auto;width:100%;height:58px;border:0;border-radius:30px;background:linear-gradient(90deg,#E8C86A,#A9741F);color:#fff;font-weight:800;font-size:19px;box-shadow:0 10px 24px rgba(143,101,36,.35);}
+/* photos */
+.sl-drop{width:100%;border:2.5px solid #EBCB6B;border-radius:28px;background:#FAF6EA;padding:26px 14px 22px;display:flex;flex-direction:column;align-items:center;gap:8px;color:#14281F;font-family:inherit;}
+.sl-drop .cam{width:70px;height:70px;border-radius:50%;background:linear-gradient(145deg,#D9AE4D,#A9741F);display:flex;align-items:center;justify-content:center;color:#fff;margin-bottom:6px;}
+.sl-drop .cam svg{width:32px;height:32px;stroke-width:2;}
+.sl-drop b{font-size:18px;font-weight:800;}
+.sl-drop span{font-size:14px;color:#6D6A58;line-height:1.55;max-width:300px;text-align:center;}
+.sl-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.sl-ph{position:relative;aspect-ratio:1/1;border-radius:18px;overflow:hidden;background:#EADFC4;}
+.sl-ph img{width:100%;height:100%;object-fit:cover;display:block;}
+.sl-ph .x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(20,40,31,.75);color:#fff;font-size:14px;line-height:1;padding:0;}
+.sl-ph .cv{position:absolute;left:6px;bottom:6px;background:linear-gradient(90deg,#E8C86A,#B27F2B);color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:10px;}
+.sl-ph .mk{position:absolute;left:6px;bottom:6px;background:rgba(20,40,31,.7);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;border:0;}
+.sl-add{aspect-ratio:1/1;border-radius:18px;border:2.5px dashed #E1C676;background:#FAF6EA;color:#9A6B1E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-weight:800;font-size:13px;font-family:inherit;}
+.sl-add svg{width:26px;height:26px;}
+.sl-err{border-color:#D8544F!important;background:#FFF4F2!important;}
+.sl-pbar{height:6px;border-radius:4px;background:rgba(255,255,255,.4);overflow:hidden;margin-top:8px;}
+/* sheet */
+.sl-sheet-bg{position:fixed;inset:0;z-index:460;background:rgba(15,25,19,.5);display:none;align-items:flex-end;justify-content:center;}
+.sl-sheet-bg.show{display:flex;}
+.sl-sheet{width:100%;max-width:560px;max-height:78vh;background:#FFFEFA;border-radius:26px 26px 0 0;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom);animation:slUp .25s ease-out;}
+@keyframes slUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sl-sheet h4{margin:0;padding:18px 20px 8px;font-size:18px;font-weight:800;}
+.sl-sheet .lst{overflow-y:auto;padding:4px 10px 14px;}
+.sl-sheet .it{width:100%;display:flex;align-items:center;gap:14px;border:0;background:none;padding:12px 12px;border-radius:16px;font-size:16px;font-weight:600;color:#14281F;text-align:left;font-family:inherit;}
+.sl-sheet .it:active,.sl-sheet .it.cur{background:#F6EBD0;}
+.sl-sheet .it .ic{font-size:24px;width:34px;text-align:center;}
+.sl-sheet .it .ck{margin-left:auto;color:#9A6B1E;font-weight:800;}
+.sl-sheet .srch{margin:0 18px 6px;height:46px;border-radius:23px;border:2px solid #EADFC4;background:#FAF7EE;padding:0 18px;font-size:16px;font-family:inherit;outline:none;}
+/* comments on listing detail */
+.mk-cm{margin-top:14px;border-top:1px solid var(--line,#eadfc4);padding-top:12px;}
+.mk-cm .cm{display:flex;gap:10px;margin:10px 0;}
+.mk-cm .cm .b{background:#F6EFDD;border-radius:16px;padding:8px 12px;font-size:14px;line-height:1.4;min-width:0;}
+.mk-cm .cm .b b{display:block;font-size:13px;}
+.mk-cm .cm .avatar{width:34px;height:34px;font-size:12px;flex-shrink:0;}
+.mk-cm .row{display:flex;gap:8px;margin-top:8px;}
+.mk-cm .row input{flex:1;min-width:0;border:1.5px solid #E6D9B8;border-radius:20px;padding:9px 14px;font-size:15px;font-family:inherit;}
+.mk-attrs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px;}
+
 </style>
 <style id="royal-theme">
 
@@ -1589,6 +1847,98 @@ img,video,canvas,svg{max-width:100%;}
 @keyframes gfxFall{to{transform:translateY(110vh) rotate(260deg)}}
 #liveTopG{position:absolute;top:calc(14px + 54px);left:12px;z-index:5;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none;}
 #liveTopG .tg{background:rgba(0,0,0,.5);color:#fff;border-radius:12px;padding:3px 9px;font-size:11.5px;white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis;} #liveTopG .tg b{color:#F1C45A;} #liveTopG em{font-style:normal;margin-right:3px;}
+
+.toast{z-index:900!important;bottom:calc(90px + var(--safe-b));max-width:90vw;text-align:center;}
+.modal-bg{z-index:600;}
+.lg-hint.bad{color:#FF8A8A;opacity:1;}
+.lg-packs{display:none;background:rgba(255,255,255,.06);border-radius:14px;padding:10px;margin-bottom:10px;font-size:12.5px;}
+.lg-packs.show{display:block;}
+.lgp-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0;}
+.lgp-row button{background:rgba(255,255,255,.1);border:1px solid rgba(241,196,90,.5);border-radius:12px;color:#fff;padding:7px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;}
+.lgp-row button b{color:#F1D79A;font-size:14px;} .lgp-row small{font-size:10.5px;opacity:.85;}
+.lg-packs a{color:#E4D09C;font-weight:700;}
+
+/* 4f. Facebook media aspect ratios */
+.post-media-grid{display:grid;gap:2px;background:var(--paper,#f4efe3);}
+.pmg-item{position:relative;overflow:hidden;background:#0c1410;min-width:0;}
+.pmg-item img,.pmg-item video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.post-media-grid[data-n="1"]{grid-template-columns:1fr;}
+.post-media-grid[data-n="1"] .pmg-item{aspect-ratio:4/3;max-height:none;}
+.post-media-grid[data-n="2"][data-l="t"]{grid-template-columns:1fr 1fr;}
+.post-media-grid[data-n="2"][data-l="t"] .pmg-item{aspect-ratio:4/5;}
+.post-media-grid[data-n="2"][data-l="w"]{grid-template-columns:1fr;}
+.post-media-grid[data-n="2"][data-l="w"] .pmg-item{aspect-ratio:16/10;}
+.post-media-grid[data-n="3"]{grid-template-columns:1fr 1fr;}
+.post-media-grid[data-n="3"][data-l="w"] .pmg-item:first-child{grid-column:1/-1;aspect-ratio:16/10;}
+.post-media-grid[data-n="3"][data-l="w"] .pmg-item:not(:first-child){aspect-ratio:1/1;}
+.post-media-grid[data-n="3"][data-l="t"]{grid-template-rows:1fr 1fr;aspect-ratio:1/1;}
+.post-media-grid[data-n="3"][data-l="t"] .pmg-item:first-child{grid-row:1/3;}
+.post-media-grid[data-n="4"]{grid-template-columns:1fr 1fr;}
+.post-media-grid[data-n="4"] .pmg-item{aspect-ratio:1/1;}
+.post-media-grid[data-n="5"]{grid-template-columns:repeat(6,minmax(0,1fr));}
+.post-media-grid[data-n="5"] .pmg-item{grid-column:span 2;aspect-ratio:1/1;}
+.post-media-grid[data-n="5"] .pmg-item:nth-child(-n+2){grid-column:span 3;}
+.pmg-more{position:absolute;inset:0;background:rgba(0,0,0,.55);color:#fff;font-size:30px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.shared-post-box .post-media-grid{border-radius:0;}
+.story-card{aspect-ratio:9/16;height:auto;}
+@media (max-width:599.98px){ .story-card{flex-basis:108px;height:auto;} }
+.pf-cover{height:auto;aspect-ratio:16/9;}
+@media (min-width:600px){ .pf-cover{aspect-ratio:820/312;} }
+.pf-grid .g.reel{aspect-ratio:9/16;}
+.mk-gallery img{aspect-ratio:1/1;max-height:none;}
+.reel video{object-fit:cover;}
+
+/* 4g. Facebook type scale: 15px body, 13px meta, 600 weights, 20-24px icons */
+body{font-size:15px;line-height:1.33;}
+input,textarea,select{font-size:16px;}
+.post-head .name{font-size:15px;font-weight:600;line-height:1.25;}
+.post-head .time{font-size:13px;font-weight:400;}
+.post-body,.post-body *,.shared-post-text{font-size:15px;line-height:1.33;}
+.post-bg-body{font-size:24px;font-weight:700;}
+.post-reactions-line{font-size:15px;}
+.post-reactions-line .reaction-icons span{width:20px;height:20px;font-size:13px;}
+.post-actions button{font-size:14px;font-weight:600;}
+.post-actions button svg{width:20px;height:20px;}
+.comment-bubble{font-size:15px;border-radius:18px;padding:8px 12px;}
+.comment-bubble .cname{font-size:13px;font-weight:600;}
+.cr-pill{font-size:15px;font-weight:400;}
+.composer .cr-btn{font-size:14px;font-weight:600;}
+.stories-title{font-weight:700;}
+.add-moment{font-weight:600;}
+.story-card .sn{font-size:13px;font-weight:600;}
+.brand-name{font-weight:700;}
+.inav-btn{font-weight:500;}
+.topstack .icon-nav .inav-svg{width:26px;height:26px;}
+.topstack .icon-nav .inav-btn{font-size:10.5px;}
+.section-title{font-size:20px;font-weight:700;}
+.person-row .name,.notif-row .text{font-size:15px;font-weight:600;}
+.person-row .sub,.convo-row .snippet,.notif-row .ntime{font-size:13px;}
+.convo-row .convo-time{font-size:12px;}
+.btn{font-size:15px;font-weight:600;}
+.tab{font-size:14px;font-weight:600;}
+.bubble{font-size:15px;}
+.bubble-time{font-size:11px;}
+.menu-card{font-size:15px;font-weight:600;}
+.menu-card-icon{font-size:26px;}
+.round-btn svg,.round-btn .ic{width:22px;height:22px;}
+.hdr-pill{font-size:14px;font-weight:600;}
+.live-pill{font-weight:700;}
+
+/* 4h. Composer quick-action buttons: 20px icons, balanced pill containers */
+.composer .cr-btn,.cr-btn{height:42px;min-width:0;border-radius:14px;gap:6px;padding:0 8px;font-size:14px;font-weight:600;letter-spacing:0;line-height:1;white-space:nowrap;}
+.cr-btn svg{width:20px;height:20px;stroke-width:1.9;}
+.cr-btn .dot{width:10px;height:10px;flex-shrink:0;}
+.cr-btn span:not(.dot){overflow:hidden;text-overflow:ellipsis;}
+@media (max-width:359.98px){ .cr-btn{gap:4px;padding:0 4px;font-size:13px;} .cr-btn svg{width:18px;height:18px;} }
+
+/* 4i. smaller composer buttons + nav icons */
+.composer .cr-btn,.cr-btn{height:38px;font-size:13px;gap:5px;padding:0 6px;}
+.cr-btn svg{width:17px;height:17px;}
+.cr-btn .dot{width:8px;height:8px;}
+.topstack .icon-nav .inav-svg{width:24px;height:24px;}
+.post-actions button{font-size:13.5px;}
+.post-actions button svg{width:19px;height:19px;}
+@media (max-width:359.98px){ .cr-btn{font-size:12px;} .cr-btn svg{width:16px;height:16px;} }
 .stories-head{flex-wrap:wrap;}
 
 /* 4c. Facebook-style edge-to-edge feed on phones */
@@ -1632,9 +1982,10 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
 /* full-bleed screens (profile, ads, reels) cancel the container padding exactly */
 #profileView.pf,.view-panel.ax{margin:calc(var(--app-pad-t)*-1) calc(var(--gutter)*-1) 0;max-width:none;}
 #reelsView{margin:calc(var(--app-pad-t)*-1) calc(var(--gutter)*-1) -90px;max-width:none;}
+#profileView.pf,.view-panel.ax,#reelsView{width:calc(100% + var(--gutter)*2);}
 @media (min-width:700px){
-  #profileView.pf,.view-panel.ax{margin:0 auto;max-width:760px;}
-  #reelsView{margin:0 auto;max-width:480px;}
+  #profileView.pf,.view-panel.ax{margin:0 auto;max-width:760px;width:100%;}
+  #reelsView{margin:0 auto;max-width:480px;width:100%;}
 }
 /* sticky in-page bars: sit below the app header when it is visible, else at the very top */
 .pf-bar,.ax-bar{top:0;padding-top:var(--safe-t);min-height:calc(64px + var(--safe-t));}
@@ -1680,6 +2031,52 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
 /* ---------- 6. Large / ultra-wide: stop stretching ---------- */
 @media (min-width:1600px){ :root{ --col-max:720px; --wide-max:1240px; } }
 @media (prefers-reduced-motion:reduce){ *{scroll-behavior:auto!important;} }
+#profileView .vbadge svg,.pf-name .vbadge svg{width:26px;height:26px;}
+.vbadge svg{filter:drop-shadow(0 1px 1px rgba(143,101,36,.35));}
+
+/* 4j menu: compact passport / suite / portals like the Android reference */
+#menuView .passport{padding:18px 16px 16px;border-radius:26px;margin-bottom:14px;}
+#menuView .pp-top{gap:14px;}
+#menuView .pp-avatar{width:78px;height:78px;padding:3px;border-width:3px;}
+#menuView .pp-avatar .avatar{font-size:24px;}
+#menuView .pp-tag{font-size:9.5px;letter-spacing:.05em;padding:6px 9px;border-radius:10px;white-space:nowrap;}
+#menuView .pp-name{font-size:20px;margin:8px 0 3px;}
+#menuView .pp-link{font-size:14px;white-space:nowrap;}
+#menuView .pp-logo{width:52px;height:52px;border-radius:14px;}
+#menuView .pp-stats{margin-top:14px;padding:12px 2px;border-radius:18px;}
+#menuView .pp-stat small{font-size:10px;margin-bottom:7px;letter-spacing:.14em;}
+#menuView .pp-stat b{font-size:14px;}
+#menuView .pp-stats{grid-template-columns:1.3fr 1fr 1.25fr;}
+#menuView .pp-mid{padding-right:2px;}
+#menuView .pp-logo{margin-left:-4px;}
+#menuView .verify-card{padding:14px;gap:12px;border-radius:22px;margin-bottom:18px;}
+#menuView .vc-seal{width:58px;height:58px;border-radius:17px;}
+#menuView .vc-seal svg{width:32px;height:32px;}
+#menuView .vc-title{flex-wrap:nowrap;gap:8px;}
+@media(max-width:350px){#menuView .vc-title{flex-wrap:wrap;}}
+#menuView .vc-title b{font-size:17px;white-space:nowrap;}
+#menuView .gold-seal-pill{font-size:10.5px;padding:6px 9px;white-space:nowrap;}
+#menuView .vc-body p{font-size:13px;margin-top:5px;}
+#menuView .vc-chev{width:40px;height:40px;}
+#menuView .sec-kicker{font-size:11px;}
+#menuView .sec-title{font-size:19px;}
+#menuView .sec-pill{font-size:12px;padding:8px 13px;}
+#menuView .suite-card{padding:16px 6px 12px;gap:8px;border-radius:22px;}
+#menuView .suite-ico{width:52px;height:52px;}
+#menuView .suite-ico svg{width:26px;height:26px;}
+#menuView .suite-card b{font-size:14px;}
+#menuView .suite-chip{font-size:11px;padding:6px 10px;}
+#menuView .portal{padding:14px 14px 16px;border-radius:24px;}
+#menuView .portal-top{margin-bottom:18px;}
+#menuView .portal-ico{width:48px;height:48px;border-radius:15px;}
+#menuView .portal-ico svg{width:24px;height:24px;}
+#menuView .portal-badge{font-size:10.5px;padding:5px 9px;}
+#menuView .portal b{font-size:17px;}
+#menuView .portal span.sub{font-size:12.5px;}
+#menuView .concierge{padding:18px 14px 20px;}
+#menuView .concierge h4{font-size:15px;}
+#menuView .concierge p{font-size:13px;}
+
 </style></head>
 <body>
 
@@ -1942,26 +2339,30 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
         <div id="convoList" class="people-list"></div>
         <div id="convoEmpty" class="empty-small" style="display:none;" data-t="noConvos">No conversations yet — message a friend from their profile.</div>
       </div>
-      <div id="chatPanel" style="display:none;">
-        <button class="back-link" onclick="closeChat()">← <span data-t="backToMessages">Back to messages</span></button>
-        <div class="chat-panel">
-          <div class="chat-header">
-            <div class="avatar" id="chatAvatar" style="width:34px;height:34px;font-size:13px;"></div>
-            <div class="who" style="flex:1;min-width:0;">
-              <div class="name" id="chatName"></div>
-              <div class="chat-status" id="chatStatus"></div>
-            </div>
-            <div class="chat-header-actions">
-              <button class="call-icon-btn" onclick="startCall('audio')" title="Audio call">📞</button>
-              <button class="call-icon-btn" onclick="startCall('video')" title="Video call">📹</button>
-            </div>
-          </div>
-          <div class="chat-messages" id="chatMessages"></div>
-          <div class="chat-input-bar">
-            <input type="text" id="chatInput" data-tph="typeMessage" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendMessage()">
-            <button onclick="sendMessage()" data-t="send">Send</button>
-          </div>
+      <div id="chatPanel" class="cm" style="display:none;">
+        <div class="cm-top">
+          <button class="cm-ib back" onclick="closeChat()" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="cm-who" onclick="cmProfile()"><div class="avatar" id="chatAvatar"></div>
+            <div class="nm"><div class="name" id="chatName"></div><div class="chat-status" id="chatStatus"></div></div></div>
+          <button class="cm-ib" onclick="startCall('audio')" aria-label="Audio call"><svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.6 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.6 3.6a1 1 0 0 1-.25 1z"/></svg></button>
+          <button class="cm-ib" onclick="startCall('video')" aria-label="Video call"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M22 7.5v9a.8.8 0 0 1-1.3.6L16.5 14v-4l4.2-3.1A.8.8 0 0 1 22 7.5z"/></svg></button>
+          <button class="cm-ib" onclick="cmSettings()" aria-label="Chat settings"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.59-.22l-2.39.96a7 7 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.5.5 0 0 0-.59.22L2.74 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg></button>
         </div>
+        <div class="cm-search" id="cmSearch" style="display:none"><input type="search" id="cmSearchIn" placeholder="Search in this chat…" oninput="cmRender()"><button onclick="cmSearchToggle(false)">Close</button></div>
+        <div class="cm-list" id="chatMessages"></div>
+        <div class="cm-banner" id="cmBanner" style="display:none"></div>
+        <div class="cm-up" id="cmUp" style="display:none"><span id="cmUpT">Sending…</span><i><b id="cmUpB"></b></i></div>
+        <div class="cm-emoji" id="cmEmoji" style="display:none"></div>
+        <div class="cm-rec" id="cmRec" style="display:none"><button class="cm-ib2" onclick="cmRecStop(false)" aria-label="Cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg></button><span class="dot"></span><b id="cmRecT">0:00</b><span class="hint">Recording…</span><button class="cm-send" onclick="cmRecStop(true)" aria-label="Send voice message"><svg viewBox="0 0 24 24"><path d="M3.4 20.4 21 12 3.4 3.6 3.3 10l12.6 2-12.6 2z"/></svg></button></div>
+        <div class="cm-bar" id="cmBar">
+          <button class="cm-ib2" onclick="document.getElementById('cmImgIn').click()" aria-label="Photo"><svg viewBox="0 0 24 24"><path d="M4 3h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm1.5 14.5h13l-4-5.3-3 4-2.2-2.8z"/></svg></button>
+          <button class="cm-ib2" onclick="cmRecStart()" aria-label="Voice message"><svg viewBox="0 0 24 24"><path d="M12 15a3.5 3.5 0 0 0 3.5-3.5V6a3.5 3.5 0 0 0-7 0v5.5A3.5 3.5 0 0 0 12 15zm6-3.5a1 1 0 0 0-2 0 4 4 0 0 1-8 0 1 1 0 0 0-2 0 6 6 0 0 0 5 5.9V20H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.6a6 6 0 0 0 5-5.9z"/></svg></button>
+          <button class="cm-ib2" onclick="document.getElementById('cmFileIn').click()" aria-label="Attach file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l9-9a3.7 3.7 0 0 1 5.2 5.2l-9 9a1.8 1.8 0 0 1-2.6-2.6l8.3-8.3"/></svg></button>
+          <div class="cm-field"><input type="text" id="chatInput" data-tph="typeMessage" placeholder="Message..." autocomplete="off" oninput="cmInput()" onkeydown="if(event.key==='Enter')sendMessage()"><button class="cm-emo" onclick="cmEmojiToggle()" aria-label="Emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M8 14.2c1 1.5 2.4 2.2 4 2.2s3-.7 4-2.2"/><path d="M9 9.5v.5M15 9.5v.5"/></svg></button></div>
+          <button class="cm-act" id="cmAct" onclick="cmActClick()" aria-label="Send"></button>
+        </div>
+        <input type="file" id="cmImgIn" accept="image/*" multiple hidden onchange="cmPickImages(event)">
+        <input type="file" id="cmFileIn" hidden onchange="cmPickFile(event)">
       </div>
     </div>
 
@@ -2115,17 +2516,17 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
 
       <div class="sec-head">
         <div><div class="sec-kicker" data-t="execKicker">EXECUTIVE SUITE · የንግድ ማዕከል</div><div class="sec-title" data-t="execTitle">Commerce &amp; Creator Lounge</div></div>
-        <button class="sec-pill" onclick="navigateMarket()">✦ ገበያ</button>
+        <button class="sec-pill" onclick="navigateMarket()">✦ MESKOT</button>
       </div>
       <div class="suite-row">
-        <div class="suite-card" onclick="navigateMarket()"><div class="suite-ico"><svg class="ic" viewBox="0 0 24 24"><use href="#i-store"/></svg></div><b data-t="marketplace">Marketplace</b><span class="am">ገበያ</span><span class="suite-chip" id="mpFxChip">Live FX</span></div>
-        <div class="suite-card dark" onclick="navigateAds()"><div class="suite-ico"><svg class="ic" viewBox="0 0 24 24"><use href="#i-megaphone"/></svg></div><b data-t="adsManager">Ads Manager</b><span class="am">ማስታወቂያ</span><span class="suite-chip" id="mpAdsChip">0 Active</span></div>
-        <div class="suite-card" onclick="navigateCreator()"><div class="suite-ico"><svg class="ic" viewBox="0 0 24 24"><use href="#i-award"/></svg></div><b data-t="creatorStudio">Creator Studio</b><span class="am">ፈጣሪዎች</span><span class="suite-chip">Chapa Pay</span></div>
+        <div class="suite-card" onclick="navigateMarket()"><div class="suite-ico"><svg class="ic" viewBox="0 0 24 24"><use href="#i-store"/></svg></div><b data-t="marketplace">Marketplace</b><span class="suite-chip" id="mpFxChip">Live FX</span></div>
+        <div class="suite-card dark" onclick="navigateAds()"><div class="suite-ico"><svg class="ic" viewBox="0 0 24 24"><use href="#i-megaphone"/></svg></div><b data-t="adsManager">Ads Manager</b><span class="suite-chip" id="mpAdsChip">0 Active</span></div>
+        <div class="suite-card" onclick="navigateCreator()"><div class="suite-ico"><svg class="ic" viewBox="0 0 24 24"><use href="#i-award"/></svg></div><b data-t="creatorStudio">Creator Studio</b><span class="suite-chip">Chapa Pay</span></div>
       </div>
 
       <div class="sec-head">
         <div><div class="sec-kicker" data-t="portalsKicker">MESKOT PORTALS · የማህበረሰብ መስኮቶች</div><div class="sec-title" data-t="portalsTitle">Community &amp; Experiences</div></div>
-        <button class="sec-pill" onclick="navigateFeed()">✦ መነሻ</button>
+        <button class="sec-pill" onclick="navigateFeed()">✦ MESKOT</button>
       </div>
       <div class="portal-grid">
         <div class="portal" onclick="navigateFeed()"><div class="portal-top"><div class="portal-ico"><svg class="ic" viewBox="0 0 24 24"><use href="#i-layers"/></svg></div><span class="portal-badge">LIVE</span></div><b data-t="pNewsFeed">News Feed</b><span class="sub" data-t="pNewsSub">Stories, Reels &amp; Pulse</span></div>
@@ -2141,8 +2542,15 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
         <div class="portal" id="menuAdminCard" onclick="navigateAdmin()" style="display:none;"><div class="portal-top"><div class="portal-ico"><svg class="ic" viewBox="0 0 24 24"><use href="#i-gear"/></svg></div><span class="portal-badge red">ADMIN</span></div><b data-t="pAdmin">Admin Console</b><span class="sub" data-t="pAdminSub">Moderation &amp; approvals</span></div>
       </div>
 
-      <div class="royal-card" style="padding:16px;margin-bottom:14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;">
+      <div class="concierge">
+        <div class="cg-logo"><i></i><img class="logo-img" alt=""><i></i></div>
+        <h4 data-t="conciergeTitle">MESKOT ROYAL CONCIERGE</h4>
+        <p>Meskot · Premier Ethiopian &amp; Habesha Global Network</p>
+        <p>Edition 2.4 · Crafted with Heritage &amp; Gold</p>
+      </div>
+
+      <div class="royal-card" style="padding:16px;margin:14px 0 6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 6px;">
           <b style="font-size:15px;" data-t="languageLbl">Language · ቋንቋ</b>
           <div class="lang-toggle">
             <button id="langEn" class="active" onclick="setLang('en')">EN</button>
@@ -2155,12 +2563,6 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
         </div>
       </div>
 
-      <div class="concierge">
-        <div class="cg-logo"><i></i><img class="logo-img" alt=""><i></i></div>
-        <h4 data-t="conciergeTitle">MESKOT ROYAL CONCIERGE</h4>
-        <p>መስኮት · Premier Ethiopian &amp; Habesha Global Network</p>
-        <p>Edition 2.4 · Crafted with Heritage &amp; Gold</p>
-      </div>
     </div>
 
     
@@ -2175,15 +2577,25 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
       </div>
     </div>
 
+    
     <!-- MARKET -->
-    <div id="marketView" class="view-panel">
-      <div class="view-head">
-        <div><h2 data-t="tMarket">Market</h2><span class="fx-chip" style="margin-top:6px;"><i></i><span id="mkFxText">Live FX</span></span></div>
-        <button class="btn gold" onclick="openListingModal()" data-t="sellBtn">+ Sell</button>
+    <div id="marketView" class="view-panel mkp">
+      <div class="mkp-top">
+        <button class="mkp-back" onclick="navigateFeed()" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+        <div class="tt"><div class="t">Meskot Marketplace</div><div class="s">Meskot Marketplace · Buy, Sell &amp; Escrow Locally</div></div>
+        <button class="mkp-fil" onclick="mkpFilter()" aria-label="Sort and filter"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
       </div>
-      <div class="search-row"><input type="text" id="mkSearch" data-tph="searchMarket" placeholder="Search listings…" oninput="renderMarket()"></div>
-      <div class="mk-bar"><button class="chip" id="mkLocBtn" onclick="editMkLocation()">📍 Mekelle</button><button class="chip" id="mkSavedOnly" onclick="toggleMkSavedOnly()">♥ Saved</button></div>
-      <div class="chip-row" id="mkChips"></div>
+      <span id="mkFxText" style="display:none"></span>
+      <div class="mkp-acts">
+        <button class="mkp-pill" onclick="mkpYou()"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>You</button>
+        <button class="mkp-pill gold" onclick="openListingModal()">+ Sell</button>
+        <button class="mkp-pill" onclick="mkpInbox()">Inbox<span class="bdg" id="mkInboxBdg" style="display:none">0</span></button>
+        <button class="mkp-pill" id="mkSavedOnly" onclick="toggleMkSavedOnly()">Saved</button>
+        <button class="mkp-pill" onclick="mkpCats()">Categories</button>
+        <button class="mkp-pill" onclick="mkpFilter()">Sort &amp; Filter</button>
+      </div>
+      <div class="chip-row mkp-chips" id="mkChips"></div>
+      <div class="mkp-head"><div class="l"><h3>Today's picks</h3><div class="sub" id="mkCount"></div></div><button class="mkp-loc" id="mkLocBtn" onclick="mkpLoc()">📍 Mekelle</button></div>
       <div class="mk-grid" id="mkGrid"></div>
       <div class="empty-small" id="mkEmpty" style="display:none;" data-t="noListings">No listings yet — be the first to sell something.</div>
     </div>
@@ -2685,6 +3097,66 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
 
 
 <div class="modal-bg" id="adSheetBg" onclick="if(event.target===this)adfCloseSheet()"><div class="modal wide ax-sheet" id="adSheet"></div></div>
+
+
+<div id="mkInbox" class="mkp-page" aria-hidden="true">
+  <div class="mkp-ptop"><button class="mkp-pback" onclick="mkpInboxClose()" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><h2>Marketplace Inbox</h2></div>
+  <div class="mkp-pbody" id="mkInboxList"></div>
+</div>
+<div id="mkThread" class="mkp-page" style="z-index:445" aria-hidden="true">
+  <div class="mkp-ptop"><button class="mkp-pback" onclick="mkpThreadClose()" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><div class="mkp-th" id="mkThreadHead"></div></div>
+  <div class="mkp-pbody mkp-msgs" id="mkThreadMsgs"></div>
+  <div class="mkp-reply"><input id="mkThreadIn" type="text" maxlength="500" placeholder="Write a message…" onkeydown="if(event.key==='Enter')mkpThreadSend()"><button onclick="mkpThreadSend()">Send</button></div>
+</div>
+
+
+<!-- SELL ON MESKOT -->
+<div id="sellPage" class="sl" aria-hidden="true">
+  <div class="sl-top">
+    <button class="sl-back" onclick="sellClose()" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="sl-tt"><div class="t" id="slHead">Sell on Meskot</div><div class="s" id="slSub">Meskot · New listing</div></div>
+    <button class="sl-pub" id="slPubTop" onclick="sellPublish()">Publish</button>
+  </div>
+  <div class="sl-prog"><i id="slProg"></i></div>
+  <div class="sl-scroll" id="slScroll">
+    <div class="sl-card" id="slCardPhotos">
+      <div class="sl-ch"><h3>Photos</h3><span class="sl-count" id="slCount">0 / 10</span></div>
+      <div id="slPhotoBox"></div>
+    </div>
+    <div class="sl-card" id="slCardAbout">
+      <h3>About the item</h3>
+      <div id="slAbout"></div>
+    </div>
+    <div class="sl-card" id="slCardPrice">
+      <h3>Price &amp; place</h3>
+      <label class="sl-l">Price</label>
+      <div class="sl-in sl-money" id="slPriceBox"><button type="button" class="sl-cur" id="slCur" onclick="slToggleCur()">$</button><input id="slPrice" type="number" inputmode="decimal" min="0" step="any" oninput="slSet('price',this.value)"></div>
+      <label class="sl-l">Location</label>
+      <button type="button" class="sl-in sl-sel" id="slLocBtn" onclick="slPickLoc()"><span class="pin">📍</span><span class="v" id="slLocV">Mekelle</span><svg class="chv" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+    </div>
+    <div class="sl-card" id="slCardDesc">
+      <h3>Description</h3>
+      <label class="sl-l">Description</label>
+      <textarea class="sl-in sl-ta" id="slDesc" rows="5" maxlength="1500" oninput="slSet('desc',this.value)"></textarea>
+      <label class="sl-l">Availability</label>
+      <div class="sl-chips" id="slAvail">
+        <button type="button" class="sl-chip on" data-v="SINGLE" onclick="slAvail('SINGLE')">List as Single Item</button>
+        <button type="button" class="sl-chip" data-v="IN_STOCK" onclick="slAvail('IN_STOCK')">List as In Stock</button>
+      </div>
+    </div>
+    <div class="sl-card" id="slCardVis">
+      <h3>Who can see it</h3>
+      <div class="sl-row"><div class="tx"><b>Offer shipping</b><span>Buyers can ask you to ship this item.</span></div><button type="button" class="sl-sw" id="slSwShip" onclick="slSwitch('ship')" aria-label="Offer shipping"><i></i></button></div>
+      <div class="sl-row"><div class="tx"><b>Hide from friends</b><span>This listing is still public. If you hide it from friends, they won't see it in most cases.</span><a href="#" class="sl-more" onclick="event.preventDefault();slLearn()">Learn more</a></div><button type="button" class="sl-sw" id="slSwHide" onclick="slSwitch('hide')" aria-label="Hide from friends"><i></i></button></div>
+      <div class="sl-row"><div class="tx"><b>Allow comments</b><span>People can comment on your listing.</span></div><button type="button" class="sl-sw on" id="slSwComments" onclick="slSwitch('comments')" aria-label="Allow comments"><i></i></button></div>
+    </div>
+    <p class="sl-policy">Every listing goes through a quick review to make sure it follows our Commerce policies. Animals, drugs, weapons and counterfeits are not allowed.</p>
+    <div style="height:110px"></div>
+  </div>
+  <div class="sl-foot"><button class="sl-pubbig" id="slPubBig" onclick="sellPublish()">Publish listing</button></div>
+</div>
+<div class="sl-sheet-bg" id="slSheetBg" onclick="if(event.target===this)slSheetClose()"><div class="sl-sheet" id="slSheet"></div></div>
+<input type="file" id="slFile" accept="image/*" multiple hidden onchange="sellFiles(event)">
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -3836,7 +4308,7 @@ window.navigateSaved = async function(){
     toast(e.message);
   }
 };
-function postMediaGridHTML(media){
+function postMediaGridHTMLOld(media){
   if(!media || !media.length) return '';
   const n = media.length === 1 ? '1' : (media.length === 2 ? '2' : (media.length === 3 ? '3' : '4+'));
   return `<div class="post-media-grid" data-n="${n}">${media.map(m => `
@@ -4486,7 +4958,7 @@ async function renderConvoList(){
     const otherUid = c.participants.find(p => p !== currentUser.uid);
     const u = await getUserCached(otherUid);
     const unread = (c.unread && c.unread[currentUser.uid]) || 0;
-    return `<div class="person-row convo-row" onclick="openChat('${otherUid}')">
+    return `<div class="person-row convo-row${unread>0?' unread':''}" onclick="openChat('${otherUid}')">
       <div class="avatar">${avatarHTML(u.photoURL,u.displayName)}</div>
       <div class="who">
         <div class="name">${escapeHtml(u.displayName||'User')}</div>
@@ -5597,7 +6069,7 @@ function renderNotifications(docs){
   Promise.all(docs.map(async d => {
     const n = d.data();
     const u = await getUserCached(n.fromUid);
-    const icons = { like:'♥', comment:'💬', friend_request:'👥', friend_accept:'✓', message:'✉', share:'🔗', tip:'💰', live:'🔴', story_like:'❤', story_reaction:'😊', reaction:(n.reactionType && REACTIONS[n.reactionType] ? REACTIONS[n.reactionType].emoji : '👍') };
+    const icons = { like:'♥', comment:'💬', friend_request:'👥', friend_accept:'✓', message:'✉', share:'🔗', tip:'💰', live:'🔴', story_like:'✨', story_reaction:'😊', reaction:(n.reactionType && REACTIONS[n.reactionType] ? REACTIONS[n.reactionType].emoji : '👍') };
     const texts = {
       like: t('notifLikeSuffix'),
       comment: t('notifCommentSuffix'),
@@ -5607,7 +6079,7 @@ function renderNotifications(docs){
       share: t('notifShareSuffix'),
       tip: (n.amount ? `${t('notifTipSuffix')} (${n.amount} ETB)` : t('notifTipSuffix')),
       reaction: t('notifReactSuffix'),
-      live: 'is live now — tap to watch', story_like: 'liked your story ❤️', story_reaction: 'reacted to your story'
+      live: 'is live now — tap to watch', story_like: 'cheered your story ✨', story_reaction: 'reacted to your story'
     };
     return `<div class="notif-row ${n.read?'':'unread'}" onclick="handleNotifClick('${n.type}','${n.postId||''}','${n.convoId||''}','${n.fromUid}','${n.liveId||''}')">
       <div class="notif-avatar-wrap">
@@ -5937,15 +6409,15 @@ Object.assign(dict.en, {
   btnLive:'Live', btnStory:'Story', btnReel:'Reel', btnPhoto:'Photo',
   royalPassport:'MESKOT ROYAL PASSPORT', statCircle:'CIRCLE', statStars:'STARS', statWallet:'WALLET',
   verifiedTitle:'Meskot Verified', goldSeal:'GOLD SEAL', verifiedSub:'Unlock the royal golden seal, priority feed reach & VIP support',
-  execKicker:'EXECUTIVE SUITE · የንግድ ማዕከል', execTitle:'Commerce & Creator Lounge',
-  portalsKicker:'MESKOT PORTALS · የማህበረሰብ መስኮቶች', portalsTitle:'Community & Experiences',
-  marketplace:'Marketplace', adsManager:'Ads Manager', creatorStudio:'Creator Studio',
-  pNewsFeed:'News Feed', pNewsSub:'Stories, Reels & Pulse', pGroups:'Groups', pFriends:'Friends',
-  pMessages:'Messages', pMessagesSub:'Direct & Voice Chat', pPhotos:'Photos', pPhotosSub:'Visual Heritage Albums',
-  pLive:'Live Streaming', pLiveSub:'Broadcast & Coffee Gifts', pNotifs:'Notifications', pNotifsSub:'Alerts & Activity',
-  pDash:'Dashboard', pDashSub:'Audience & Reach Analytics', pSaved:'Saved Posts', pAds:'Ads & Promotions',
+  execKicker:'EXECUTIVE SUITE', execTitle:'Commerce & Creator Lounge',
+  portalsKicker:'MESKOT PORTALS', portalsTitle:'Community & Experiences',
+  marketplace:'Bazaar', adsManager:'Ads Manager', creatorStudio:'Creator Studio',
+  pNewsFeed:'Home', pNewsSub:'Stories, Clips & Pulse', pGroups:'Circles', pFriends:'Connections',
+  pMessages:'Chats', pMessagesSub:'Direct & Voice Chat', pPhotos:'Gallery', pPhotosSub:'Visual Heritage Albums',
+  pLive:'Live Streaming', pLiveSub:'Broadcast & Coffee Gifts', pNotifs:'Activity', pNotifsSub:'Alerts & Activity',
+  pDash:'Dashboard', pDashSub:'Audience & Reach Analytics', pSaved:'Bookmarks', pAds:'Ads & Promotions',
   pAdsSub:'Boost Meskot Content', pAdmin:'Admin Console', pAdminSub:'Moderation & approvals',
-  languageLbl:'Language · ቋንቋ', conciergeTitle:'MESKOT ROYAL CONCIERGE',
+  languageLbl:'Language · ቋንቋ', connWord:'Connection', connsWord:'Connections', conciergeTitle:'MESKOT ROYAL CONCIERGE',
   newReel:'New Reel', sellBtn:'+ Sell', searchMarket:'Search listings…', noListings:'No listings yet — be the first to sell something.',
   goLive:'Go Live', noLives:'Nobody is live right now — be the first to go live.',
   boostPost:'+ Boost post', noAds:'No campaigns yet — boost a post to reach more people.',
@@ -5974,7 +6446,7 @@ Object.assign(dict.am, {
   pLive:'ቀጥታ ስርጭት', pLiveSub:'ስርጭት እና የቡና ስጦታዎች', pNotifs:'ማሳወቂያዎች', pNotifsSub:'ማንቂያ እና እንቅስቃሴ',
   pDash:'ዳሽቦርድ', pDashSub:'የተመልካች እና ተደራሽነት ትንተና', pSaved:'የተቀመጡ ልጥፎች', pAds:'ማስታወቂያ እና ማስተዋወቂያ',
   pAdsSub:'ይዘትዎን ያስተዋውቁ', pAdmin:'የአስተዳዳሪ ማዕከል', pAdminSub:'ቁጥጥር እና ማጽደቅ',
-  languageLbl:'ቋንቋ · Language', conciergeTitle:'የመስኮት ንጉሣዊ አገልግሎት',
+  languageLbl:'ቋንቋ · Language', connWord:'ግንኙነት', connsWord:'ግንኙነቶች', conciergeTitle:'የመስኮት ንጉሣዊ አገልግሎት',
   newReel:'አዲስ ሪል', sellBtn:'+ ሽጥ', searchMarket:'ዝርዝሮችን ይፈልጉ…', noListings:'እስካሁን ምንም ዝርዝር የለም — መጀመሪያ ይሽጡ።',
   goLive:'ቀጥታ ይሂዱ', noLives:'አሁን ማንም በቀጥታ አይደለም።',
   boostPost:'+ ልጥፍ አስተዋውቅ', noAds:'እስካሁን ምንም ዘመቻ የለም።',
@@ -6041,7 +6513,7 @@ function visIcon(v){ return v === 'friends' ? '👥' : v === 'onlyme' ? '🔒' :
 let verifiedUids = new Set();
 let activeAds = [];   // active boost campaigns (everyone's) — drives the Sponsored pill and feed priority
 function verifiedBadge(uid){
-  return verifiedUids.has(uid) ? `<span class="vbadge" title="Meskot Verified"><svg viewBox="0 0 24 24"><use href="#i-seal"/></svg></span>` : '';
+  return verifiedUids.has(uid) ? `<span class="vbadge" title="Meskot Verified"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#C99A42" stroke="none"/><path d="m6.8 12.4 3.5 3.5 6.9-7.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>` : '';
 }
 function boostFor(col, id){
   if(col !== 'posts') return null;
@@ -6160,7 +6632,7 @@ async function loadFx(){
 function updateFxUI(){
   const txt = fxRate ? `Live FX · $1 ≈ ${Math.round(fxRate*100)/100} ETB` : 'Live FX';
   const el = document.getElementById('mkFxText'); if(el) el.textContent = txt;
-  const chip = document.getElementById('mpFxChip'); if(chip) chip.textContent = fxRate ? `$1 ≈ ${Math.round(fxRate)} Br` : 'Live FX';
+  const chip = document.getElementById('mpFxChip'); if(chip) chip.textContent = 'NBE Live';
 }
 function fmtMoney(n){ return Number(n||0).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
 
@@ -6367,7 +6839,7 @@ window.toggleStoryLike = async function(){
   svRenderLike();
   try{
     await updateDoc(doc(db,'stories',s.id), upd);
-    if(!liked && s.uid !== me) addNotification(s.uid, 'story_like', { postId: s.id, text: `${currentProfile.displayName || 'Someone'} liked your story ❤️` });
+    if(!liked && s.uid !== me) addNotification(s.uid, 'story_like', { postId: s.id, text: `${currentProfile.displayName || 'Someone'} cheered your story ✨` });
   }catch(e){ toast(e.message); }
 };
 window.reactToStory = async function(emoji){
@@ -6629,6 +7101,7 @@ window.renderMarket = function(){
   const items = listings.filter(l => {
     if(mkCat !== 'all' && l.categoryId !== mkCat) return false;
     if(mkOnlySaved && !saved.has(l.id)) return false;
+    if(l.hideFromFriends && currentUser && l.sellerId !== currentUser.uid && myFriends.has(l.sellerId)) return false;
     if(term){
       const hay = [l.title, l.description, mkLocName(l), (l.tags||[]).join(' ')].join(' ').toLowerCase();
       if(!hay.includes(term)) return false;
@@ -6767,9 +7240,11 @@ window.openListingDetail = function(id, keepOpen){
     <h3 style="margin:6px 0 8px;">${escapeHtml(l.title||'')} ${l.isAvailable === false ? '<span class="status-pill rejected">UNAVAILABLE</span>' : ''}${l.isPromoted ? ' <span class="status-pill active">PROMOTED</span>' : ''}</h3>
     <div class="chip-row" style="margin-bottom:8px;"><span class="chip">${mkCat_(l.categoryId)[2]} ${escapeHtml(mkCat_(l.categoryId)[1])}</span><span class="chip">${escapeHtml(l.condition||'')}</span>${mkLocName(l)?`<span class="chip">📍 ${escapeHtml(mkLocName(l))}${d!=null?` · ${d<1?'<1':Math.round(d)} km`:''}</span>`:''}<span class="chip">${fmtPostDate(l.createdAt)}</span><span class="chip">👁 ${l.viewsCount||0}</span></div>
     ${l.deliveryOption ? `<div style="font-size:13px;color:var(--muted);margin-bottom:6px;">🚚 ${escapeHtml(l.deliveryOption)}</div>` : ''}
+    ${window.mkAttrsHTML ? mkAttrsHTML(l) : ''}
     <p style="font-size:14px;line-height:1.55;white-space:pre-wrap;margin:6px 0;">${escapeHtml(l.description||'')}</p>
     ${(l.tags||[]).length ? `<div class="chip-row">${l.tags.map(g => `<span class="chip">#${escapeHtml(g)}</span>`).join('')}</div>` : ''}
     <div class="mk-seller" onclick="closeListingDetail();navigateProfile('${l.sellerId}')"><div class="avatar">${avatarHTML(l.sellerPhoto,l.sellerName)}</div><div><b>${escapeHtml(l.sellerName||'Seller')}</b>${verifiedBadge(l.sellerId)}<div style="font-size:12px;color:var(--muted);">View profile</div></div></div>
+    ${window.mkCommentsHTML ? mkCommentsHTML(l) : ''}
     ${mine ? `<div class="modal-actions" style="justify-content:flex-start;flex-wrap:wrap;">
         <button class="btn ghost" onclick="openListingEdit('${id}')">Edit</button>
         <button class="btn ghost" onclick="toggleListingAvailability('${id}')">${l.isAvailable === false ? 'Mark available' : 'Mark unavailable'}</button>
@@ -6784,6 +7259,7 @@ window.openListingDetail = function(id, keepOpen){
         <button class="btn ghost" onclick="toggleSaveListing('${id}')">${saved ? '♥ Saved' : '♡ Save'}</button>
         <button class="btn ghost" onclick="closeListingDetail()">Close</button></div>`}`;
   showModal('listingDetailBg');
+  if(window.mkLoadComments && l.allowComments !== false) mkLoadComments(id);
 };
 window.closeListingDetail = function(){ hideModal('listingDetailBg'); currentListingId = null; };
 // Inquiry: stored as a marketplace chat message AND mirrored into the direct Messages thread (as in the Android app)
@@ -6877,7 +7353,7 @@ function startLiveChatListener(){
   liveState.gt0 = Date.now() - 1500;
   liveState.unsubs.push(onSnapshot(query(collection(db,'live_messages'), where('streamId','==',liveState.id)), snap => {
     try{
-      snap.docChanges().forEach(ch => { if(ch.type === 'added'){ const m = ch.doc.data(); if(m.type === 'GIFT' && (m.timestamp||0) >= liveState.gt0) playGiftFX(m); } });
+      snap.docChanges().forEach(ch => { if(ch.type === 'added'){ const m = ch.doc.data(); if(m.type === 'GIFT' && (m.timestamp||0) >= liveState.gt0 && !(m.senderUid === currentUser.uid && liveState.role === 'viewer')) playGiftFX(m); } });
       renderTopGifters(snap.docs);
     }catch(e){ console.warn(e); }
     const box = document.getElementById('liveChat');
@@ -6901,6 +7377,34 @@ function tuneLiveSenders(peer, vBps){
     }catch(e){}
   });
 }
+
+
+// ================= FACEBOOK-STYLE MEDIA LAYOUTS =================
+// 1 item  : natural aspect ratio, clamped between 4:5 (tall) and 1.91:1 (wide)
+// 2 items : side by side (portrait) or stacked (landscape)
+// 3 items : one large + two small      4 items : 2x2      5+ : 2 + 3 with "+N"
+function postMediaGridHTML(media){
+  if(!media || !media.length) return '';
+  const n = Math.min(media.length, 5), extra = media.length - 5;
+  const items = media.slice(0, 5).map((m, i) => {
+    const more = (i === 4 && extra > 0) ? `<span class="pmg-more">+${extra}</span>` : '';
+    return `<div class="pmg-item">${
+      m.type === 'video'
+        ? `<video src="${m.url}" controls playsinline preload="metadata" onloadedmetadata="pmgFit(this)"></video>`
+        : `<img src="${m.url}" alt="" loading="lazy" onload="pmgFit(this)">`
+    }${more}</div>`;
+  }).join('');
+  return `<div class="post-media-grid" data-n="${n}" data-l="w">${items}</div>`;
+}
+window.pmgFit = function(el){
+  try{
+    const it = el.closest('.pmg-item'); if(!it) return; const g = it.parentNode;
+    const w = el.naturalWidth || el.videoWidth, h = el.naturalHeight || el.videoHeight; if(!w || !h) return;
+    const r = w / h;
+    if(it === g.firstElementChild) g.dataset.l = r >= 1.15 ? 'w' : 't';
+    if(g.dataset.n === '1') it.style.aspectRatio = String(Math.min(1.91, Math.max(0.8, r)).toFixed(3));
+  }catch(e){}
+};
 
 // ================= LIVE → FOLLOWER NOTIFICATIONS (TikTok style) =================
 async function liveAudienceUids(){
@@ -7121,7 +7625,8 @@ const LIVE_GIFTS = [
 ];
 let giftSel = 2, giftCombo = null;
 function giftTrayHTML(){
-  return `<div class="lg-head"><span class="lg-title">Send a gift</span><span class="lg-bal">★ <b id="liveStarBal">${starBal()}</b> <a href="#" onclick="event.preventDefault();openWalletModal()">Recharge ›</a></span></div>
+  return `<div class="lg-head"><span class="lg-title">Send a gift</span><span class="lg-bal">★ <b id="liveStarBal">${starBal()}</b> <a href="#" onclick="event.preventDefault();toggleStarPacks()">Recharge ›</a></span></div>
+    <div class="lg-packs" id="lgPacks"></div>
     <div class="lg-grid">${LIVE_GIFTS.map(g => `<button class="lg-item ${g.id===giftSel?'sel':''}" data-gid="${g.id}" onclick="selectGift(${g.id})"><span class="gi">${g.icon}</span><span class="gn">${g.name}</span><b>★ ${g.coins}</b></button>`).join('')}</div>
     <div class="lg-foot"><span class="lg-hint" id="lgHint"></span><button class="lg-send" id="lgSend" onclick="sendLiveGift(giftSel)">Send</button></div>`;
 }
@@ -7136,6 +7641,7 @@ function resetGiftSendBtn(){
   const g = LIVE_GIFTS.find(x => x.id === giftSel); const h = document.getElementById('lgHint');
   if(h && g) h.textContent = g.icon + ' ' + g.name + ' · ★ ' + g.coins;
 }
+window.__setLive = o => { liveState = o; };
 window.toggleGiftTray = function(){
   const tray = document.getElementById('liveGifts');
   if(tray.classList.toggle('show')){ tray.innerHTML = giftTrayHTML(); resetGiftSendBtn(); }
@@ -7148,24 +7654,64 @@ function startComboUI(g){
   giftCombo.iv = setInterval(() => { const p = Math.max(0, 1 - (Date.now()-t0)/D); b.style.setProperty('--p', (p*100).toFixed(1)+'%'); }, 60);
   giftCombo.t = setTimeout(() => { clearInterval(giftCombo.iv); giftCombo = null; resetGiftSendBtn(); }, D);
 }
+function giftNote(msg, bad){
+  const h = document.getElementById('lgHint'); if(!h) return toast(msg);
+  h.textContent = msg; h.classList.toggle('bad', !!bad);
+}
+const STAR_PACKS = [10, 50, 100, 500];
+window.toggleStarPacks = function(force){
+  const p = document.getElementById('lgPacks'); if(!p) return;
+  const show = force === undefined ? !p.classList.contains('show') : force;
+  p.classList.toggle('show', show);
+  if(show) p.innerHTML = '<div class="lgp-t">Buy Stars with your wallet · <b>ETB ' + etb2(walletBal()) + '</b></div><div class="lgp-row">'
+    + STAR_PACKS.map(n => '<button onclick="buyStarsPack(' + n + ')"><b>★ ' + n + '</b><small>ETB ' + etb2(n*STAR_PRICE_ETB) + '</small></button>').join('')
+    + '</div><a href="#" onclick="event.preventDefault();openWalletModal()">Add funds to wallet ›</a>';
+};
+window.buyStarsPack = async function(n){
+  try{
+    const cost = n * STAR_PRICE_ETB;
+    if(walletBal() < cost){ giftNote('Wallet has ETB ' + etb2(walletBal()) + ' — add funds to buy ★' + n + '.', true); toast('Not enough wallet balance. Add funds first.'); return; }
+    await walletDebit(cost, 'STARS_PURCHASE', `Stars Top-up (${n} Stars)`, `Purchased ${n} Stars · ${etb2(cost)} ETB from wallet`, refCode('STR'));
+    await updateDoc(doc(db,'users',currentUser.uid), { starBalance: increment(n) });
+    if(currentProfile) currentProfile.starBalance = starBal() + n;
+    const bal = document.getElementById('liveStarBal'); if(bal) bal.textContent = starBal();
+    giftNote('★ ' + n + ' Stars added', false); toggleStarPacks(false);
+  }catch(e){ giftNote(e.message, true); }
+};
 window.sendLiveGift = async function(giftId){
-  if(!liveState || liveState.role !== 'viewer'){ if(liveState && liveState.role === 'host') toast('You can receive gifts, not send them.'); return; }
+  if(!liveState){ return toast('Join a live first.'); }
+  if(liveState.role === 'host'){ return giftNote('You are the host — you receive gifts, you cannot send them.', true); }
   const g = LIVE_GIFTS.find(x => x.id === giftId); if(!g) return;
   if(liveState.sending) return; liveState.sending = true;
+  const sid = liveState.id, hostUid = liveState.hostUid;
+  const uref = doc(db,'users',currentUser.uid);
+  let debited = false;
   try{
-    const uref = doc(db,'users',currentUser.uid);
     const cur = Number(((await getDoc(uref)).data() || {}).starBalance || 0);
-    if(cur < g.coins){ toast('Not enough Stars.'); openWalletModal(); return; }
-    await updateDoc(uref, { starBalance: increment(-g.coins) });
+    if(cur < g.coins){
+      giftNote('Not enough Stars — you have ★' + cur + ', need ★' + g.coins + '.', true);
+      toggleStarPacks(true); return;
+    }
+    await updateDoc(uref, { starBalance: increment(-g.coins) }); debited = true;
     if(currentProfile) currentProfile.starBalance = cur - g.coins;
     const bal = document.getElementById('liveStarBal'); if(bal) bal.textContent = cur - g.coins;
-    if(liveState.hostUid){ const etb = g.coins * 0.12; await updateDoc(doc(db,'users',liveState.hostUid), { creatorGrossEarnings: increment(etb), creatorNetBalance: increment(etb) }).catch(()=>{}); }
-    await updateDoc(doc(db,'live_streams',liveState.id), { totalCoins: increment(g.coins) });
     const n = (giftCombo && giftCombo.id === g.id) ? giftCombo.n + 1 : 1;
-    await postLiveMessage(liveState.id, { senderUid: currentUser.uid, senderName: currentProfile.displayName || 'User', senderPhoto: myPhoto(), text: `sent ${g.name} ${g.icon}${n>1?' x'+n:''} (${g.coins} 🪙)`, type:'GIFT', giftId: g.id, giftName: g.name, giftIcon: g.icon, giftCoins: g.coins, giftCombo: n });
+    const msg = { senderUid: currentUser.uid, senderName: currentProfile.displayName || 'User', senderPhoto: myPhoto(), text: `sent ${g.name} ${g.icon}${n>1?' x'+n:''} (${g.coins} 🪙)`, type:'GIFT', giftId: g.id, giftName: g.name, giftIcon: g.icon, giftCoins: g.coins, giftCombo: n };
+    try{ await postLiveMessage(sid, msg); }
+    catch(e){ // the gift never reached the room: give the Stars back
+      await updateDoc(uref, { starBalance: increment(g.coins) }).catch(()=>{}); debited = false;
+      if(currentProfile) currentProfile.starBalance = cur; if(bal) bal.textContent = cur;
+      throw new Error('Could not send the gift (' + (e.code || e.message) + '). Your Stars were not charged.');
+    }
+    debited = false;
+    playGiftFX(Object.assign({ timestamp: Date.now() }, msg));   // instant feedback for the sender
+    // best-effort extras: totals and host earnings (never block or undo a delivered gift)
+    updateDoc(doc(db,'live_streams',sid), { totalCoins: increment(g.coins) }).catch(()=>{});
+    if(hostUid){ const etb = g.coins * 0.12; updateDoc(doc(db,'users',hostUid), { creatorGrossEarnings: increment(etb), creatorNetBalance: increment(etb) }).catch(()=>{}); }
     if(g.coins < 50){ giftCombo = { id:g.id, n, t:null, iv:null }; startComboUI(g); }
     else { giftCombo = null; resetGiftSendBtn(); document.getElementById('liveGifts').classList.remove('show'); }
-  }catch(e){ toast(e.message); }
+    toggleStarPacks(false);
+  }catch(e){ giftNote(e.message || 'Could not send the gift.', true); toast(e.message || 'Could not send the gift.'); }
   finally{ if(liveState) liveState.sending = false; }
 };
 
@@ -7609,7 +8155,7 @@ async function fillMenu(){
   document.getElementById('menuAvatar').innerHTML = avatarHTML(currentProfile.photoURL, currentProfile.displayName);
   document.getElementById('menuName').innerHTML = escapeHtml(currentProfile.displayName || 'User') + verifiedBadge(currentUser.uid);
   const n = myFriends.size;
-  document.getElementById('mpCircle').textContent = `${n} ${n === 1 ? t('friendWord') : t('friendsWord')}`;
+  document.getElementById('mpCircle').textContent = `${n} ${t(n === 1 ? 'connWord' : 'connsWord')}`;
   document.getElementById('mpFriendsSub').textContent = `${n} Connected`;
   document.getElementById('mpSavedSub').textContent = `${mySavedPostKeys.size} Curated Bookmarks`;
   document.getElementById('menuAdminCard').style.display = currentProfile.isAdmin ? 'block' : 'none';
@@ -7825,7 +8371,7 @@ function pfRenderTop(uid){
   document.getElementById('pfAvCam').style.display = own ? 'flex' : 'none';
   document.getElementById('profAvatar').innerHTML = avatarHTML(u.photoURL || u.photoUrl, nm);
   const isV = own ? (u.isVerified || verifiedUids.has(uid)) : verifiedUids.has(uid);
-  document.getElementById('profName').innerHTML = escapeHtml(nm) + (isV ? '<span class="vbadge" title="Meskot Verified"><svg viewBox="0 0 24 24"><use href="#i-seal"/></svg></span>' : '');
+  document.getElementById('profName').innerHTML = escapeHtml(nm) + (isV ? '<span class="vbadge" title="Meskot Verified"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#C99A42" stroke="none"/><path d="m6.8 12.4 3.5 3.5 6.9-7.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' : '');
   const fr = Math.max(u._friendCount || 0, own ? myFriends.size : 0);
   const followers = Math.max(u.followersCount || 0, fr), following = Math.max(u.followingCount || 0, fr);
   document.getElementById('pfCounts').innerHTML = '<a onclick="navigateFriends()"><b>'+followers+'</b> followers</a> • <a onclick="navigateFriends()"><b>'+following+'</b> following</a>';
@@ -8421,6 +8967,697 @@ window.adfSubmit = async function(){
 // keep the pay card + wallet in sync when the balance changes
 const _axRefreshWallet = refreshWalletUI;
 refreshWalletUI = function(){ _axRefreshWallet(); try{ if(adDraft && document.getElementById('adsCreateView').classList.contains('active')){ adfRenderPay(); adfRenderFoot(); } }catch(e){} };
+
+
+// ================= SELL ON MESKOT (full-screen listing creator) =================
+const SL_MAX = 10;
+const SL_CITIES = [
+  ['Mekelle',13.4967,39.4753],['Adigrat',14.2766,39.4626],['Axum',14.1211,38.7280],['Adwa',14.1667,38.9000],['Shire',14.1000,38.2800],
+  ['Wukro',13.7919,39.6000],['Addis Ababa',9.0300,38.7400],['Bahir Dar',11.5936,37.3908],['Gondar',12.6000,37.4667],['Dessie',11.1333,39.6333],
+  ['Adama',8.5400,39.2700],['Hawassa',7.0621,38.4763],['Dire Dawa',9.6000,41.8500],['Jimma',7.6781,36.8344]
+];
+const SL_VEH_TYPES = ['Car/Truck','Motorcycle','Powersport','RV/Camper','Trailer','Boat','Commercial/Industrial','Other'];
+const SL_COLORS = ['Black','White','Silver','Gray','Blue','Red','Green','Brown','Beige','Gold','Orange','Yellow','Purple','Other'];
+const SL = {};
+function slReset(){
+  Object.assign(SL, { cat:'', cond:'', ttl:'', vtype:'', year:'', make:'', model:'', icol:'', ecol:'', brand:'', size:'', price:'', cur:'USD',
+    loc:{ name:((currentProfile && currentProfile.location) || mkLoc().name || 'Mekelle'), lat:null, lng:null }, desc:'', avail:'SINGLE', ship:false, hide:false, comments:true,
+    photos:[], editId:null, dirty:false, busy:false });
+  const hit = SL_CITIES.find(c => c[0].toLowerCase() === String(SL.loc.name).toLowerCase());
+  if(hit){ SL.loc = { name:hit[0], lat:hit[1], lng:hit[2] }; } else { const b = mkLoc(); SL.loc = { name: SL.loc.name || b.name, lat:b.lat, lng:b.lng }; }
+}
+function slSpec(cat){
+  if(cat === 'vehicles') return 'vehicle';
+  if(cat === 'property' || cat === 'home_sales') return 'property';
+  if(cat === 'fashion_women' || cat === 'fashion_men') return 'fashion';
+  return 'general';
+}
+function slEsc(s){ return escapeHtml(String(s == null ? '' : s)); }
+window.slSet = function(k, v){ SL[k] = v; SL.dirty = true; slProgress(); const el = document.getElementById('slErr_' + k); if(el) el.classList.remove('sl-err'); };
+function slMain(){ return SL.cat && slSpec(SL.cat) === 'vehicle' ? [SL.year, SL.make.trim(), SL.model.trim()].filter(Boolean).join(' ') : SL.ttl.trim(); }
+function slMainOk(){ return slSpec(SL.cat) === 'vehicle' ? !!(SL.year && SL.make.trim() && SL.model.trim()) : !!SL.ttl.trim(); }
+function slProgress(){
+  const done = [SL.photos.length > 0, !!SL.cat, !!SL.cat && slMainOk(), SL.price !== '' && Number(SL.price) >= 0, !!SL.loc.name, SL.desc.trim().length > 0].filter(Boolean).length;
+  const p = document.getElementById('slProg'); if(p) p.style.width = Math.round(done / 6 * 100) + '%';
+}
+// ---- photos ----
+function slRenderPhotos(){
+  const box = document.getElementById('slPhotoBox'); const n = SL.photos.length;
+  document.getElementById('slCount').textContent = n + ' / ' + SL_MAX;
+  if(!n){
+    box.innerHTML = '<button type="button" class="sl-drop" id="slErr_photos" onclick="slAddPhotos()"><span class="cam"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></svg></span><b>Add photos</b><span>Good light and a clean background sell faster. First photo is the cover.</span></button>';
+  } else {
+    box.innerHTML = '<div class="sl-grid">' + SL.photos.map((p, i) =>
+      '<div class="sl-ph"><img src="' + slEsc(p.url) + '" alt=""><button type="button" class="x" onclick="slRemovePhoto(' + i + ')" aria-label="Remove">✕</button>'
+      + (i === 0 ? '<span class="cv">Cover</span>' : '<button type="button" class="mk" onclick="slMakeCover(' + i + ')">Make cover</button>') + '</div>').join('')
+      + (n < SL_MAX ? '<button type="button" class="sl-add" onclick="slAddPhotos()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add</button>' : '') + '</div>';
+  }
+  slProgress();
+}
+window.slAddPhotos = function(){ if(SL.photos.length >= SL_MAX) return toast('You can add up to ' + SL_MAX + ' photos.'); document.getElementById('slFile').click(); };
+window.sellFiles = function(e){
+  const room = SL_MAX - SL.photos.length;
+  const files = Array.from(e.target.files || []).filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|heic)$/i.test(f.name)).slice(0, room);
+  if((e.target.files || []).length > room) toast('Only ' + SL_MAX + ' photos fit — extra ones were skipped.');
+  files.forEach(f => SL.photos.push({ file:f, url: URL.createObjectURL(f) }));
+  e.target.value = ''; SL.dirty = true; slRenderPhotos();
+};
+window.slRemovePhoto = function(i){ const p = SL.photos[i]; if(p && p.file) try{ URL.revokeObjectURL(p.url); }catch(e){} SL.photos.splice(i, 1); SL.dirty = true; slRenderPhotos(); };
+window.slMakeCover = function(i){ const [p] = SL.photos.splice(i, 1); SL.photos.unshift(p); slRenderPhotos(); };
+function slShrink(file){
+  return new Promise(res => {
+    try{
+      if(!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size < 450 * 1024) return res(file);
+      const url = URL.createObjectURL(file); const img = new Image();
+      img.onload = () => {
+        try{
+          const M = 1600, r = Math.min(1, M / Math.max(img.width, img.height));
+          if(r === 1 && file.size < 1.5 * 1024 * 1024){ URL.revokeObjectURL(url); return res(file); }
+          const c = document.createElement('canvas'); c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(b => { URL.revokeObjectURL(url); res(b && b.size < file.size ? new File([b], file.name.replace(/\.\w+$/, '') + '.jpg', { type:'image/jpeg' }) : file); }, 'image/jpeg', 0.86);
+        }catch(e){ res(file); }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); res(file); };
+      img.src = url;
+    }catch(e){ res(file); }
+  });
+}
+// ---- about the item (changes with the category) ----
+function slSelHTML(id, label, key, ph, val){
+  return '<label class="sl-l">' + label + '</label><button type="button" class="sl-in sl-sel" id="slErr_' + key + '" onclick="slPick(\'' + key + '\')"><span class="v' + (val ? '' : ' ph') + '">' + slEsc(val || ph) + '</span><svg class="chv" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>';
+}
+function slTextHTML(label, key, val, ph){
+  return '<label class="sl-l">' + label + '</label><input class="sl-in" id="slErr_' + key + '" type="text" maxlength="80" value="' + slEsc(val) + '" placeholder="' + slEsc(ph||'') + '" oninput="slSet(\'' + key + '\',this.value)">';
+}
+function slCondHTML(){
+  return '<label class="sl-l">Condition</label><div class="sl-chips" id="slErr_cond">' + MK_CONDITIONS.map(c => '<button type="button" class="sl-chip' + (SL.cond === c ? ' on' : '') + '" onclick="slCond(\'' + c + '\')">' + c + '</button>').join('') + '</div>';
+}
+window.slCond = function(c){ SL.cond = c; SL.dirty = true; slRenderAbout(); slProgress(); };
+function slRenderAbout(){
+  const c = SL.cat ? mkCat_(SL.cat) : null; const spec = slSpec(SL.cat);
+  let h = '<label class="sl-l" style="margin-top:4px">Category</label><button type="button" class="sl-in sl-sel sl-cat" id="slErr_cat" onclick="slPick(\'cat\')"><span class="ic">' + (c ? c[2] : '🪟') + '</span><span class="v' + (c ? '' : ' ph') + '">' + slEsc(c ? c[1] : 'Choose a category') + '</span><svg class="chv" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>';
+  if(SL.cat){
+    if(spec === 'vehicle'){
+      h += slSelHTML('vt', 'Vehicle type', 'vtype', 'Select', SL.vtype) + slSelHTML('yr', 'Year', 'year', 'Select', SL.year)
+        + slTextHTML('Make', 'make', SL.make) + slTextHTML('Model', 'model', SL.model)
+        + slSelHTML('ic', 'Interior color', 'icol', 'Select', SL.icol) + slSelHTML('ec', 'Exterior color', 'ecol', 'Select', SL.ecol);
+    } else if(spec === 'fashion'){
+      h += slCondHTML() + slTextHTML('Brand', 'brand', SL.brand) + slTextHTML('Size', 'size', SL.size) + slTextHTML('What are you selling?', 'ttl', SL.ttl);
+    } else if(spec === 'property'){
+      h += slTextHTML('What are you selling?', 'ttl', SL.ttl);
+    } else {
+      h += slCondHTML() + slTextHTML('What are you selling?', 'ttl', SL.ttl);
+    }
+  }
+  document.getElementById('slAbout').innerHTML = h; slProgress();
+}
+// ---- pickers (bottom sheet) ----
+function slSheet(title, opts, cur, pick, searchable){
+  const bg = document.getElementById('slSheetBg'); const sh = document.getElementById('slSheet');
+  const draw = q => {
+    const list = opts.filter(o => !q || o.l.toLowerCase().includes(q.toLowerCase()));
+    sh.querySelector('.lst').innerHTML = list.map(o => '<button type="button" class="it' + (o.v === cur ? ' cur' : '') + '" data-v="' + slEsc(o.v) + '">' + (o.i ? '<span class="ic">' + o.i + '</span>' : '') + '<span>' + slEsc(o.l) + '</span>' + (o.v === cur ? '<span class="ck">✓</span>' : '') + '</button>').join('') || '<div style="padding:18px;color:#6D6A58">No matches</div>';
+  };
+  sh.className = 'sl-sheet'; sh.innerHTML = '<h4>' + slEsc(title) + '</h4>' + (searchable ? '<input class="srch" type="search" placeholder="Search" autocomplete="off">' : '') + '<div class="lst"></div>';
+  draw('');
+  sh.onclick = e => { const b = e.target.closest('.it'); if(!b) return; const o = opts.find(x => String(x.v) === b.dataset.v); slSheetClose(); if(o) pick(o.v, o); };
+  const s = sh.querySelector('.srch'); if(s) s.oninput = () => draw(s.value);
+  bg.classList.add('show');
+}
+window.slSheetClose = function(){ document.getElementById('slSheetBg').classList.remove('show'); };
+window.slPick = function(key){
+  if(key === 'cat') return slSheet('Choose a category', MK_CATS.filter(c => c[0] !== 'all').map(c => ({ v:c[0], l:c[1], i:c[2] })), SL.cat, v => {
+    const old = slSpec(SL.cat); SL.cat = v; SL.dirty = true;
+    if(slSpec(v) !== old){ SL.cond = ''; SL.ttl = SL.ttl; }
+    slRenderAbout();
+  }, true);
+  if(key === 'vtype') return slSheet('Vehicle type', SL_VEH_TYPES.map(x => ({ v:x, l:x })), SL.vtype, v => { SL.vtype = v; SL.dirty = true; slRenderAbout(); });
+  if(key === 'year'){ const y = new Date().getFullYear() + 1; const a = []; for(let i = y; i >= 1950; i--) a.push({ v:String(i), l:String(i) }); return slSheet('Year', a, SL.year, v => { SL.year = v; SL.dirty = true; slRenderAbout(); }, true); }
+  if(key === 'icol') return slSheet('Interior color', SL_COLORS.map(x => ({ v:x, l:x })), SL.icol, v => { SL.icol = v; SL.dirty = true; slRenderAbout(); });
+  if(key === 'ecol') return slSheet('Exterior color', SL_COLORS.map(x => ({ v:x, l:x })), SL.ecol, v => { SL.ecol = v; SL.dirty = true; slRenderAbout(); });
+};
+window.slPickLoc = function(){
+  const opts = [{ v:'__gps', l:'Use my current location', i:'🎯' }].concat(SL_CITIES.map(c => ({ v:c[0], l:c[0], i:'📍' })));
+  slSheet('Location', opts, SL.loc.name, v => {
+    if(v === '__gps'){
+      if(!navigator.geolocation) return toast('Location is not available on this device.');
+      toast('Getting your location…');
+      navigator.geolocation.getCurrentPosition(p => { SL.loc = { name:'Current location', lat:p.coords.latitude, lng:p.coords.longitude }; SL.dirty = true; slRenderPrice(); }, () => toast('Could not read your location.'), { timeout:8000 });
+      return;
+    }
+    const c = SL_CITIES.find(x => x[0] === v); SL.loc = { name:c[0], lat:c[1], lng:c[2] }; SL.dirty = true; slRenderPrice();
+  }, true);
+};
+function slRenderPrice(){
+  document.getElementById('slLocV').textContent = SL.loc.name || 'Choose a location';
+  document.getElementById('slCur').textContent = SL.cur === 'USD' ? '$' : 'ETB';
+  slProgress();
+}
+window.slToggleCur = function(){ SL.cur = SL.cur === 'USD' ? 'ETB' : 'USD'; SL.dirty = true; slRenderPrice(); };
+window.slAvail = function(v){ SL.avail = v; SL.dirty = true; document.querySelectorAll('#slAvail .sl-chip').forEach(b => b.classList.toggle('on', b.dataset.v === v)); };
+window.slSwitch = function(k){
+  SL[k] = !SL[k]; SL.dirty = true;
+  const id = { ship:'slSwShip', hide:'slSwHide', comments:'slSwComments' }[k];
+  document.getElementById(id).classList.toggle('on', !!SL[k]);
+};
+window.slLearn = function(){ alert('Hide from friends: people who are your friends on Meskot will not see this listing in the Market. Anyone else can still find it, so it is not fully private.'); };
+function slFlag(id, msg){
+  toast(msg);
+  const el = document.getElementById('slErr_' + id) || document.getElementById(id);
+  if(el){ el.classList.add('sl-err'); el.scrollIntoView({ behavior:'smooth', block:'center' }); }
+  return false;
+}
+// ---- open / close ----
+window.sellOpen = function(editId){
+  if(!currentUser) return toast('Please sign in first.');
+  slReset();
+  const pg = document.getElementById('sellPage');
+  document.getElementById('slHead').textContent = editId ? 'Edit listing' : 'Sell on Meskot';
+  document.getElementById('slSub').textContent = editId ? 'Meskot · Edit listing' : 'Meskot · New listing';
+  document.getElementById('slPubBig').textContent = editId ? 'Save changes' : 'Publish listing';
+  document.getElementById('slPubTop').textContent = editId ? 'Save' : 'Publish';
+  document.getElementById('slPrice').value = ''; document.getElementById('slDesc').value = '';
+  if(editId){
+    const l = listings.find(x => x.id === editId); if(!l) return;
+    SL.editId = editId; SL.cat = l.categoryId || 'miscellaneous'; SL.cond = l.condition || ''; SL.price = String(l.price != null ? l.price : '');
+    SL.cur = l.currency === 'ETB' ? 'ETB' : 'USD'; SL.desc = l.description || ''; SL.avail = l.availabilityType || 'SINGLE';
+    SL.ship = !!l.offerShipping; SL.hide = !!l.hideFromFriends; SL.comments = l.allowComments !== false;
+    SL.loc = { name: l.locationName || SL.loc.name, lat: l.latitude != null ? l.latitude : SL.loc.lat, lng: l.longitude != null ? l.longitude : SL.loc.lng };
+    const a = l.attributes || {}; SL.vtype = a.vehicleType || ''; SL.year = a.year || ''; SL.make = a.make || ''; SL.model = a.model || '';
+    SL.icol = a.interiorColor || ''; SL.ecol = a.exteriorColor || ''; SL.brand = a.brand || ''; SL.size = a.size || '';
+    SL.ttl = l.title || ''; SL.photos = (l.imageUrls || []).map(u => ({ url:u, existing:true }));
+    document.getElementById('slPrice').value = SL.price; document.getElementById('slDesc').value = SL.desc;
+  }
+  document.getElementById('slSwShip').classList.toggle('on', SL.ship);
+  document.getElementById('slSwHide').classList.toggle('on', SL.hide);
+  document.getElementById('slSwComments').classList.toggle('on', SL.comments);
+  document.querySelectorAll('#slAvail .sl-chip').forEach(b => b.classList.toggle('on', b.dataset.v === SL.avail));
+  slRenderPhotos(); slRenderAbout(); slRenderPrice();
+  pg.classList.add('show'); pg.setAttribute('aria-hidden', 'false'); document.getElementById('slScroll').scrollTop = 0;
+  document.documentElement.style.overflow = 'hidden';
+};
+window.sellClose = function(force){
+  if(!force && SL.dirty && !confirm('Discard this listing? Your changes will be lost.')) return;
+  SL.photos.forEach(p => { if(p.file) try{ URL.revokeObjectURL(p.url); }catch(e){} });
+  const pg = document.getElementById('sellPage'); pg.classList.remove('show'); pg.setAttribute('aria-hidden', 'true');
+  document.documentElement.style.overflow = ''; slSheetClose();
+};
+window.__SL = SL; window.slRenderAbout = slRenderAbout;
+window.openListingModal = function(){ sellOpen(); };
+window.openListingEdit = function(id){ closeListingDetail(); sellOpen(id); };
+// ---- publish ----
+window.sellPublish = async function(){
+  if(SL.busy) return;
+  document.querySelectorAll('.sl-err').forEach(e => e.classList.remove('sl-err'));
+  if(!SL.photos.length) return slFlag('photos', 'Add at least one photo.');
+  if(!SL.cat) return slFlag('cat', 'Choose a category.');
+  const spec = slSpec(SL.cat);
+  if(spec === 'vehicle'){
+    if(!SL.vtype) return slFlag('vtype', 'Select the vehicle type.');
+    if(!SL.year) return slFlag('year', 'Select the year.');
+    if(!SL.make.trim()) return slFlag('make', 'Enter the make.');
+    if(!SL.model.trim()) return slFlag('model', 'Enter the model.');
+  } else {
+    if(spec !== 'property' && !SL.cond) return slFlag('cond', 'Choose the condition.');
+    if(!SL.ttl.trim()) return slFlag('ttl', 'Tell buyers what you are selling.');
+  }
+  const price = parseFloat(SL.price);
+  if(!(price >= 0)) return slFlag('slPriceBox', 'Enter a price (0 for free).');
+  if(!SL.loc.name) return slFlag('slLocBtn', 'Choose a location.');
+  SL.busy = true;
+  const top = document.getElementById('slPubTop'), big = document.getElementById('slPubBig'); const bigTxt = big.textContent, topTxt = top.textContent;
+  top.disabled = big.disabled = true;
+  const say = t => { big.textContent = t; };
+  try{
+    const kept = SL.photos.filter(p => p.existing).map(p => p.url);
+    const fresh = SL.photos.filter(p => p.file);
+    const uploaded = [];
+    for(let i = 0; i < fresh.length; i++){
+      say('Uploading photo ' + (i + 1) + ' of ' + fresh.length + '…');
+      const f = await slShrink(fresh[i].file);
+      uploaded.push(await withTimeout(uploadFile('listings/' + currentUser.uid + '/' + Date.now() + '_' + i + '_' + f.name, f, fr => { say('Uploading ' + Math.round(((i + fr) / fresh.length) * 100) + '%…'); }), mediaUploadTimeout([f]), 'Photo'));
+    }
+    // keep the user's photo order (cover first)
+    let ui = 0; const imageUrls = SL.photos.map(p => p.existing ? p.url : uploaded[ui++]).filter(Boolean);
+    say('Publishing…');
+    const title = slMain();
+    const attributes = {};
+    if(spec === 'vehicle') Object.assign(attributes, { vehicleType:SL.vtype, year:SL.year, make:SL.make.trim(), model:SL.model.trim(), interiorColor:SL.icol, exteriorColor:SL.ecol });
+    if(spec === 'fashion') Object.assign(attributes, { brand:SL.brand.trim(), size:SL.size.trim() });
+    const condition = spec === 'vehicle' || spec === 'property' ? '' : SL.cond;
+    const common = {
+      title, price: Math.max(0, price), currency: SL.cur, imageUrls, categoryId: SL.cat, condition,
+      description: SL.desc.trim(), locationName: SL.loc.name, latitude: SL.loc.lat, longitude: SL.loc.lng,
+      attributes, availabilityType: SL.avail, offerShipping: SL.ship, hideFromFriends: SL.hide, allowComments: SL.comments,
+      deliveryOption: SL.ship ? 'Shipping available · Meetup in ' + SL.loc.name : 'Meetup in ' + SL.loc.name,
+      tags: [SL.brand.trim(), SL.make.trim(), SL.model.trim()].filter(Boolean).slice(0, 8)
+    };
+    if(SL.editId){
+      await updateDoc(doc(db, 'marketplace_listings', SL.editId), common);
+      toast('Saved');
+    } else {
+      const base = mkLoc();
+      await setDoc(doc(db, 'marketplace_listings', 'mkt_' + Date.now()), Object.assign({
+        radiusKm: base.radiusKm, distanceKm: 0, sellerId: currentUser.uid, sellerName: currentProfile.displayName || 'Meskot User', sellerPhoto: myPhoto(),
+        sellerVerified: verifiedUids.has(currentUser.uid), isAvailable: true, isNegotiable: true,
+        sellerPhone: currentProfile.phoneNumber || '', allowChat: true, allowCall: !!currentProfile.phoneNumber, allowWhatsApp: false,
+        isPromoted: false, viewsCount: 0, createdAt: Date.now()
+      }, common));
+      toast('Listing published');
+    }
+    SL.dirty = false; sellClose(true);
+    try{ navigateMarket(); }catch(e){}
+  }catch(e){ toast(e.message || 'Could not publish. Try again.'); console.error(e); }
+  finally{ SL.busy = false; top.disabled = big.disabled = false; big.textContent = bigTxt; top.textContent = topTxt; }
+};
+// ---- listing detail extras: vehicle / clothing attributes and comments ----
+window.mkAttrsHTML = function(l){
+  const a = l.attributes || {}; const bits = [['Type', a.vehicleType], ['Year', a.year], ['Make', a.make], ['Model', a.model], ['Interior', a.interiorColor], ['Exterior', a.exteriorColor], ['Brand', a.brand], ['Size', a.size]].filter(x => x[1]);
+  const av = l.availabilityType === 'IN_STOCK' ? '<span class="chip">In stock</span>' : '';
+  return (bits.length || av) ? '<div class="mk-attrs">' + bits.map(x => '<span class="chip">' + slEsc(x[0]) + ': ' + slEsc(x[1]) + '</span>').join('') + av + '</div>' : '';
+};
+window.mkCommentsHTML = function(l){
+  if(l.allowComments === false) return '';
+  return '<div class="mk-cm"><b>Comments</b><div id="mkCmList"><div style="color:#8E8A78;font-size:13px;margin-top:8px">Loading…</div></div><div class="row"><input id="mkCmIn" type="text" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key===\'Enter\')mkPostComment(\'' + l.id + '\')"><button class="btn gold" onclick="mkPostComment(\'' + l.id + '\')">Post</button></div></div>';
+};
+window.mkLoadComments = async function(id){
+  const box = document.getElementById('mkCmList'); if(!box) return;
+  try{
+    const sn = await getDocs(query(collection(db, 'marketplace_listings', id, 'comments'), orderBy('createdAt', 'asc'), limit(60)));
+    if(currentListingId !== id) return;
+    box.innerHTML = sn.docs.length ? sn.docs.map(d => { const c = d.data(); return '<div class="cm"><div class="avatar">' + avatarHTML(c.authorPhoto || '', c.authorName || '') + '</div><div class="b"><b>' + slEsc(c.authorName || 'User') + '</b>' + slEsc(c.text || '') + '</div></div>'; }).join('') : '<div style="color:#8E8A78;font-size:13px;margin-top:8px">No comments yet. Be the first.</div>';
+  }catch(e){ box.innerHTML = '<div style="color:#8E8A78;font-size:13px;margin-top:8px">Comments are unavailable right now.</div>'; }
+};
+window.mkPostComment = async function(id){
+  const inp = document.getElementById('mkCmIn'); const text = inp && inp.value.trim(); if(!text || !currentUser) return;
+  inp.disabled = true;
+  try{
+    await addDoc(collection(db, 'marketplace_listings', id, 'comments'), { text, authorId: currentUser.uid, authorName: currentProfile.displayName || 'User', authorPhoto: myPhoto(), createdAt: Date.now() });
+    inp.value = ''; await mkLoadComments(id);
+  }catch(e){ toast(e.message || 'Could not post the comment.'); }
+  finally{ inp.disabled = false; }
+};
+
+
+// ================= MESKOT MARKETPLACE SCREEN =================
+const MKF = { q:'', sort:'new', min:'', max:'', cond:'', saved:false };
+let mkpChatA = [], mkpChatB = [], mkpUnsubs = [], mkpUid = null, mkpThreadId = null, mkpTab = 'mine';
+function mkpEtb(l){ const n = Number(l.price || 0); return (l.currency || 'ETB') === 'USD' ? n * (fxRate || 160) : n; }
+function mkpSold(l){ return l.isSold === true || l.isAvailable === false; }
+window.toggleMkSavedOnly = function(){ MKF.saved = !MKF.saved; renderMarket(); };
+window.renderMarket = function(){
+  const loc = mkLoc();
+  const lb = document.getElementById('mkLocBtn'); if(lb) lb.textContent = '📍 ' + loc.name;
+  document.getElementById('mkChips').innerHTML = MK_CATS.map(([k,l,ic]) => '<button class="chip ' + (mkCat===k?'active':'') + '" onclick="setMkCat(\'' + k + '\')">' + ic + ' ' + escapeHtml(l) + '</button>').join('');
+  const sb = document.getElementById('mkSavedOnly'); if(sb) sb.classList.toggle('active', MKF.saved);
+  const term = MKF.q.trim().toLowerCase(); const saved = mkSavedSet(); let hidden = 0;
+  const min = MKF.min === '' ? null : Number(MKF.min), max = MKF.max === '' ? null : Number(MKF.max);
+  const items = listings.filter(l => {
+    if(mkCat !== 'all' && l.categoryId !== mkCat) return false;
+    if(MKF.saved && !saved.has(l.id)) return false;
+    if(l.hideFromFriends && currentUser && l.sellerId !== currentUser.uid && myFriends.has(l.sellerId)) return false;
+    if(MKF.cond && l.condition !== MKF.cond) return false;
+    if(term){ const hay = [l.title, l.description, mkLocName(l), (l.tags||[]).join(' ')].join(' ').toLowerCase(); if(!hay.includes(term)) return false; }
+    const e = mkpEtb(l); if(min != null && e < min) return false; if(max != null && e > max) return false;
+    const d = mkDistanceKm(l);
+    if(d != null && d > loc.radiusKm && !(currentUser && l.sellerId === currentUser.uid)){ hidden++; return false; }
+    return true;
+  });
+  const T = l => tsMillis(l.createdAt);
+  items.sort((a,b) => (b.isPromoted?1:0) - (a.isPromoted?1:0) || (MKF.sort === 'low' ? mkpEtb(a) - mkpEtb(b) : MKF.sort === 'high' ? mkpEtb(b) - mkpEtb(a) : MKF.sort === 'near' ? ((mkDistanceKm(a) ?? 1e9) - (mkDistanceKm(b) ?? 1e9)) : T(b) - T(a)));
+  const live = items.filter(l => !mkpSold(l)).length;
+  document.getElementById('mkCount').textContent = live + ' item' + (live === 1 ? '' : 's') + ' available' + (fxRate ? ' · NBE Rate 1 USD = ' + Math.round(fxRate) + ' ETB' : '');
+  const grid = document.getElementById('mkGrid'), empty = document.getElementById('mkEmpty');
+  if(!items.length){ grid.innerHTML = ''; empty.style.display = 'block'; empty.textContent = hidden ? hidden + ' listing' + (hidden===1?' is':'s are') + ' outside ' + loc.radiusKm + ' km of ' + loc.name + '. Tap the location above to widen your search.' : t('noListings'); return; }
+  empty.style.display = 'none';
+  grid.innerHTML = items.map(l => {
+    const img = mkImages(l)[0]; const d = mkDistanceKm(l); const alt = mkAltPrice(l);
+    return '<div class="mk-card" onclick="openListingDetail(\'' + l.id + '\')"><div class="mk-img">' + (img ? '<img src="' + img + '" loading="lazy" alt="">' : mkCat_(l.categoryId)[2])
+      + (mkpSold(l) ? '<span class="mk-sold">' + (l.isSold ? 'SOLD' : 'UNAVAILABLE') + '</span>' : '') + (l.isPromoted ? '<span class="mk-promo">★ Promoted</span>' : '')
+      + '<button class="mk-save ' + (saved.has(l.id)?'on':'') + '" onclick="event.stopPropagation();toggleSaveListing(\'' + l.id + '\')">' + svgIcon('heart') + '</button></div>'
+      + '<div class="mk-body"><div class="mk-price">' + mkPriceLabel(l) + '</div>' + (alt ? '<div class="mk-usd">' + alt + '</div>' : '') + '<div class="mk-title">' + escapeHtml(l.title || '') + '</div>'
+      + '<div class="mk-loc">' + (mkLocName(l) ? '📍 ' + escapeHtml(mkLocName(l)) : '') + (d != null ? ' · ' + (d < 1 ? '<1' : Math.round(d)) + ' km' : '') + '</div></div></div>';
+  }).join('');
+  if(document.getElementById('slSheet').classList.contains('mkp-you') && document.getElementById('slSheetBg').classList.contains('show')) mkpYouDraw();
+};
+try{ new MutationObserver(() => { try{ renderMarket(); }catch(e){} }).observe(document.getElementById('mkFxText'), { childList:true, characterData:true, subtree:true }); }catch(e){}
+function mkpSheetOpen(html, cls){ const sh = document.getElementById('slSheet'); sh.className = 'sl-sheet' + (cls ? ' ' + cls : ''); sh.onclick = null; sh.innerHTML = html; document.getElementById('slSheetBg').classList.add('show'); }
+// ---- categories / location ----
+window.mkpCats = function(){
+  slSheet('Categories', MK_CATS.map(c => ({ v:c[0], l:c[1], i:c[2] })), mkCat, v => setMkCat(v), true);
+};
+window.mkpLoc = function(){
+  const cur = mkLoc();
+  const opts = [{ v:'__gps', l:'Use my current location', i:'🎯' }].concat(SL_CITIES.map(c => ({ v:c[0], l:c[0], i:'📍' })));
+  slSheet('Your area', opts, cur.name, v => {
+    const save = o => { try{ localStorage.setItem('meskot_mk_loc', JSON.stringify(Object.assign({}, cur, o))); }catch(e){} renderMarket(); setTimeout(mkpRadius, 250); };
+    if(v === '__gps'){
+      if(!navigator.geolocation) return toast('Location is not available on this device.');
+      navigator.geolocation.getCurrentPosition(p => save({ name:'Current location', lat:p.coords.latitude, lng:p.coords.longitude }), () => toast('Could not read your location.'), { timeout:8000 }); return;
+    }
+    const c = SL_CITIES.find(x => x[0] === v); save({ name:c[0], lat:c[1], lng:c[2] });
+  }, true);
+};
+function mkpRadius(){
+  const opts = [10,25,50,65,100,200,500].map(k => ({ v:String(k), l:'Within ' + k + ' km', i:'🧭' }));
+  slSheet('Search radius', opts, String(mkLoc().radiusKm), v => { const cur = mkLoc(); try{ localStorage.setItem('meskot_mk_loc', JSON.stringify(Object.assign({}, cur, { radiusKm:Number(v) }))); }catch(e){} renderMarket(); });
+}
+// ---- sort & filter ----
+window.mkpFilter = function(){
+  const sorts = [['new','Newest first'],['low','Price: low to high'],['high','Price: high to low'],['near','Nearest first']];
+  mkpSheetOpen('<h4>Sort &amp; Filter</h4><div class="mkp-f"><label style="margin-top:4px">Search</label><input type="text" id="mkfQ" value="' + escapeHtml(MKF.q) + '" placeholder="Search listings…">'
+    + '<label>Sort by</label><div class="sl-chips" id="mkfSort">' + sorts.map(s => '<button type="button" class="sl-chip' + (MKF.sort === s[0] ? ' on' : '') + '" data-v="' + s[0] + '">' + s[1] + '</button>').join('') + '</div>'
+    + '<label>Price range (ETB)</label><div class="two"><input type="number" id="mkfMin" inputmode="numeric" placeholder="Min" value="' + escapeHtml(MKF.min) + '"><input type="number" id="mkfMax" inputmode="numeric" placeholder="Max" value="' + escapeHtml(MKF.max) + '"></div>'
+    + '<label>Condition</label><div class="sl-chips" id="mkfCond"><button type="button" class="sl-chip' + (!MKF.cond ? ' on' : '') + '" data-v="">Any</button>' + MK_CONDITIONS.map(c => '<button type="button" class="sl-chip' + (MKF.cond === c ? ' on' : '') + '" data-v="' + c + '">' + c + '</button>').join('') + '</div>'
+    + '<label>Area</label><button type="button" class="sl-in sl-sel" onclick="slSheetClose();mkpLoc()"><span class="v">📍 ' + escapeHtml(mkLoc().name) + ' · ' + mkLoc().radiusKm + ' km</span><svg class="chv" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>'
+    + '<div class="act"><button type="button" onclick="mkpFilterReset()">Reset</button><button type="button" class="gold" onclick="mkpFilterApply()">Show results</button></div></div>');
+  ['mkfSort','mkfCond'].forEach(id => document.getElementById(id).onclick = e => { const b = e.target.closest('.sl-chip'); if(!b) return; document.querySelectorAll('#' + id + ' .sl-chip').forEach(x => x.classList.toggle('on', x === b)); });
+};
+window.mkpFilterApply = function(){
+  MKF.q = document.getElementById('mkfQ').value; MKF.min = document.getElementById('mkfMin').value; MKF.max = document.getElementById('mkfMax').value;
+  MKF.sort = (document.querySelector('#mkfSort .on') || {}).dataset?.v || 'new'; MKF.cond = (document.querySelector('#mkfCond .on') || {}).dataset?.v || '';
+  slSheetClose(); renderMarket();
+};
+window.mkpFilterReset = function(){ Object.assign(MKF, { q:'', sort:'new', min:'', max:'', cond:'' }); slSheetClose(); renderMarket(); };
+// ---- You sheet ----
+window.mkpYou = function(){ if(!currentUser) return toast('Please sign in first.'); mkpSheetOpen('', 'mkp-you'); mkpYouDraw(); };
+function mkpYouDraw(){
+  const sh = document.getElementById('slSheet'); const me = currentUser.uid;
+  const mine = listings.filter(l => l.sellerId === me); const saved = mkSavedSet(); const savedL = listings.filter(l => saved.has(l.id));
+  const views = mine.reduce((a, l) => a + (l.viewsCount || 0), 0);
+  const list = mkpTab === 'mine' ? mine : savedL;
+  const card = l => { const img = mkImages(l)[0]; const sold = mkpSold(l);
+    return '<div class="mkp-mc"><div class="im" onclick="slSheetClose();openListingDetail(\'' + l.id + '\')">' + (img ? '<img src="' + img + '" alt="">' : mkCat_(l.categoryId)[2]) + (sold ? '<span class="sold">SOLD</span>' : '') + '</div>'
+      + '<div class="p">' + mkPriceLabel(l) + '</div><div class="n">' + escapeHtml(l.title || '') + '</div>'
+      + (mkpTab === 'mine' ? '<div class="a"><button onclick="mkpToggleSold(\'' + l.id + '\')">' + (sold ? 'Relist' : 'Mark Sold') + '</button><button onclick="mkpBoost(\'' + l.id + '\')">' + (l.isPromoted ? 'Boosted' : 'Boost') + '</button><button class="del" onclick="mkpDelete(\'' + l.id + '\')" aria-label="Delete"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13M10 11v6M14 11v6"/></svg></button></div>'
+        : '<div class="a"><button onclick="toggleSaveListing(\'' + l.id + '\')">♥ Remove</button></div>') + '</div>'; };
+  sh.innerHTML = '<div class="mkp-me"><div class="avatar">' + avatarHTML(myPhoto(), currentProfile.displayName || '') + '</div><div><b>' + escapeHtml(currentProfile.displayName || 'You') + '</b><span>' + mine.length + ' Listings · ' + savedL.length + ' Saved · ' + views + ' Views</span></div></div>'
+    + '<div class="mkp-btns"><button class="gold" onclick="slSheetClose();openListingModal()">＋ Create Listing</button><button onclick="slSheetClose();mkpInbox()">Inbox (' + mkpThreads().length + ')</button></div>'
+    + '<div class="mkp-tabs"><button class="' + (mkpTab === 'mine' ? 'on' : '') + '" onclick="mkpTab=\'mine\';mkpYouDraw()">Your Listings (' + mine.length + ')</button><button class="' + (mkpTab === 'saved' ? 'on' : '') + '" onclick="mkpTab=\'saved\';mkpYouDraw()">Saved Items (' + savedL.length + ')</button></div>'
+    + '<div class="mkp-ml">' + (list.length ? list.map(card).join('') : '<div class="mkp-empty">' + (mkpTab === 'mine' ? 'You have not listed anything yet.' : 'No saved items yet.') + '</div>') + '</div>';
+}
+window.mkpYouDraw = mkpYouDraw;
+window.mkpToggleSold = async function(id){
+  const l = listings.find(x => x.id === id); if(!l) return; const sold = mkpSold(l);
+  try{ await updateDoc(doc(db, 'marketplace_listings', id), { isSold: !sold, isAvailable: sold }); toast(sold ? 'Listing is available again' : 'Marked as sold'); }catch(e){ toast(e.message); }
+};
+window.mkpBoost = async function(id){
+  const l = listings.find(x => x.id === id); if(!l || l.isPromoted) return toast('Already boosted.');
+  try{ await updateDoc(doc(db, 'marketplace_listings', id), { isPromoted: true }); toast('Listing boosted'); }catch(e){ toast(e.message); }
+};
+window.mkpDelete = async function(id){
+  if(!confirm('Delete this listing?')) return;
+  try{ await deleteDoc(doc(db, 'marketplace_listings', id)); toast('Deleted'); }catch(e){ toast(e.message); }
+};
+// ---- Inbox ----
+function mkpStart(){
+  if(!currentUser || mkpUid === currentUser.uid) return;
+  mkpUnsubs.forEach(u => { try{ u(); }catch(e){} }); mkpUnsubs = []; mkpUid = currentUser.uid; mkpChatA = []; mkpChatB = [];
+  const on = (k, set) => onSnapshot(query(collection(db, 'marketplace_chats'), where(k, '==', currentUser.uid)), s => { set(s.docs.map(d => ({ id:d.id, ...d.data() }))); mkpInboxChanged(); }, () => {});
+  mkpUnsubs.push(on('senderId', v => mkpChatA = v), on('receiverId', v => mkpChatB = v));
+}
+function mkpThreads(){
+  const all = new Map(); [...mkpChatA, ...mkpChatB].forEach(m => all.set(m.id, m));
+  const by = new Map();
+  all.forEach(m => { const k = m.chatId || m.id; const t = by.get(k); if(!t || (m.timestamp || 0) > (t.last.timestamp || 0)) by.set(k, { chatId:k, last:m }); });
+  return [...by.values()].sort((a, b) => (b.last.timestamp || 0) - (a.last.timestamp || 0));
+}
+function mkpInboxChanged(){
+  const n = mkpThreads().length; const b = document.getElementById('mkInboxBdg'); if(b){ b.textContent = n; b.style.display = n ? 'flex' : 'none'; }
+  if(document.getElementById('mkInbox').classList.contains('show')) mkpInboxDraw();
+  if(mkpThreadId && document.getElementById('mkThread').classList.contains('show')) mkpThreadDraw();
+}
+function mkpInboxDraw(){
+  const me = currentUser.uid; const th = mkpThreads(); const box = document.getElementById('mkInboxList');
+  box.innerHTML = th.length ? th.map(t => { const m = t.last; const who = m.senderId === me ? 'You' : (m.senderName || 'User');
+    return '<button class="mkp-it" onclick="mkpThreadOpen(\'' + slEsc(t.chatId) + '\')">' + (m.itemThumbUrl ? '<img src="' + slEsc(m.itemThumbUrl) + '" alt="">' : '<div class="ph"></div>') + '<div class="m"><b>' + slEsc(m.itemTitle || 'Listing') + '</b><span>' + slEsc(who) + ': ' + slEsc(m.messageText || '') + '</span></div><svg class="chv" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>'; }).join('')
+    : '<div class="mkp-empty" style="padding:60px 10px">No marketplace messages yet.<br>When someone asks about your listing, it shows up here.</div>';
+}
+window.mkpInbox = function(){ if(!currentUser) return toast('Please sign in first.'); mkpStart(); const p = document.getElementById('mkInbox'); mkpInboxDraw(); p.classList.add('show'); p.setAttribute('aria-hidden', 'false'); };
+window.mkpInboxClose = function(){ const p = document.getElementById('mkInbox'); p.classList.remove('show'); p.setAttribute('aria-hidden', 'true'); };
+window.mkpThreadOpen = function(chatId){ mkpThreadId = chatId; const p = document.getElementById('mkThread'); mkpThreadDraw(); p.classList.add('show'); p.setAttribute('aria-hidden', 'false'); };
+window.mkpThreadClose = function(){ const p = document.getElementById('mkThread'); p.classList.remove('show'); p.setAttribute('aria-hidden', 'true'); mkpThreadId = null; };
+function mkpThreadMsgs(){ const all = new Map(); [...mkpChatA, ...mkpChatB].forEach(m => { if((m.chatId || m.id) === mkpThreadId) all.set(m.id, m); }); return [...all.values()].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0)); }
+function mkpThreadDraw(){
+  const me = currentUser.uid; const ms = mkpThreadMsgs(); const f = ms[ms.length - 1] || {};
+  document.getElementById('mkThreadHead').innerHTML = (f.itemThumbUrl ? '<img src="' + slEsc(f.itemThumbUrl) + '" alt="">' : '<div class="ph"></div>') + '<div style="min-width:0"><b>' + slEsc(f.itemTitle || 'Listing') + '</b><span>' + slEsc(f.itemPriceLabel || '') + '</span></div>';
+  const box = document.getElementById('mkThreadMsgs'); const stick = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  box.innerHTML = ms.map(m => '<div class="mkp-msg' + (m.senderId === me ? ' me' : '') + '">' + slEsc(m.messageText || '') + '<small>' + (m.senderId === me ? 'You' : slEsc(m.senderName || '')) + ' · ' + new Date(m.timestamp || Date.now()).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) + '</small></div>').join('');
+  if(stick || ms.length < 3) box.scrollTop = box.scrollHeight;
+}
+window.mkpThreadSend = async function(){
+  const inp = document.getElementById('mkThreadIn'); const text = inp.value.trim(); if(!text || !mkpThreadId) return;
+  const ms = mkpThreadMsgs(); const f = ms[ms.length - 1]; if(!f) return;
+  const me = currentUser.uid; const other = f.senderId === me ? f.receiverId : f.senderId; const otherName = f.senderId === me ? f.receiverName : f.senderName; const otherPhoto = f.senderId === me ? f.receiverPhoto : f.senderPhoto;
+  inp.value = ''; const ts = Date.now();
+  try{
+    await setDoc(doc(db, 'marketplace_chats', mkpThreadId + '_' + ts), { chatId:mkpThreadId, senderId:me, senderName:currentProfile.displayName || 'Meskot User', senderPhoto:myPhoto(), receiverId:other, receiverName:otherName || '', receiverPhoto:otherPhoto || '', itemId:f.itemId, itemTitle:f.itemTitle, itemPriceLabel:f.itemPriceLabel || '', itemThumbUrl:f.itemThumbUrl || '', messageText:text, timestamp:ts });
+  }catch(e){ inp.value = text; toast(e.message || 'Could not send.'); }
+};
+const _mkpNav = window.navigateMarket;
+window.navigateMarket = function(){ _mkpNav(); mkpStart(); };
+
+
+// ================= MESSAGES: Meskot chat =================
+Object.assign(dict.en, { typeMessage:'Message...' }); Object.assign(dict.am, { typeMessage:'መልእክት...' }); try{ document.getElementById('chatInput').placeholder = t('typeMessage'); }catch(e){}
+let cmDocs = [], cmConvo = null, cmConvoUnsub = null, cmReply = null, cmEdit = null, cmRec = null, cmFirst = true, cmUser = {};
+const CM_EMOJI = '😀😁😂🤣😊😍🥰😘😎🤩🥳😇🙂😉😌😋🤗🤔😏😴😢😭😡😤🥺🙏👍👏🙌💪🤝👋✌️🔥✨🌟💛❤️💚💙🧡🎉🎁☕🍽️🌹🌍🇪🇹📍📷🎤💯✅❌⭐🚀🏠🚗💼📞'.match(/\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*|🇪🇹/gu) || [];
+const CM_SPARK = '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.7 6.9L21.5 12l-6.8 2.6L12 21.5l-2.7-6.9L2.5 12l6.8-2.6z"/></svg>';
+const CM_SENDI = '<svg viewBox="0 0 24 24"><path d="M3.4 20.4 21 12 3.4 3.6 3.3 10l12.6 2-12.6 2z"/></svg>';
+function cmLink(s){
+  let h = escapeHtml(s);
+  h = h.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  h = h.replace(/(^|[\s>(])(\+?\d[\d\s-]{7,}\d)(?=$|[\s<).,!?])/g, (m, p, n) => p + '<a href="tel:' + n.replace(/[^\d+]/g, '') + '">' + n + '</a>');
+  return h;
+}
+function cmDate(ms){
+  const d = new Date(ms), now = new Date(); const o = { month:'short', day:'numeric' }; if(d.getFullYear() !== now.getFullYear()) o.year = 'numeric';
+  return d.toLocaleDateString('en-US', o) + ' at ' + d.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+}
+function cmTime(ms){ return new Date(ms).toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' }); }
+function cmClearedAt(){ try{ return Number(localStorage.getItem('meskot_clr_' + activeConvoId)) || 0; }catch(e){ return 0; } }
+function cmSize(n){ return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+function cmPreview(m){ return m.imageUrls && m.imageUrls.length ? '📷 Photo' : m.audioUrl ? '🎤 Voice message' : m.fileUrl ? '📎 ' + (m.fileName || 'File') : (m.text || ''); }
+window.cmRender = function(){
+  const box = document.getElementById('chatMessages'); if(!box) return;
+  const me = currentUser.uid; const cleared = cmClearedAt();
+  const term = (document.getElementById('cmSearchIn') || {}).value ? document.getElementById('cmSearchIn').value.trim().toLowerCase() : '';
+  const near = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  let docs = cmDocs.filter(d => tsMillis(d.createdAt) > cleared);
+  if(term) docs = docs.filter(d => (d.text || d.fileName || '').toLowerCase().includes(term));
+  if(!docs.length){ box.innerHTML = '<div class="cm-empty">' + (term ? 'No messages found.' : escapeHtml(t('startedChat'))) + '</div>'; return; }
+  let last = 0; let html = '';
+  const lastMine = [...docs].reverse().find(d => d.from === me);
+  const seen = cmConvo && cmConvo.unread && cmConvo.unread[activeChatUid] === 0;
+  docs.forEach(m => {
+    const ms = tsMillis(m.createdAt); const mine = m.from === me;
+    if(!last || ms - last > 3600000) html += '<div class="cm-sep">' + cmDate(ms) + '</div>';
+    last = ms; let body;
+    const who = mine ? 'You' : escapeHtml(((cmUser.displayName || 'User')).split(' ')[0]);
+    if(m.callLog){
+      const missed = m.callStatus === 'missed', v = m.callType === 'video';
+      body = '<div class="cm-b"><div class="cm-call ' + (missed ? 'miss' : '') + '"' + (missed ? ' onclick="startCall(\'' + m.callType + '\')"' : '') + '><span class="ci">' + (v ? '📹' : '📞') + '</span><div><b>' + (missed ? (v ? 'Missed video call' : 'Missed audio call') : (v ? 'Video call' : 'Audio call')) + '</b><small>' + (missed ? 'Tap to call back' : formatCallDuration(m.callDuration || 0)) + '</small></div></div></div>';
+    } else if(m.imageUrls && m.imageUrls.length){
+      const im = m.imageUrls;
+      body = '<div class="cm-b media">' + (im.length === 1 ? '<img class="cm-img" src="' + slEsc(im[0]) + '" alt="" onclick="cmView(this.src)">' : '<div class="cm-gal">' + im.slice(0, 4).map(u => '<img src="' + slEsc(u) + '" alt="" onclick="cmView(this.src)">').join('') + '</div>') + '</div>';
+    } else if(m.audioUrl){
+      body = '<div class="cm-b"><div class="cm-voice"><button onclick="cmPlay(this,\'' + slEsc(m.audioUrl) + '\')" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></svg></button><div class="bar"><i></i></div><small>' + cmDur(m.audioDuration || 0) + '</small></div></div>';
+    } else if(m.fileUrl){
+      body = '<div class="cm-b"><a class="cm-file" href="' + slEsc(m.fileUrl) + '" target="_blank" rel="noopener" download><span class="fi">📄</span><span><b>' + slEsc(m.fileName || 'File') + '</b><small>' + cmSize(m.fileSize || 0) + '</small></span></a></div>';
+    } else {
+      const txt = m.text || ''; const emo = /^(\p{Extended_Pictographic}|\uFE0F|\u200D|\s){1,3}$/u.test(txt);
+      body = '<div class="cm-b' + (emo ? ' big' : '') + '">' + (m.replyTo ? '<div class="cm-quote">↩ ' + slEsc(m.replyTo.text || '') + '</div>' : '') + cmLink(txt) + '</div>';
+    }
+    const act = m.callLog ? '' : ' onclick="cmActions(\'' + m.id + '\',event)" oncontextmenu="cmActions(\'' + m.id + '\',event);return false;"';
+    html += '<div class="cm-row ' + (mine ? 'mine' : '') + '"' + act + '>' + body + '<div class="cm-t">' + who + ' • ' + cmTime(ms) + (m.editedAt ? ' · edited' : '') + (mine && lastMine && lastMine.id === m.id && seen ? ' · <span class="seen">Seen</span>' : '') + '</div></div>';
+  });
+  box.innerHTML = html;
+  if(near || cmFirst){ box.scrollTop = box.scrollHeight; cmFirst = false; }
+};
+function cmDur(s){ s = Math.round(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+let cmAudio = null, cmAudioBtn = null;
+window.cmPlay = function(btn, url){
+  if(cmAudio){ cmAudio.pause(); if(cmAudioBtn) cmAudioBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></svg>'; if(cmAudioBtn === btn){ cmAudio = null; cmAudioBtn = null; return; } }
+  cmAudio = new Audio(url); cmAudioBtn = btn; const bar = btn.parentNode.querySelector('.bar i');
+  btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
+  cmAudio.ontimeupdate = () => { if(cmAudio && cmAudio.duration) bar.style.width = (cmAudio.currentTime / cmAudio.duration * 100) + '%'; };
+  cmAudio.onended = () => { btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></svg>'; bar.style.width = '0'; cmAudio = null; cmAudioBtn = null; };
+  cmAudio.play().catch(() => toast('Could not play this voice message.'));
+};
+window.cmView = function(src){ let v = document.getElementById('cmViewer'); if(!v){ v = document.createElement('div'); v.id = 'cmViewer'; v.className = 'cm-view'; v.innerHTML = '<img alt=""><button aria-label="Close">✕</button>'; v.onclick = () => v.classList.remove('show'); document.body.appendChild(v); } v.querySelector('img').src = src; v.classList.add('show'); };
+// ---- open / close ----
+function cmFit(){ const p = document.getElementById('chatPanel'); const vv = window.visualViewport; if(!p || !vv || !p.classList.contains('open')) return; p.style.height = vv.height + 'px'; p.style.top = vv.offsetTop + 'px'; p.style.bottom = 'auto'; const b = document.getElementById('chatMessages'); if(b) b.scrollTop = b.scrollHeight; }
+if(window.visualViewport){ visualViewport.addEventListener('resize', cmFit); visualViewport.addEventListener('scroll', cmFit); }
+window.openChat = async function(otherUid){
+  if(!otherUid || !currentUser || otherUid === currentUser.uid) return;
+  activeChatUid = otherUid; activeConvoId = convoId(currentUser.uid, otherUid); cmDocs = []; cmConvo = null; cmReply = cmEdit = null; cmFirst = true;
+  setView('messagesView');
+  document.getElementById('convoListPanel').style.display = 'none';
+  const p = document.getElementById('chatPanel'); p.style.display = ''; p.classList.add('open'); p.style.height = ''; p.style.top = '';
+  document.getElementById('chatInput').value = ''; cmInput(); cmBanner(); cmSearchToggle(false); document.getElementById('cmEmoji').style.display = 'none';
+  document.getElementById('chatMessages').innerHTML = '<div class="cm-empty">…</div>';
+  cmFit();
+  const u = await getUserCached(otherUid); cmUser = u || {};
+  document.getElementById('chatAvatar').innerHTML = avatarHTML(u.photoURL, u.displayName);
+  document.getElementById('chatName').textContent = u.displayName || 'User';
+  document.getElementById('chatStatus').textContent = presenceText(u.lastSeen);
+  updateDoc(doc(db, 'conversations', activeConvoId), { ['unread.' + currentUser.uid]: 0 }).catch(() => {});
+  if(chatMessagesUnsub) chatMessagesUnsub(); if(cmConvoUnsub) cmConvoUnsub();
+  const cid = activeConvoId;
+  cmConvoUnsub = onSnapshot(doc(db, 'conversations', cid), s => { if(cid !== activeConvoId) return; cmConvo = s.exists() ? s.data() : null; cmRender(); if(cmConvo && cmConvo.unread && cmConvo.unread[currentUser.uid] > 0) updateDoc(doc(db, 'conversations', cid), { ['unread.' + currentUser.uid]: 0 }).catch(() => {}); }, () => {});
+  chatMessagesUnsub = onSnapshot(query(collection(db, 'conversations', cid, 'messages'), orderBy('createdAt', 'asc')), snap => { if(cid !== activeConvoId) return; cmDocs = snap.docs.map(d => ({ id:d.id, ...d.data() })); cmDocs.forEach(m => msgTextCache[m.id] = m.text || ''); cmRender(); });
+};
+window.closeChat = function(){
+  cmRecStop(false); if(cmAudio){ cmAudio.pause(); cmAudio = null; }
+  activeChatUid = null; activeConvoId = null;
+  if(chatMessagesUnsub){ chatMessagesUnsub(); chatMessagesUnsub = null; } if(cmConvoUnsub){ cmConvoUnsub(); cmConvoUnsub = null; }
+  const p = document.getElementById('chatPanel'); p.classList.remove('open'); p.style.display = 'none';
+  navigateMessages();
+};
+window.cmProfile = function(){ const u = activeChatUid; if(!u) return; closeChat(); navigateProfile(u); };
+// ---- composer ----
+window.cmInput = function(){
+  const has = document.getElementById('chatInput').value.trim().length > 0 || !!cmEdit;
+  const a = document.getElementById('cmAct'); a.innerHTML = has ? '<span class="cm-send">' + CM_SENDI + '</span>' : CM_SPARK; a.dataset.mode = has ? 'send' : 'like';
+};
+window.cmActClick = function(){ if(document.getElementById('cmAct').dataset.mode === 'send') sendMessage(); else cmPost({ text:'🌟' }); };
+function cmBanner(){
+  const b = document.getElementById('cmBanner');
+  if(cmEdit){ b.style.display = 'flex'; b.innerHTML = '<span><b>Editing message</b> · ' + slEsc(cmEdit.text) + '</span><button onclick="cmCancelBanner()">✕</button>'; }
+  else if(cmReply){ b.style.display = 'flex'; b.innerHTML = '<span><b>Replying to ' + (cmReply.from === currentUser.uid ? 'yourself' : slEsc((cmUser.displayName || 'User').split(' ')[0])) + '</b> · ' + slEsc(cmReply.text) + '</span><button onclick="cmCancelBanner()">✕</button>'; }
+  else b.style.display = 'none';
+}
+window.cmCancelBanner = function(){ if(cmEdit) document.getElementById('chatInput').value = ''; cmReply = cmEdit = null; cmBanner(); cmInput(); };
+window.cmEmojiToggle = function(){
+  const e = document.getElementById('cmEmoji');
+  if(e.style.display === 'none'){ if(!e.innerHTML) e.innerHTML = CM_EMOJI.map(x => '<button type="button" onclick="cmEmojiPick(\'' + x + '\')">' + x + '</button>').join(''); e.style.display = 'grid'; } else e.style.display = 'none';
+};
+window.cmEmojiPick = function(x){ const i = document.getElementById('chatInput'); const s = i.selectionStart == null ? i.value.length : i.selectionStart; i.value = i.value.slice(0, s) + x + i.value.slice(i.selectionEnd == null ? s : i.selectionEnd); i.focus(); try{ i.setSelectionRange(s + x.length, s + x.length); }catch(e){} cmInput(); };
+async function cmPost(extra){
+  if(!activeConvoId || !activeChatUid) return false;
+  const cid = activeConvoId, other = activeChatUid, me = currentUser.uid;
+  const data = Object.assign({ from:me, createdAt:serverTimestamp() }, extra);
+  if(cmReply && !extra.audioUrl){ data.replyTo = { id:cmReply.id, text:cmReply.text.slice(0, 120), from:cmReply.from }; }
+  const prev = cmPreview(data); const cRef = doc(db, 'conversations', cid);
+  try{
+    const cSnap = await getDoc(cRef);
+    if(!cSnap.exists()) await setDoc(cRef, { participants:[me, other], lastMessage:prev, lastMessageAt:serverTimestamp(), unread:{ [me]:0, [other]:1 } });
+    else await updateDoc(cRef, { lastMessage:prev, lastMessageAt:serverTimestamp(), ['unread.' + other]:increment(1), ['unread.' + me]:0 });
+    await addDoc(collection(db, 'conversations', cid, 'messages'), data);
+    addNotification(other, 'message', { convoId:cid });
+    cmReply = null; cmBanner(); return true;
+  }catch(e){ toast(e.message || 'Could not send.'); return false; }
+}
+window.sendMessage = async function(){
+  const input = document.getElementById('chatInput'); const text = input.value.trim();
+  if(cmEdit){
+    const id = cmEdit.id; if(!text) return; input.value = ''; cmEdit = null; cmBanner(); cmInput();
+    try{ await updateDoc(doc(db, 'conversations', activeConvoId, 'messages', id), { text, editedAt:serverTimestamp() }); }catch(e){ toast(e.message); } return;
+  }
+  if(!text) return; input.value = ''; cmInput(); document.getElementById('cmEmoji').style.display = 'none';
+  if(!(await cmPost({ text }))) input.value = text, cmInput();
+};
+function cmUp(label, f){ const u = document.getElementById('cmUp'); u.style.display = label ? 'block' : 'none'; if(label){ document.getElementById('cmUpT').textContent = label; document.getElementById('cmUpB').style.width = Math.round((f || 0) * 100) + '%'; } }
+async function cmUpload(file, label){
+  cmUp(label, 0);
+  try{ return await withTimeout(uploadFile('chat/' + activeConvoId + '/' + Date.now() + '_' + file.name.replace(/[^\w.\-]/g, '_'), file, f => cmUp(label, f)), mediaUploadTimeout([file]), 'Upload'); }
+  finally{ cmUp(''); }
+}
+window.cmPickImages = async function(e){
+  const files = Array.from(e.target.files || []).filter(f => /^image\//.test(f.type)).slice(0, 6); e.target.value = ''; if(!files.length) return;
+  try{ const urls = []; for(let i = 0; i < files.length; i++){ const f = await slShrink(files[i]); urls.push(await cmUpload(f, 'Sending photo ' + (i + 1) + ' of ' + files.length + '…')); } await cmPost({ imageUrls:urls }); }
+  catch(err){ toast(err.message || 'Could not send the photo.'); }
+};
+window.cmPickFile = async function(e){
+  const f = (e.target.files || [])[0]; e.target.value = ''; if(!f) return;
+  if(f.size > 25 * 1048576) return toast('Files up to 25 MB, please.');
+  try{ const url = await cmUpload(f, 'Sending file…'); await cmPost({ fileUrl:url, fileName:f.name, fileSize:f.size }); }catch(err){ toast(err.message || 'Could not send the file.'); }
+};
+// ---- voice messages ----
+window.cmRecStart = async function(){
+  if(!navigator.mediaDevices || !window.MediaRecorder) return toast('Voice messages are not supported on this device.');
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true }); const chunks = [];
+    const mr = new MediaRecorder(stream); cmRec = { mr, stream, chunks, t0:Date.now(), send:false };
+    mr.ondataavailable = ev => { if(ev.data.size) chunks.push(ev.data); };
+    mr.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop()); const r = cmRec; cmRec = null; clearInterval(r.timer);
+      document.getElementById('cmRec').style.display = 'none'; document.getElementById('cmBar').style.display = 'flex';
+      if(!r.send || !chunks.length) return;
+      const dur = (Date.now() - r.t0) / 1000; if(dur < 0.8) return toast('Hold a little longer.');
+      const type = mr.mimeType || 'audio/webm'; const ext = /mp4/.test(type) ? 'm4a' : /ogg/.test(type) ? 'ogg' : 'webm';
+      try{ const url = await cmUpload(new File([new Blob(chunks, { type })], 'voice.' + ext, { type }), 'Sending voice message…'); await cmPost({ audioUrl:url, audioDuration:Math.round(dur) }); }catch(err){ toast(err.message || 'Could not send the voice message.'); }
+    };
+    mr.start(); document.getElementById('cmBar').style.display = 'none'; document.getElementById('cmRec').style.display = 'flex'; document.getElementById('cmRecT').textContent = '0:00';
+    cmRec.timer = setInterval(() => { document.getElementById('cmRecT').textContent = cmDur((Date.now() - cmRec.t0) / 1000); if(Date.now() - cmRec.t0 > 300000) cmRecStop(true); }, 250);
+  }catch(e){ toast('Microphone permission is needed for voice messages.'); }
+};
+window.cmRecStop = function(send){ if(!cmRec) return; cmRec.send = !!send; try{ cmRec.mr.stop(); }catch(e){} };
+// ---- message actions ----
+function cmSheet(title, rows){
+  const sh = document.getElementById('slSheet'); sh.className = 'sl-sheet';
+  sh.innerHTML = (title ? '<h4>' + title + '</h4>' : '') + '<div class="lst">' + rows.map((r, i) => '<button type="button" class="it" data-i="' + i + '"><span class="ic">' + r.i + '</span><span' + (r.danger ? ' style="color:#8B1A2B"' : '') + '>' + r.l + '</span></button>').join('') + '</div>';
+  sh.onclick = e => { const b = e.target.closest('.it'); if(!b) return; slSheetClose(); rows[+b.dataset.i].f(); };
+  document.getElementById('slSheetBg').classList.add('show');
+}
+window.cmActions = function(id, ev){
+  if(ev && (ev.target.closest('a,button,img,.cm-file'))) return;
+  const m = cmDocs.find(x => x.id === id); if(!m) return; const mine = m.from === currentUser.uid; const rows = [];
+  rows.push({ i:'↩', l:'Reply', f:() => { cmReply = { id, text:cmPreview(m), from:m.from }; cmEdit = null; cmBanner(); cmInput(); document.getElementById('chatInput').focus(); } });
+  if(m.text) rows.push({ i:'📋', l:'Copy', f:() => { try{ navigator.clipboard.writeText(m.text); toast('Copied'); }catch(e){ toast('Could not copy.'); } } });
+  if(mine && m.text && !m.imageUrls) rows.push({ i:'✏️', l:'Edit', f:() => { cmEdit = { id, text:m.text }; cmReply = null; const i = document.getElementById('chatInput'); i.value = m.text; cmBanner(); cmInput(); i.focus(); } });
+  if(mine) rows.push({ i:'🗑️', l:'Delete', danger:true, f:async () => { if(!confirm('Delete this message?')) return; try{ await deleteDoc(doc(db, 'conversations', activeConvoId, 'messages', id)); }catch(e){ toast(e.message); } } });
+  cmSheet('', rows);
+};
+// ---- settings ----
+window.cmSearchToggle = function(on){ const s = document.getElementById('cmSearch'); s.style.display = on ? 'flex' : 'none'; if(on) document.getElementById('cmSearchIn').focus(); else { document.getElementById('cmSearchIn').value = ''; if(activeConvoId) cmRender(); } };
+window.cmSettings = function(){
+  cmSheet(slEsc(cmUser.displayName || 'Chat'), [
+    { i:'👤', l:'View profile', f:cmProfile },
+    { i:'🔍', l:'Search in chat', f:() => cmSearchToggle(true) },
+    { i:'📞', l:'Audio call', f:() => startCall('audio') },
+    { i:'📹', l:'Video call', f:() => startCall('video') },
+    { i:'🧹', l:'Clear chat (for me)', danger:true, f:() => { if(!confirm('Clear this chat on your side? The other person keeps their copy.')) return; try{ localStorage.setItem('meskot_clr_' + activeConvoId, String(Date.now())); }catch(e){} cmRender(); toast('Chat cleared'); } }
+  ]);
+};
+// ---- conversation list: unread styling + media previews ----
+
+
+// ================= MESKOT IDENTITY: own words + own icons =================
+Object.assign(dict.en, {
+  like:'Cheer', reactLike:'Cheer', reactLove:'Cherish', reactHaha:'Laugh', reactWow:'Amazed', reactSad:'Sorrow', reactAngry:'Upset',
+  comment:'Say', writeComment:'Say something…', share:'Spread', save:'Keep', saved:'Kept', support:'Buna', likesLabel:'cheers',
+  composerPh:"Share what's brewing…", btnStory:'Tale', btnReel:'Clip', btnPhoto:'Frame', tReels:'Clips', newReel:'New Clip',
+  storiesTitle:'Meskot Tales', addMoment:'+ Add Tale', createStory:'Create Tale', shareMoment:'Share a tale', addFriend:'Join circle', friendsWord:'Circle', friendWord:'Circle member'
+});
+Object.assign(dict.am, {
+  like:'አበረታታ', reactLike:'አበረታታ', reactLove:'ውድ', reactHaha:'ሳቅ', reactWow:'ድንቅ', reactSad:'ሀዘን', reactAngry:'ቁጣ',
+  comment:'ተናገር', writeComment:'አንድ ነገር ይናገሩ…', share:'አሰራጭ', save:'አቆይ', saved:'የተቆዩ', support:'ቡና', likesLabel:'ማበረታቻዎች',
+  composerPh:'ምን እየተፈላ ነው?…', btnStory:'ተረት', btnReel:'ክሊፕ', btnPhoto:'ፍሬም', tReels:'ክሊፖች', newReel:'አዲስ ክሊፕ',
+  storiesTitle:'የመስኮት ተረቶች', addMoment:'+ ተረት ጨምር', createStory:'ተረት ፍጠር', shareMoment:'ተረት አጋራ', addFriend:'ክበብ ተቀላቀል', friendsWord:'ክበብ', friendWord:'የክበብ አባል'
+});
+Object.assign(REACTIONS.like, { emoji:'🌟' }); Object.assign(REACTIONS.love, { emoji:'💛' });
+Object.assign(REACTIONS.haha, { emoji:'😄' }); Object.assign(REACTIONS.wow, { emoji:'🤩' });
+Object.assign(REACTIONS.sad, { emoji:'🥀' });  Object.assign(REACTIONS.angry, { emoji:'😤' });
+(function(){
+  const S = d => '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+  Object.assign(FBI, {
+    like: S('<path d="M12 3l2.3 6.2L21 12l-6.7 2.8L12 21l-2.3-6.2L3 12l6.7-2.8z"/>'),
+    comment: S('<path d="M6 8h4v4c0 2.6-1.4 4.4-4 5.5M14 8h4v4c0 2.6-1.4 4.4-4 5.5"/>'),
+    share: S('<circle cx="6.5" cy="12" r="2.6"/><path d="M12 7.6a6.2 6.2 0 0 1 0 8.8M16 4.6a10.8 10.8 0 0 1 0 14.8"/>'),
+    save: S('<path d="M7 4h10l4 5-9 11L3 9z"/><path d="M3 9h18M9.5 4 12 9l2.5-5"/>'),
+    tip: S('<path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5V9z"/><path d="M16 11h1.4a2.4 2.4 0 0 1 0 4.8H16M8.5 3v3M12 3v3"/>')
+  });
+  // sprite: every heart in the app becomes the Meskot spark
+  const h = document.getElementById('i-heart'); if(h) h.innerHTML = '<path d="M12 3l2.3 6.2L21 12l-6.7 2.8L12 21l-2.3-6.2L3 12l6.7-2.8z"/>';
+  // composer buttons
+  const set = (sel, d) => { const el = document.querySelector(sel + ' svg'); if(el) el.innerHTML = d; };
+  set('.cr-btn.story', '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v3M20.5 12h-3M12 20.5v-3M3.5 12h3"/>');
+  set('.cr-btn.rl', '<rect x="3" y="4" width="18" height="16" rx="5"/><path d="M10.2 9v6l5-3z"/>');
+  set('.cr-btn.photo', '<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M7.5 16l3-4 2.5 3 1.5-2 2 3z"/>');
+  try{ setLang(lang); }catch(e){}
+})();
 
 
 /* ===== RESPONSIVE RUNTIME: measure the real header height; expose the active breakpoint ===== */
