@@ -1042,6 +1042,59 @@ body:not(:has(#adsCreateView.active)) .adf-foot{display:none;}
 @media(max-width:420px){.ax-bt .t{font-size:24px}.ax-live{padding:8px 12px;font-size:14px}.ax-opt b{font-size:19px}.ax-amt{gap:16px}.ax-amt .av b{font-size:36px}.ax-amt .av{min-width:140px}.ax-pm{padding:18px 12px;gap:12px}.ax-pm .rd{width:40px;height:40px}.ax-kp div b{font-size:19px}.ax-ad .top{gap:10px}.ax-st{padding:10px}}
 
 
+.cx-wrap{grid-column:1/-1;min-width:0;max-width:100%;}
+.cx-wrap .cx{min-width:0;max-width:100%;overflow:hidden;}
+.post.cx{padding-bottom:12px;}
+.cx{position:relative;}
+.cx .cx-head{display:flex;align-items:center;gap:10px;padding:12px 14px 6px;}
+.cx .cx-head .avatar{width:40px;height:40px;font-size:14px;flex:none;}
+.cx .cx-head b{display:block;font-size:15px;font-weight:800;color:#14281F;}
+.cx .cx-head span{font-size:12.5px;color:#76776B;font-weight:600;}
+.cx .cx-text{padding:2px 14px 8px;font-size:15px;line-height:1.4;color:#14281F;}
+.cx-scroll{display:flex;gap:10px;overflow-x:auto;padding:4px 14px 6px;scroll-snap-type:x mandatory;scroll-padding-left:14px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:none;}
+.cx-scroll::-webkit-scrollbar{display:none;}
+.cx-card{flex:0 0 min(74%,280px);scroll-snap-align:start;scroll-snap-stop:always;background:#fff;border:1px solid #EADFC4;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;}
+.cx-card .im{aspect-ratio:1/1;background:#F6EBD0;display:flex;align-items:center;justify-content:center;font-size:44px;cursor:pointer;overflow:hidden;}
+.cx-card .im img{width:100%;height:100%;object-fit:cover;display:block;}
+.cx-card .tx{padding:10px 12px 2px;cursor:pointer;min-height:54px;}
+.cx-card .tx b{display:block;font-size:15px;font-weight:800;color:#14281F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cx-card .tx span{display:block;font-size:13px;color:#9A6B1E;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.cx-card .tx span.d{color:#6D6A58;font-weight:600;}
+.cx-cta{margin:8px 12px 12px;height:40px;border:0;border-radius:20px;background:#F6EBD0;color:#9A6B1E;font-weight:800;font-size:14px;font-family:inherit;}
+.cx-cta:active{background:#EBD9A8;}
+.cx-more{flex:0 0 min(50%,160px);scroll-snap-align:start;border-radius:18px;background:#F6EBD0;display:flex;align-items:center;justify-content:center;color:#9A6B1E;font-weight:800;border:1px solid #EADFC4;}
+.cx-dots{display:flex;justify-content:center;gap:6px;padding-top:6px;}
+.cx-dots i{width:6px;height:6px;border-radius:50%;background:#EADFC4;transition:all .2s;}
+.cx-dots i.on{background:#9A6B1E;width:8px;height:8px;}
+.cx-nav{display:none;position:absolute;top:52%;width:38px;height:38px;border-radius:50%;border:0;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25);color:#14281F;font-size:18px;z-index:2;}
+.cx-nav.l{left:6px;}.cx-nav.r{right:6px;}
+@media(hover:hover){.cx:hover .cx-nav{display:block;}}
+/* builder */
+.cxb-sec{background:#FFFEFA;border:1.5px solid #E6D9B8;border-radius:24px;padding:16px;margin-bottom:14px;}
+.cxb-sec h3{margin:0 0 4px;font-size:17px;font-weight:800;}
+.cxb-sec p{margin:0 0 12px;font-size:13px;color:#6D6A58;}
+.cxb-sec input[type=text],.cxb-sec textarea{width:100%;box-sizing:border-box;border:2px solid #EADFC4;border-radius:18px;background:#FAF7EE;padding:12px 16px;font-size:16px;font-family:inherit;outline:none;}
+.cxb-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.cxb-it{position:relative;aspect-ratio:1/1;border-radius:14px;overflow:hidden;background:#F6EBD0;border:3px solid transparent;padding:0;font-size:30px;display:flex;align-items:center;justify-content:center;}
+.cxb-it img{width:100%;height:100%;object-fit:cover;}
+.cxb-it.on{border-color:#B27F2B;}
+.cxb-it .n{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#E8C86A,#A9741F);color:#fff;font-size:13px;font-weight:800;display:none;align-items:center;justify-content:center;}
+.cxb-it.on .n{display:flex;}
+.cxb-it .p{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(0deg,rgba(0,0,0,.65),transparent);color:#fff;font-size:11px;font-weight:700;padding:14px 6px 4px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cxb-step{display:flex;align-items:center;justify-content:space-between;margin:8px 0;}
+.cxb-step b{font-size:15px;}
+.cxb-step div{display:flex;align-items:center;gap:14px;}
+.cxb-step button{width:40px;height:40px;border-radius:50%;border:2px solid #E8C86A;background:#FBF8F0;font-size:20px;font-weight:800;color:#9A6B1E;padding:0;}
+.cxb-step output{min-width:60px;text-align:center;font-weight:800;font-size:17px;}
+.cxb-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #EADFC4;}
+.cxb-foot small{display:block;color:#6D6A58;font-weight:700;font-size:12px;}
+.cxb-foot b{font-size:20px;}
+.cxb-go{height:50px;padding:0 30px;border:0;border-radius:25px;background:linear-gradient(90deg,#E8C86A,#A9741F);color:#fff;font-weight:800;font-size:16px;}
+.cxb-go:disabled{opacity:.6;}
+.cxb-note{font-size:12.5px;color:#6D6A58;margin-top:8px;}
+.cxb-prev{margin-top:6px;margin-inline:-16px;}
+
+
 #chatPanel.cm{position:fixed;inset:0;z-index:430;background:#EFF1F7;flex-direction:column;color:#14281F;display:none;}
 #chatPanel.cm.open{display:flex!important;}
 .cm svg{width:24px;height:24px;fill:currentColor;}
@@ -2031,6 +2084,8 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
 /* ---------- 6. Large / ultra-wide: stop stretching ---------- */
 @media (min-width:1600px){ :root{ --col-max:720px; --wide-max:1240px; } }
 @media (prefers-reduced-motion:reduce){ *{scroll-behavior:auto!important;} }
+.live-unmute{white-space:nowrap;position:absolute;left:50%;top:42%;transform:translateX(-50%);z-index:20;height:50px;padding:0 24px;border:0;border-radius:25px;background:rgba(20,40,31,.85);color:#fff;font-weight:800;font-size:16px;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.live-top .x#liveSnd{margin-right:6px;}
 #profileView .vbadge svg,.pf-name .vbadge svg{width:26px;height:26px;}
 .vbadge svg{filter:drop-shadow(0 1px 1px rgba(143,101,36,.35));}
 
@@ -3038,11 +3093,12 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
 <div class="live-room" id="liveRoom">
   <video id="liveVideo" autoplay playsinline></video>
   <div class="live-wait" id="liveWait">Connecting…</div>
+  <button class="live-unmute" id="liveUnmute" style="display:none" onclick="liveUnmute()">🔇 Tap to hear the host</button>
   <div class="live-top">
     <div class="avatar" id="liveAvatar"></div>
     <div><div class="nm" id="liveName"></div><span class="live-badge"><i></i>LIVE</span></div>
     <div class="vw" id="liveViewers">👁 0</div><div class="vw" id="liveLikes">❤ 0</div><div class="vw" id="liveCoins">★ 0</div>
-    <button class="x" onclick="leaveLive()">✕</button>
+    <button class="x" id="liveSnd" onclick="liveToggleSound()" aria-label="Sound">🔊</button><button class="x" onclick="leaveLive()">✕</button>
   </div>
   <div class="live-chat" id="liveChat"></div>
   <div class="live-gifts" id="liveGifts"></div>
@@ -3097,6 +3153,13 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
 
 
 <div class="modal-bg" id="adSheetBg" onclick="if(event.target===this)adfCloseSheet()"><div class="modal wide ax-sheet" id="adSheet"></div></div>
+
+
+<div id="cxBuilder" class="mkp-page" style="z-index:442" aria-hidden="true">
+  <div class="mkp-ptop"><button class="mkp-pback" onclick="cxbClose()" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><h2>Carousel ad</h2></div>
+  <div class="mkp-pbody" id="cxbBody"></div>
+  <div class="cxb-foot"><div><small id="cxbTotalL">Total</small><b id="cxbTotal">$0</b></div><button class="cxb-go" id="cxbGo" onclick="cxbLaunch()">Launch ad</button></div>
+</div>
 
 
 <div id="mkInbox" class="mkp-page" aria-hidden="true">
@@ -7315,6 +7378,26 @@ window.openLiveStart = function(){
   showModal('liveStartBg');
 };
 window.closeLiveStart = function(){ hideModal('liveStartBg'); };
+// --- viewer audio: never fall back to a silent, un-unmutable video ---
+function liveShowUnmute(on){ const b = document.getElementById('liveUnmute'); if(b) b.style.display = on ? 'flex' : 'none'; liveSndIcon(); }
+function liveSndIcon(){ const v = document.getElementById('liveVideo'), b = document.getElementById('liveSnd'); if(b && v) b.textContent = v.muted || v.volume === 0 ? '🔇' : '🔊'; }
+function liveAttachRemote(remote){
+  const v = document.getElementById('liveVideo'); if(!v) return;
+  if(v.srcObject !== remote) v.srcObject = remote;
+  v.muted = false; v.volume = 1;
+  const p = v.play();
+  if(p && p.catch) p.catch(() => { v.muted = true; v.play().catch(()=>{}); liveShowUnmute(true); });
+  clearTimeout(liveAttachRemote.t);
+  liveAttachRemote.t = setTimeout(() => {
+    if(!liveState || liveState.role !== 'viewer') return;
+    liveShowUnmute(v.muted || v.paused);
+    if(!remote.getAudioTracks().length) toast('No audio from the host yet — their microphone may be off.');
+  }, 1200);
+}
+window.__liveAttach = liveAttachRemote; window.__showLiveRoom = showLiveRoom;
+window.liveUnmute = function(){ const v = document.getElementById('liveVideo'); v.muted = false; v.volume = 1; v.play().catch(()=>{}); liveShowUnmute(false); };
+window.liveToggleSound = function(){ const v = document.getElementById('liveVideo'); if(v.muted){ liveUnmute(); } else { v.muted = true; liveSndIcon(); } };
+document.addEventListener('pointerdown', e => { const r = document.getElementById('liveRoom'); const v = document.getElementById('liveVideo'); if(r && r.classList.contains('show') && e.target.closest('#liveRoom') && v && v.muted && liveState && liveState.role === 'viewer' && liveState.gotTrack && !e.target.closest('#liveSnd')) liveUnmute(); }, true);
 function showLiveRoom(opts){
   const room = document.getElementById('liveRoom'); room.classList.add('show');
   document.getElementById('liveAvatar').innerHTML = avatarHTML(opts.photo, opts.name);
@@ -7327,6 +7410,7 @@ function showLiveRoom(opts){
   document.getElementById('liveGifts').classList.remove('show');
   document.getElementById('liveLikes').textContent = '❤ 0'; document.getElementById('liveCoins').textContent = '★ 0';
   document.getElementById('liveWait').style.display = opts.host ? 'none' : 'flex';
+  document.getElementById('liveSnd').style.display = opts.host ? 'none' : ''; liveShowUnmute(false);
   document.getElementById('liveWait').textContent = 'Connecting…';
   document.body.style.overflow = 'hidden';
 }
@@ -7559,8 +7643,7 @@ window.joinLive = async function(liveId){
     const remote = new MediaStream();
     peer.ontrack = ev => {
       remote.addTrack(ev.track);
-      const v = document.getElementById('liveVideo'); v.srcObject = remote; v.muted = false;
-      v.play().catch(() => { v.muted = true; v.play().catch(()=>{}); });
+      liveAttachRemote(remote);
       liveState.gotTrack = true; document.getElementById('liveWait').style.display = 'none';
     };
     const vref = doc(db,'live_streams',liveId,'viewers',vid);
@@ -8067,7 +8150,7 @@ window.deleteCampaign = async function(id){
 };
 // ---- sponsored campaign cards inside the feed ----
 function eligibleCampaigns(){ return feedCampaigns.filter(c => campLive(c) && c.advertiserUid !== (currentUser && currentUser.uid)); }
-function adCardHTML(c){
+function adCardHTMLOld(c){
   return `<div class="post ad-card" data-camp="${c.id}">
     <div class="sponsored-pill">📣 Sponsored</div>
     <div class="post-head"><div class="avatar">${avatarHTML(c.advertiserAvatar, c.advertiserName)}</div><div class="who"><div class="name">${escapeHtml(c.advertiserName||'Advertiser')}${verifiedBadge(c.advertiserUid)}</div><div class="time">Sponsored</div></div></div>
@@ -8075,6 +8158,7 @@ function adCardHTML(c){
     ${c.mediaUrl ? `<div class="post-media-grid" data-n="1"><div class="pmg-item"><img src="${c.mediaUrl}" alt=""></div></div>` : ''}
     <div class="ad-cta"><div class="ad-h">${escapeHtml(c.headline||'')}</div><button class="btn gold" onclick="adClick('${c.id}')">${escapeHtml(c.ctaText||'Learn more')}</button></div></div>`;
 }
+function adCardHTML(c){ return (window.cxIsC && cxIsC(c)) ? carouselAdHTML(c) : adCardHTMLOld(c); }
 function renderFeedHTML(docs){
   const ads = eligibleCampaigns(); let ai = 0, out = '';
   docs.forEach((d, i) => {
@@ -9291,14 +9375,15 @@ window.renderMarket = function(){
   const grid = document.getElementById('mkGrid'), empty = document.getElementById('mkEmpty');
   if(!items.length){ grid.innerHTML = ''; empty.style.display = 'block'; empty.textContent = hidden ? hidden + ' listing' + (hidden===1?' is':'s are') + ' outside ' + loc.radiusKm + ' km of ' + loc.name + '. Tap the location above to widen your search.' : t('noListings'); return; }
   empty.style.display = 'none';
-  grid.innerHTML = items.map(l => {
+  const cardsHTML = items.map(l => {
     const img = mkImages(l)[0]; const d = mkDistanceKm(l); const alt = mkAltPrice(l);
     return '<div class="mk-card" onclick="openListingDetail(\'' + l.id + '\')"><div class="mk-img">' + (img ? '<img src="' + img + '" loading="lazy" alt="">' : mkCat_(l.categoryId)[2])
       + (mkpSold(l) ? '<span class="mk-sold">' + (l.isSold ? 'SOLD' : 'UNAVAILABLE') + '</span>' : '') + (l.isPromoted ? '<span class="mk-promo">★ Promoted</span>' : '')
       + '<button class="mk-save ' + (saved.has(l.id)?'on':'') + '" onclick="event.stopPropagation();toggleSaveListing(\'' + l.id + '\')">' + svgIcon('heart') + '</button></div>'
       + '<div class="mk-body"><div class="mk-price">' + mkPriceLabel(l) + '</div>' + (alt ? '<div class="mk-usd">' + alt + '</div>' : '') + '<div class="mk-title">' + escapeHtml(l.title || '') + '</div>'
       + '<div class="mk-loc">' + (mkLocName(l) ? '📍 ' + escapeHtml(mkLocName(l)) : '') + (d != null ? ' · ' + (d < 1 ? '<1' : Math.round(d)) + ' km' : '') + '</div></div></div>';
-  }).join('');
+  });
+  grid.innerHTML = window.cxMarketInsert ? cxMarketInsert(cardsHTML, items) : cardsHTML.join('');
   if(document.getElementById('slSheet').classList.contains('mkp-you') && document.getElementById('slSheetBg').classList.contains('show')) mkpYouDraw();
 };
 try{ new MutationObserver(() => { try{ renderMarket(); }catch(e){} }).observe(document.getElementById('mkFxText'), { childList:true, characterData:true, subtree:true }); }catch(e){}
@@ -9353,7 +9438,7 @@ function mkpYouDraw(){
       + (mkpTab === 'mine' ? '<div class="a"><button onclick="mkpToggleSold(\'' + l.id + '\')">' + (sold ? 'Relist' : 'Mark Sold') + '</button><button onclick="mkpBoost(\'' + l.id + '\')">' + (l.isPromoted ? 'Boosted' : 'Boost') + '</button><button class="del" onclick="mkpDelete(\'' + l.id + '\')" aria-label="Delete"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13M10 11v6M14 11v6"/></svg></button></div>'
         : '<div class="a"><button onclick="toggleSaveListing(\'' + l.id + '\')">♥ Remove</button></div>') + '</div>'; };
   sh.innerHTML = '<div class="mkp-me"><div class="avatar">' + avatarHTML(myPhoto(), currentProfile.displayName || '') + '</div><div><b>' + escapeHtml(currentProfile.displayName || 'You') + '</b><span>' + mine.length + ' Listings · ' + savedL.length + ' Saved · ' + views + ' Views</span></div></div>'
-    + '<div class="mkp-btns"><button class="gold" onclick="slSheetClose();openListingModal()">＋ Create Listing</button><button onclick="slSheetClose();mkpInbox()">Inbox (' + mkpThreads().length + ')</button></div>'
+    + '<div class="mkp-btns"><button class="gold" onclick="slSheetClose();openListingModal()">＋ Create Listing</button><button onclick="slSheetClose();mkpInbox()">Inbox (' + mkpThreads().length + ')</button></div><div class="mkp-btns" style="padding-top:0"><button onclick="cxbOpen()">📣 Promote as carousel ad</button></div>'
     + '<div class="mkp-tabs"><button class="' + (mkpTab === 'mine' ? 'on' : '') + '" onclick="mkpTab=\'mine\';mkpYouDraw()">Your Listings (' + mine.length + ')</button><button class="' + (mkpTab === 'saved' ? 'on' : '') + '" onclick="mkpTab=\'saved\';mkpYouDraw()">Saved Items (' + savedL.length + ')</button></div>'
     + '<div class="mkp-ml">' + (list.length ? list.map(card).join('') : '<div class="mkp-empty">' + (mkpTab === 'mine' ? 'You have not listed anything yet.' : 'No saved items yet.') + '</div>') + '</div>';
 }
@@ -9622,6 +9707,122 @@ window.cmSettings = function(){
   ]);
 };
 // ---- conversation list: unread styling + media previews ----
+
+
+// ================= CAROUSEL ADS (marketplace + feed) =================
+const cxSyn = new Map();
+function cxCampCards(c){ return Array.isArray(c.cards) ? c.cards.filter(x => x && x.imageUrl) : []; }
+function cxIsCarousel(c){ return cxCampCards(c).length >= 2; }
+function cxCardHTML(c, k, i){
+  const d = k.description || '';
+  return '<div class="cx-card"><div class="im" onclick="cxClick(\'' + c.id + '\',' + i + ',false)"><img src="' + slEsc(k.imageUrl) + '" loading="lazy" decoding="async" alt="' + slEsc(k.title || '') + '"></div>'
+    + '<div class="tx" onclick="cxClick(\'' + c.id + '\',' + i + ',false)"><b>' + slEsc(k.title || '') + '</b>' + (k.priceLabel ? '<span>' + slEsc(k.priceLabel) + '</span>' : (d ? '<span class="d">' + slEsc(d) + '</span>' : '')) + '</div>'
+    + '<button class="cx-cta" onclick="cxClick(\'' + c.id + '\',' + i + ',true)">' + slEsc(k.ctaLabel || 'Shop now') + '</button></div>';
+}
+window.carouselAdHTML = function(c){
+  const cards = cxCampCards(c); const real = !!c.id && !String(c.id).startsWith('syn_');
+  return '<div class="post ad-card cx" ' + (real ? 'data-camp="' + c.id + '"' : '') + '><div class="cx-head"><div class="avatar">' + avatarHTML(c.advertiserAvatar, c.advertiserName) + '</div><div><b>' + slEsc(c.advertiserName || 'Advertiser') + verifiedBadge(c.advertiserUid) + '</b><span>Sponsored</span></div></div>'
+    + (c.primaryText ? '<div class="cx-text">' + slEsc(c.primaryText) + '</div>' : '')
+    + '<button class="cx-nav l" onclick="cxNav(this,-1)" aria-label="Previous">‹</button><button class="cx-nav r" onclick="cxNav(this,1)" aria-label="Next">›</button>'
+    + '<div class="cx-scroll">' + cards.map((k, i) => cxCardHTML(c, k, i)).join('') + '</div>'
+    + '<div class="cx-dots">' + cards.map((_, i) => '<i class="' + (i === 0 ? 'on' : '') + '"></i>').join('') + '</div></div>';
+};
+window.cxNav = function(btn, dir){ const s = btn.parentNode.querySelector('.cx-scroll'); const w = s.querySelector('.cx-card'); s.scrollBy({ left:dir * ((w ? w.offsetWidth : 240) + 10), behavior:'smooth' }); };
+let cxRaf = 0;
+document.addEventListener('scroll', e => {
+  const s = e.target; if(!s || !s.classList || !s.classList.contains('cx-scroll')) return;
+  cancelAnimationFrame(cxRaf);
+  cxRaf = requestAnimationFrame(() => {
+    const c = s.querySelector('.cx-card'); if(!c) return; const i = Math.round(s.scrollLeft / (c.offsetWidth + 10));
+    s.parentNode.querySelectorAll('.cx-dots i').forEach((d, j) => d.classList.toggle('on', j === i));
+  });
+}, true);
+window.cxClick = async function(id, idx, cta){
+  const c = cxSyn.get(id) || feedCampaigns.find(x => x.id === id); if(!c) return; const k = cxCampCards(c)[idx]; if(!k) return;
+  if(k.listingId && listings.find(l => l.id === k.listingId)){ openListingDetail(k.listingId); }
+  else { const u = safeUrl(k.destinationUrl || c.destinationUrl || ''); if(u) window.open(u, '_blank', 'noopener'); }
+  if(cxSyn.has(id)) return;
+  const cost = c.dailyBudgetEtb > 0 ? Math.max(c.dailyBudgetEtb / 50, 0.25) : 1; const clicks = (c.clicks || 0) + 1, spent = (c.totalSpentEtb || 0) + cost;
+  try{ await updateDoc(doc(db, 'ad_campaigns', id), { clicks:increment(1), totalSpentEtb:increment(cost), ctr:c.impressions ? Math.round((clicks / c.impressions) * 10000) / 100 : 0, avgCpcEtb:Math.round((spent / clicks) * 100) / 100 }); }catch(e){}
+};
+window.cxIsC = cxIsCarousel;
+// feed: carousel campaigns render as carousels, everything else as before
+window.__cxFeed = true;
+// marketplace: insert a carousel after every few listings
+window.cxMarketInsert = function(cardsHTML, items){
+  const camps = eligibleCampaigns().filter(cxIsCarousel); const out = []; let ai = 0, n = 0;
+  let synth = null;
+  if(!camps.length){
+    const promo = listings.filter(l => l.isPromoted && !mkpSold(l) && mkImages(l)[0]).slice(0, 8);
+    if(promo.length >= 3){
+      synth = { id:'syn_promo', advertiserName:'Promoted listings', advertiserAvatar:'', advertiserUid:'', primaryText:'Top picks from sellers near you',
+        cards: promo.map(l => ({ id:l.id, imageUrl:mkImages(l)[0], title:l.title || '', priceLabel:mkPriceLabel(l), ctaLabel:'Shop now', listingId:l.id })) };
+      cxSyn.set(synth.id, synth);
+    }
+  }
+  cardsHTML.forEach((h, i) => {
+    out.push(h);
+    if((i + 1) % 6 === 0 || (i === 3 && cardsHTML.length > 4)){
+      const c = camps.length ? camps[ai++ % camps.length] : synth; if(c && (i === 3 ? ai === 1 || !camps.length : true)) out.push('<div class="cx-wrap">' + carouselAdHTML(c) + '</div>');
+    }
+  });
+  setTimeout(observeAdCards, 0);
+  return out.join('');
+};
+// ---- builder: promote my listings as a carousel ----
+const CXB = { sel:[], text:'', cta:'Shop now', usd:5, days:5, busy:false }; window.__CXB = CXB;
+const CX_CTAS = ['Shop now','Learn more','Message','Order now','See offer'];
+window.cxbOpen = function(){
+  if(!currentUser) return toast('Please sign in first.');
+  const mine = listings.filter(l => l.sellerId === currentUser.uid && !mkpSold(l) && mkImages(l)[0]);
+  if(mine.length < 2){ return toast('List at least 2 items with photos to make a carousel ad.'); }
+  Object.assign(CXB, { sel:mine.slice(0, 3).map(l => l.id), text:'', cta:'Shop now', usd:5, days:5, busy:false });
+  slSheetClose(); cxbDraw(); const p = document.getElementById('cxBuilder'); p.classList.add('show'); p.setAttribute('aria-hidden', 'false');
+};
+window.cxbClose = function(){ const p = document.getElementById('cxBuilder'); p.classList.remove('show'); p.setAttribute('aria-hidden', 'true'); };
+function cxbTotals(){ const base = CXB.usd * adfx() * CXB.days; return { base, total:Math.round(base * 1.05 * 100) / 100 }; }
+function cxbDraw(){
+  const mine = listings.filter(l => l.sellerId === currentUser.uid && !mkpSold(l) && mkImages(l)[0]);
+  const t = cxbTotals();
+  document.getElementById('cxbBody').innerHTML =
+    '<div class="cxb-sec"><h3>Headline</h3><p>Shown above your cards.</p><input type="text" maxlength="120" id="cxbText" placeholder="e.g. New arrivals this week" value="' + slEsc(CXB.text) + '" oninput="CXB_text(this.value)"></div>'
+    + '<div class="cxb-sec"><h3>Cards <span style="color:#9A6B1E">' + CXB.sel.length + '/10</span></h3><p>Pick 2–10 of your listings. Tap order = swipe order.</p><div class="cxb-pick">'
+    + mine.slice(0, 40).map(l => { const i = CXB.sel.indexOf(l.id); return '<button type="button" class="cxb-it' + (i >= 0 ? ' on' : '') + '" onclick="cxbToggle(\'' + l.id + '\')"><img src="' + slEsc(mkImages(l)[0]) + '" alt=""><span class="n">' + (i + 1) + '</span><span class="p">' + slEsc(l.title || '') + '</span></button>'; }).join('') + '</div></div>'
+    + '<div class="cxb-sec"><h3>Button</h3><div class="sl-chips">' + CX_CTAS.map(c => '<button type="button" class="sl-chip' + (CXB.cta === c ? ' on' : '') + '" onclick="cxbCta(\'' + c + '\')">' + c + '</button>').join('') + '</div></div>'
+    + '<div class="cxb-sec"><h3>Budget &amp; duration</h3><div class="cxb-step"><b>Daily budget</b><div><button onclick="cxbStep(\'usd\',-1)">−</button><output>$' + CXB.usd + '</output><button onclick="cxbStep(\'usd\',1)">+</button></div></div>'
+    + '<div class="cxb-step"><b>Days</b><div><button onclick="cxbStep(\'days\',-1)">−</button><output>' + CXB.days + '</output><button onclick="cxbStep(\'days\',1)">+</button></div></div>'
+    + '<div class="cxb-note">Paid from your Meskot wallet · includes 5% tax · wallet balance ' + walletText(walletBal()) + '</div></div>'
+    + '<div class="cxb-sec"><h3>Preview</h3><div class="cxb-prev">' + carouselAdHTML(cxbCampaign('syn_preview')) + '</div></div>';
+  document.getElementById('cxbTotal').textContent = '$' + (t.total / adfx()).toFixed(2);
+  document.getElementById('cxbTotalL').textContent = CXB.days + ' days · ≈ ETB ' + Math.round(t.total);
+}
+window.CXB_text = function(v){ CXB.text = v; };
+function cxbCampaign(id){
+  const me = currentProfile || {};
+  const cards = CXB.sel.map(i => listings.find(l => l.id === i)).filter(Boolean).map(l => ({ id:l.id, imageUrl:mkImages(l)[0], title:l.title || '', priceLabel:mkPriceLabel(l), ctaLabel:CXB.cta, listingId:l.id, destinationUrl:'' }));
+  const c = { id, advertiserName:me.displayName || 'You', advertiserAvatar:myPhoto(), advertiserUid:currentUser.uid, primaryText:CXB.text, cards };
+  if(id === 'syn_preview') cxSyn.set(id, c); return c;
+}
+window.cxbToggle = function(id){ const i = CXB.sel.indexOf(id); if(i >= 0) CXB.sel.splice(i, 1); else if(CXB.sel.length < 10) CXB.sel.push(id); else toast('Up to 10 cards.'); const y = document.getElementById('cxbBody').scrollTop; cxbDraw(); document.getElementById('cxbBody').scrollTop = y; };
+window.cxbCta = function(c){ CXB.cta = c; const y = document.getElementById('cxbBody').scrollTop; cxbDraw(); document.getElementById('cxbBody').scrollTop = y; };
+window.cxbStep = function(k, d){ CXB[k] = k === 'usd' ? Math.max(1, Math.min(200, CXB.usd + d)) : Math.max(1, Math.min(90, CXB.days + d)); const y = document.getElementById('cxbBody').scrollTop; cxbDraw(); document.getElementById('cxbBody').scrollTop = y; };
+window.cxbLaunch = async function(){
+  if(CXB.busy) return; if(CXB.sel.length < 2) return toast('Pick at least 2 cards.');
+  const t = cxbTotals(); if(walletBal() < t.total){ toast('Not enough wallet balance — add funds first.'); return openWalletModal(); }
+  CXB.busy = true; const go = document.getElementById('cxbGo'); go.disabled = true; go.textContent = 'Launching…';
+  try{
+    const me = currentProfile || {}, ref = refCode('WAL-AD'), now = Date.now(), id = 'camp_' + now, daily = CXB.usd * adfx(); const camp = cxbCampaign(id);
+    await walletDebit(t.total, 'AD_CAMPAIGN_DEBIT', 'Carousel ad promoted', 'Paid via Meskot Wallet · Ref: ' + ref + ' · Duration: ' + CXB.days + 'd', ref);
+    await setDoc(doc(db, 'ad_campaigns', id), {
+      id, name:'Carousel ad', objective:'Carousel', type:'CAROUSEL', status:'ACTIVE', dailyBudgetEtb:daily, totalSpentEtb:0, impressions:0, clicks:0, conversions:0, ctr:0, avgCpcEtb:0, cpmEtb:0,
+      headline:CXB.text || 'Shop my listings', primaryText:CXB.text, mediaUrl:camp.cards[0].imageUrl, ctaText:CXB.cta, destinationUrl:'', cards:camp.cards,
+      advertiserName:me.displayName || 'Meskot User', advertiserAvatar:myPhoto(), advertiserUid:currentUser.uid, durationDays:CXB.days, targetAudience:'Everyone in Ethiopia',
+      paymentMethod:'Meskot Creator Wallet (USD)', paymentRef:ref, totalPaidEtb:t.total, endsAt:now + CXB.days * 864e5, createdAt:now, targetLocations:['Ethiopia'], currency:'USD'
+    });
+    toast('Carousel ad is live 📣'); cxbClose();
+  }catch(e){ toast(e.message || 'Could not launch the ad.'); }
+  finally{ CXB.busy = false; go.disabled = false; go.textContent = 'Launch ad'; }
+};
 
 
 // ================= MESKOT IDENTITY: own words + own icons =================
