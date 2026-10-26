@@ -2084,6 +2084,58 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
 /* ---------- 6. Large / ultra-wide: stop stretching ---------- */
 @media (min-width:1600px){ :root{ --col-max:720px; --wide-max:1240px; } }
 @media (prefers-reduced-motion:reduce){ *{scroll-behavior:auto!important;} }
+
+/* ---------- 4k. TikTok-style live ---------- */
+.live-room .lt-shade{position:absolute;inset:0;pointer-events:none;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.5),transparent 24%,transparent 52%,rgba(0,0,0,.72));}
+.live-top{top:max(12px,var(--safe-t))!important;justify-content:space-between;}
+.lt-host{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.38);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:28px;padding:4px 6px 4px 4px;min-width:0;max-width:64%;}
+.live-top .lt-host .avatar{width:38px;height:38px;border:2px solid #fff;flex:none;}
+.lt-meta{min-width:0;} .live-top .lt-meta .nm{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:30vw;}
+.lt-sub{font-size:11px;opacity:.92;font-weight:700;}
+.lt-follow{background:#FE2C55;color:#fff;border:0;border-radius:16px;padding:7px 12px;font-weight:800;font-size:12.5px;flex:none;}
+.lt-follow.on{background:rgba(255,255,255,.25);}
+.lt-right{display:flex;align-items:center;gap:6px;flex:none;}
+.live-top .lt-right .vw{margin-left:0;background:rgba(0,0,0,.4);padding:7px 11px;border-radius:16px;}
+.live-top .lt-right .x{width:34px;height:34px;font-size:16px;background:rgba(0,0,0,.4);}
+.lt-row2{position:absolute;top:calc(max(12px,var(--safe-t)) + 54px);left:12px;right:12px;z-index:5;display:flex;align-items:center;gap:6px;flex-wrap:wrap;color:#fff;}
+.lt-row2 .vw{background:rgba(0,0,0,.4);border-radius:12px;padding:3px 9px;font-size:12px;font-weight:700;}
+.lt-guests{display:flex;gap:5px;flex-wrap:wrap;}
+.lt-g{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.45);border-radius:14px;padding:2px 9px 2px 2px;font-size:11.5px;font-weight:700;max-width:34vw;}
+.lt-g .avatar{width:20px;height:20px;font-size:9px;} .lt-g span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lt-g.muted{opacity:.7;}
+#liveTopG{top:calc(max(12px,var(--safe-t)) + 88px)!important;}
+.live-chat{bottom:calc(72px + var(--safe-b))!important;right:auto!important;width:76%;max-width:420px;max-height:34%!important;}
+.live-msg{background:rgba(0,0,0,.3)!important;border-radius:16px!important;padding:5px 11px!important;font-size:13px!important;}
+.live-bar{background:none!important;padding:10px 12px calc(12px + var(--safe-b))!important;gap:7px!important;}
+.live-bar input{border:0!important;background:rgba(0,0,0,.42)!important;min-width:0;}
+.live-bar .send{width:42px;height:42px;padding:0!important;border-radius:50%!important;background:#FE2C55!important;color:#fff!important;font-size:16px;flex:none;}
+.live-bar .gift{width:42px;height:42px;padding:0!important;border-radius:50%!important;background:rgba(0,0,0,.45)!important;font-size:19px!important;flex:none;position:relative;box-shadow:none;}
+.live-bar .gift.heart{background:rgba(254,44,85,.85)!important;}
+.live-bar .gift.on#liveMicBtn{background:#E53935!important;box-shadow:0 0 0 3px rgba(229,57,53,.4)!important;}
+.live-bar .gift.wait#liveMicBtn{background:#C99A42!important;}
+.live-bar #liveEndBtn{display:none!important;}
+.lt-badge{position:absolute;top:-3px;right:-3px;background:#FE2C55;color:#fff;border-radius:10px;min-width:18px;height:18px;line-height:18px;font-size:11px;font-weight:800;padding:0 4px;}
+.live-bar .gift.pulse{animation:ltPulse 1.1s infinite;}
+@keyframes ltPulse{0%,100%{box-shadow:0 0 0 0 rgba(254,44,85,.6);}50%{box-shadow:0 0 0 8px rgba(254,44,85,0);}}
+#liveHostPanel{position:absolute;left:0;right:0;bottom:0;z-index:30;background:#15191b;color:#fff;border-radius:20px 20px 0 0;padding:12px 14px calc(14px + var(--safe-b));max-height:64%;display:none;flex-direction:column;box-shadow:0 -10px 30px rgba(0,0,0,.5);}
+#liveHostPanel.show{display:flex;}
+.lhp-head{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:16px;}
+.lhp-tabs{display:flex;gap:6px;margin:10px 0;} .lhp-tabs button{flex:1;border:0;border-radius:18px;padding:8px 4px;background:rgba(255,255,255,.1);color:#fff;font-weight:700;font-size:12.5px;} .lhp-tabs button.on{background:#fff;color:#111;}
+.lhp-list{overflow-y:auto;flex:1;min-height:90px;}
+.lhp-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);}
+.lhp-row .avatar{width:40px;height:40px;flex:none;} .lhp-nm{flex:1;min-width:0;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lhp-b{border:0;border-radius:16px;padding:7px 12px;font-weight:800;font-size:12.5px;background:rgba(255,255,255,.14);color:#fff;white-space:nowrap;}
+.lhp-b.ok{background:#FE2C55;} .lhp-b.bad{color:#ff7b7b;}
+.lhp-empty{opacity:.65;text-align:center;padding:24px 0;font-size:13.5px;}
+.lhp-foot{display:flex;justify-content:space-between;gap:8px;margin-top:10px;}
+#liveList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.lv-card{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:3/4;background:linear-gradient(160deg,#2f5a45,#14281F);color:#fff;cursor:pointer;}
+.lv-card .lv-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;} .lv-card .lv-bg img{width:100%;height:100%;object-fit:cover;filter:blur(1px);}
+.lv-card .lv-bg .avatar{width:84px;height:84px;font-size:28px;}
+.lv-card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 30%,transparent 55%,rgba(0,0,0,.75));}
+.lv-card .live-badge{position:absolute;top:8px;left:8px;z-index:2;} .lv-card .lv-v{position:absolute;top:8px;right:8px;z-index:2;background:rgba(0,0,0,.45);border-radius:10px;padding:3px 8px;font-size:11.5px;font-weight:700;}
+.lv-card .lv-info{position:absolute;left:10px;right:10px;bottom:9px;z-index:2;} .lv-t{font-weight:800;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .lv-h{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:12px;font-weight:700;} .lv-h .avatar{width:20px;height:20px;font-size:9px;}
+
 .live-bar .gift.on#liveMicBtn{background:#E53935;box-shadow:0 0 0 3px rgba(229,57,53,.35);}
 .live-unmute{white-space:nowrap;position:absolute;left:50%;top:42%;transform:translateX(-50%);z-index:20;height:50px;padding:0 24px;border:0;border-radius:25px;background:rgba(20,40,31,.85);color:#fff;font-weight:800;font-size:16px;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.4);}
 .live-top .x#liveSnd{margin-right:6px;}
@@ -3093,21 +3145,38 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
 <!-- live room -->
 <div class="live-room" id="liveRoom">
   <video id="liveVideo" autoplay playsinline></video>
+  <div class="lt-shade"></div>
   <div class="live-wait" id="liveWait">Connecting…</div>
   <button class="live-unmute" id="liveUnmute" style="display:none" onclick="liveUnmute()">🔇 Tap to hear the host</button>
   <div class="live-top">
-    <div class="avatar" id="liveAvatar"></div>
-    <div><div class="nm" id="liveName"></div><span class="live-badge"><i></i>LIVE</span></div>
-    <div class="vw" id="liveViewers">👁 0</div><div class="vw" id="liveLikes">❤ 0</div><div class="vw" id="liveCoins">★ 0</div>
-    <button class="x" id="liveSnd" onclick="liveToggleSound()" aria-label="Sound">🔊</button><button class="x" onclick="leaveLive()">✕</button>
+    <div class="lt-host">
+      <div class="avatar" id="liveAvatar"></div>
+      <div class="lt-meta"><div class="nm" id="liveName"></div><div class="lt-sub" id="liveLikes">❤ 0</div></div>
+      <button class="lt-follow" id="liveFollow" onclick="liveFollow()">Follow</button>
+    </div>
+    <div class="lt-right">
+      <div class="vw" id="liveViewers">👁 0</div>
+      <button class="x" id="liveSnd" onclick="liveToggleSound()" aria-label="Sound">🔊</button>
+      <button class="x" onclick="leaveLive()" aria-label="Close">✕</button>
+    </div>
   </div>
+  <div class="lt-row2"><span class="live-badge"><i></i>LIVE</span><div class="vw" id="liveCoins">★ 0</div><div class="lt-guests" id="liveGuests"></div></div>
   <div class="live-chat" id="liveChat"></div>
   <div class="live-gifts" id="liveGifts"></div>
   <div class="live-bar">
     <input type="text" id="liveInput" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendLiveChat()">
-    <button class="send" onclick="sendLiveChat()" data-t="send">Send</button>
-    <button class="gift" id="liveMicBtn" onclick="liveMic()">🎙️</button><button class="gift" onclick="sendLiveHeart()">❤</button><button class="gift" id="liveGiftBtn" onclick="toggleGiftTray()">🎁</button>
+    <button class="send" onclick="sendLiveChat()" aria-label="Send">➤</button>
+    <button class="gift" id="liveMicBtn" onclick="liveMic()" title="Request to speak">🎙️</button>
+    <button class="gift" id="liveHostBtn" onclick="liveHostPanel()" title="Manage viewers" style="display:none">👥<span class="lt-badge" id="liveHostBadge" style="display:none">0</span></button>
+    <button class="gift" id="liveGiftBtn" onclick="toggleGiftTray()">🎁</button>
+    <button class="gift heart" onclick="sendLiveHeart()">❤</button>
     <button class="end" id="liveEndBtn" style="display:none;" onclick="endLive()">End</button>
+  </div>
+  <div id="liveHostPanel">
+    <div class="lhp-head"><span>Live controls</span><button class="lhp-b" onclick="liveHostPanel(false)">✕</button></div>
+    <div class="lhp-tabs" id="lhpTabs"></div>
+    <div class="lhp-list" id="lhpList"></div>
+    <div class="lhp-foot"><button class="lhp-b" onclick="liveHostAct('', 'muteall')">🔇 Mute all guests</button><button class="lhp-b bad" onclick="endLive()">End live</button></div>
   </div>
 </div>
 
@@ -7368,10 +7437,10 @@ function renderLiveList(){
   const list = document.getElementById('liveList'); const empty = document.getElementById('liveEmpty');
   if(!activeLives.length){ list.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  list.innerHTML = activeLives.map(l => `<div class="person-row live-row" onclick="joinLive('${l.id}')">
-    <div class="avatar">${avatarHTML(l.hostPhoto, l.hostName)}</div>
-    <div class="who" style="flex:1;min-width:0;"><div class="name">${escapeHtml(l.hostName||'User')}${verifiedBadge(l.hostUid)}</div><div class="sub">${escapeHtml(l.title||'')}${l.category ? ' · '+escapeHtml(l.category) : ''}</div></div>
-    <div style="text-align:right;"><span class="live-badge"><i></i>LIVE</span><div class="sub" style="margin-top:4px;">👁 ${l.viewerCount||0}</div></div></div>`).join('');
+  list.innerHTML = activeLives.map(l => `<div class="lv-card" onclick="joinLive('${l.id}')">
+    <div class="lv-bg">${l.hostPhoto ? `<img src="${safeUrl(l.hostPhoto)}" alt="">` : `<div class="avatar">${avatarHTML(l.hostPhoto, l.hostName)}</div>`}</div>
+    <span class="live-badge"><i></i>LIVE</span><span class="lv-v">👁 ${l.viewerCount||0}</span>
+    <div class="lv-info"><div class="lv-t">${escapeHtml(l.title||'Live')}</div><div class="lv-h"><div class="avatar">${avatarHTML(l.hostPhoto, l.hostName)}</div><span>${escapeHtml(l.hostName||'User')}</span></div></div></div>`).join('');
 }
 window.openLiveStart = function(){
   if(liveState){ toast('You are already in a live room.'); return; }
@@ -7401,8 +7470,8 @@ window.liveToggleSound = function(){ const v = document.getElementById('liveVide
 document.addEventListener('pointerdown', e => { const r = document.getElementById('liveRoom'); const v = document.getElementById('liveVideo'); if(r && r.classList.contains('show') && e.target.closest('#liveRoom') && v && v.muted && liveState && liveState.role === 'viewer' && liveState.gotTrack && !e.target.closest('#liveSnd')) liveUnmute(); }, true);
 // --- two-way voice: host mixes (mix-minus) so everyone hears the host and every speaking viewer, never themselves ---
 function liveAudioInit(){
-  const s = liveState; const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
-  s.actx = new AC(); s.mixGain = s.actx.createGain(); s.vSrc = new Map(); s.vDest = new Map(); s.vEl = new Map();
+  const s = liveState; s.vuid = new Map(); s.vinfo = new Map(); liveReqInit(); const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+  s.actx = new AC(); s.mixGain = s.actx.createGain(); s.vSrc = new Map(); s.vRaw = new Map(); s.vDest = new Map(); s.vEl = new Map();
   const at = s.stream.getAudioTracks();
   if(at.length){ s.micSrc = s.actx.createMediaStreamSource(new MediaStream([at[0]])); s.micSrc.connect(s.mixGain); }
   s.actx.resume().catch(()=>{});
@@ -7423,14 +7492,17 @@ function hostOnViewerTrack(vid, ev){
   s.actx.resume().catch(()=>{});
   const ms = new MediaStream([ev.track]);
   const el = new Audio(); el.muted = true; el.srcObject = ms; el.play().catch(()=>{}); s.vEl.set(vid, el);   // keeps the remote stream flowing in every browser
-  const src = s.actx.createMediaStreamSource(ms);
-  src.connect(s.actx.destination);                                   // the host hears the viewer
+  const raw = s.actx.createMediaStreamSource(ms);
+  const src = s.actx.createGain(); src.gain.value = hostGateFor(vid) ? 1 : 0;   // only accepted, un-muted guests are heard
+  raw.connect(src);
+  src.connect(s.actx.destination);                                   // the host hears the guest
   s.vDest.forEach((dest, ov) => { if(ov !== vid){ try{ src.connect(dest); }catch(e){} } });   // other viewers hear them too
-  s.vSrc.set(vid, src);
+  s.vSrc.set(vid, src); s.vRaw.set(vid, raw);
 }
 function hostAudioDrop(vid){
   const s = liveState; if(!s || !s.vSrc) return;
   const src = s.vSrc.get(vid); if(src){ try{ src.disconnect(); }catch(e){} s.vSrc.delete(vid); }
+  const raw = s.vRaw && s.vRaw.get(vid); if(raw){ try{ raw.disconnect(); }catch(e){} s.vRaw.delete(vid); }
   const dest = s.vDest.get(vid); if(dest){ try{ s.mixGain.disconnect(dest); }catch(e){} s.vDest.delete(vid); }
   const el = s.vEl.get(vid); if(el){ try{ el.srcObject = null; }catch(e){} s.vEl.delete(vid); }
 }
@@ -7441,15 +7513,132 @@ window.liveMic = async function(){
     const at = s.stream.getAudioTracks(); if(!at.length) return toast('No microphone found.');
     const on = !at[0].enabled; at.forEach(t => t.enabled = on); liveMicUI(on); toast(on ? 'Mic on' : 'Mic muted'); return;
   }
-  if(!s.micTrack){
-    try{
-      const ms = await getRawCallMedia('audio'); s.micTrack = ms.getAudioTracks()[0];
-      if(!liveState || liveState !== s){ s.micTrack.stop(); return; }
-      await s.aSender.replaceTrack(s.micTrack); liveMicUI(true); toast('You are on the mic — everyone can hear you');
-    }catch(e){ toast('Microphone permission is needed to speak: ' + (e.message || e)); }
-    return;
+  const st = s.myStatus || 'none';
+  if(st === 'pending') return liveCancelRequest();
+  if(st !== 'accepted') return liveRequestSpeak();
+  if(s.myMuted) return toast('The host has muted you.');
+  s.selfMuted = !s.selfMuted; if(s.micTrack) s.micTrack.enabled = !s.selfMuted; liveViewerMicUI();
+  toast(s.selfMuted ? 'Mic muted' : 'You are on the mic');
+};
+// ---- request to speak: viewer asks, host accepts, host controls the guests ----
+const reqRef = (id, uid) => doc(db,'live_streams',id,'requests',uid);
+function liveReqInit(){
+  const s = liveState; if(!s || s.reqUnsub) return; s.reqs = new Map(); s.reqUnsub = true;
+  s.unsubs.push(onSnapshot(collection(db,'live_streams',s.id,'requests'), snap => {
+    if(!liveState || liveState !== s) return;
+    if(s.role === 'host'){
+      try{ snap.docChanges().forEach(ch => { const d = ch.doc.data() || {}; if(ch.type !== 'removed' && d.status === 'pending' && (!s.seenReq || s.seenReq.get(ch.doc.id) !== d.ts)){ (s.seenReq = s.seenReq || new Map()).set(ch.doc.id, d.ts); if(Date.now() - (d.ts||0) < 60000) toast('🎙️ ' + (d.name || 'A viewer') + ' wants to speak'); } }); }catch(e){}
+    }
+    s.reqs = new Map(snap.docs.map(d => [d.id, d.data()]));
+    if(s.role === 'host') hostGateAll(); else liveViewerReqSync();
+    liveGuestsDraw(); liveHostPanelDraw();
+  }));
+}
+function hostGateFor(vid){ const s = liveState; const uid = s && s.vuid && s.vuid.get(vid); const r = uid && s.reqs && s.reqs.get(uid); return !!(r && r.status === 'accepted' && !r.muted); }
+function hostGateAll(){ const s = liveState; if(!s || !s.vSrc) return; s.vSrc.forEach((g, vid) => { try{ g.gain.value = hostGateFor(vid) ? 1 : 0; }catch(e){} }); }
+window.liveRequestSpeak = async function(){
+  const s = liveState; if(!s || s.role !== 'viewer') return;
+  try{ await setDoc(reqRef(s.id, currentUser.uid), { uid: currentUser.uid, name: currentProfile.displayName || 'User', photo: myPhoto() || '', status:'pending', muted:false, ts: Date.now() }); toast('Request sent — waiting for the host to accept'); }
+  catch(e){ toast(e.message); }
+};
+window.liveCancelRequest = async function(){ const s = liveState; if(!s) return; try{ await deleteDoc(reqRef(s.id, currentUser.uid)); toast('Request cancelled'); }catch(e){} };
+function liveViewerReqSync(){
+  const s = liveState; if(!s || s.role !== 'viewer') return;
+  const r = s.reqs.get(currentUser.uid) || null; const st = r ? r.status : 'none'; const prev = s.myStatus || 'none'; const wasMuted = !!s.myMuted;
+  s.myStatus = st; s.myMuted = !!(r && r.muted);
+  if(st === 'accepted' && prev !== 'accepted') liveStartSpeaking();
+  if(st !== 'accepted' && prev === 'accepted') liveStopSpeaking(st === 'removed' ? 'The host moved you back to the audience.' : '');
+  if(st === 'declined' && prev === 'pending') toast('The host declined your request.');
+  if(st === 'accepted' && s.myMuted && !wasMuted) toast('🔇 The host muted you');
+  if(st === 'accepted' && !s.myMuted && wasMuted && prev === 'accepted') toast('🎤 The host unmuted you');
+  if(s.micTrack) s.micTrack.enabled = st === 'accepted' && !s.myMuted && !s.selfMuted;
+  liveViewerMicUI();
+}
+async function liveStartSpeaking(){
+  const s = liveState; if(!s) return;
+  try{
+    if(!s.micTrack){ const ms = await getRawCallMedia('audio'); s.micTrack = ms.getAudioTracks()[0]; if(!liveState || liveState !== s){ s.micTrack.stop(); return; } await s.aSender.replaceTrack(s.micTrack); }
+    s.selfMuted = false; s.micTrack.enabled = !s.myMuted; liveViewerMicUI(); toast('🎤 The host accepted you — you are on the mic');
+  }catch(e){ toast('Microphone permission is needed to speak: ' + (e.message || e)); }
+}
+function liveStopSpeaking(msg){
+  const s = liveState; if(!s) return;
+  if(s.micTrack){ try{ s.aSender.replaceTrack(null); }catch(e){} try{ s.micTrack.stop(); }catch(e){} s.micTrack = null; }
+  s.selfMuted = false; liveViewerMicUI(); if(msg) toast(msg);
+}
+function liveViewerMicUI(){
+  const s = liveState, b = document.getElementById('liveMicBtn'); if(!b || !s || s.role !== 'viewer') return;
+  const st = s.myStatus || 'none'; b.classList.remove('on','wait');
+  if(st === 'pending'){ b.textContent = '⏳'; b.classList.add('wait'); b.title = 'Request sent — tap to cancel'; }
+  else if(st === 'accepted'){ const live = !s.myMuted && !s.selfMuted; b.textContent = live ? '🎤' : '🔇'; if(live) b.classList.add('on'); b.title = live ? 'You are on the mic — tap to mute' : 'Muted'; }
+  else { b.textContent = '🎙️'; b.title = 'Request to speak'; }
+}
+function liveGuestsDraw(){
+  const s = liveState, box = document.getElementById('liveGuests'); if(!s || !box || !s.reqs) return;
+  const g = [...s.reqs.values()].filter(r => r.status === 'accepted');
+  box.innerHTML = g.map(r => `<div class="lt-g ${r.muted?'muted':''}"><div class="avatar">${avatarHTML(r.photo, r.name)}</div><span>${escapeHtml(r.name||'User')}</span>${r.muted?'🔇':'🎤'}</div>`).join('');
+  if(s.role === 'host'){
+    const n = [...s.reqs.values()].filter(r => r.status === 'pending').length;
+    const bd = document.getElementById('liveHostBadge'), hb = document.getElementById('liveHostBtn');
+    if(bd){ bd.style.display = n ? '' : 'none'; bd.textContent = n; } if(hb) hb.classList.toggle('pulse', n > 0);
   }
-  const on = !s.micTrack.enabled; s.micTrack.enabled = on; liveMicUI(on); toast(on ? 'You are on the mic' : 'Mic muted');
+}
+window.liveHostPanel = function(open){
+  const p = document.getElementById('liveHostPanel'); if(!p || !liveState || liveState.role !== 'host') return;
+  const on = open === undefined ? !p.classList.contains('show') : open; p.classList.toggle('show', on);
+  if(on){ liveState.tab = liveState.tab || 'req'; liveHostPanelDraw(); }
+};
+window.liveHostTab = function(t){ if(liveState){ liveState.tab = t; liveHostPanelDraw(); } };
+function liveHostPanelDraw(){
+  const s = liveState, p = document.getElementById('liveHostPanel'); if(!s || s.role !== 'host' || !p || !p.classList.contains('show')) return;
+  const reqs = [...(s.reqs || new Map()).entries()].map(([uid, r]) => Object.assign({ uid }, r));
+  const pend = reqs.filter(r => r.status === 'pending'), stage = reqs.filter(r => r.status === 'accepted');
+  const seen = new Set(), viewers = []; (s.vinfo || new Map()).forEach(v => { if(!seen.has(v.uid)){ seen.add(v.uid); viewers.push(v); } });
+  const tab = s.tab || 'req';
+  document.getElementById('lhpTabs').innerHTML = [['req','Requests',pend.length],['stage','On stage',stage.length],['all','Viewers',viewers.length]].map(x => `<button class="${tab===x[0]?'on':''}" onclick="liveHostTab('${x[0]}')">${x[1]} (${x[2]})</button>`).join('');
+  const row = (u, name, photo, btns) => `<div class="lhp-row"><div class="avatar">${avatarHTML(photo, name)}</div><div class="lhp-nm">${escapeHtml(name||'User')}</div>${btns}</div>`;
+  const A = (uid, act, label, cls) => `<button class="lhp-b ${cls||''}" onclick="liveHostAct('${uid}','${act}')">${label}</button>`;
+  let h = '';
+  if(tab === 'req') h = pend.map(r => row(r.uid, r.name, r.photo, A(r.uid,'decline','Decline') + A(r.uid,'accept','Accept','ok'))).join('') || '<div class="lhp-empty">No requests right now.<br>Viewers tap 🎙️ to ask to speak.</div>';
+  if(tab === 'stage') h = stage.map(r => row(r.uid, r.name, r.photo, A(r.uid, r.muted ? 'unmute' : 'mute', r.muted ? '🔇 Unmute' : '🎤 Mute') + A(r.uid,'remove','Remove','bad'))).join('') || '<div class="lhp-empty">Nobody is on stage.</div>';
+  if(tab === 'all') h = viewers.map(v => { const r = s.reqs && s.reqs.get(v.uid); const on = r && r.status === 'accepted'; return row(v.uid, v.name, v.photo, (on ? A(v.uid, r.muted?'unmute':'mute', r.muted?'🔇':'🎤') : '') + A(v.uid,'kick','🚫 Remove','bad')); }).join('') || '<div class="lhp-empty">No viewers yet.</div>';
+  document.getElementById('lhpList').innerHTML = h;
+}
+window.liveHostAct = async function(uid, act){
+  const s = liveState; if(!s || s.role !== 'host') return;
+  try{
+    if(act === 'accept') await updateDoc(reqRef(s.id, uid), { status:'accepted', muted:false });
+    else if(act === 'decline') await updateDoc(reqRef(s.id, uid), { status:'declined' });
+    else if(act === 'mute') await updateDoc(reqRef(s.id, uid), { muted:true });
+    else if(act === 'unmute') await updateDoc(reqRef(s.id, uid), { muted:false });
+    else if(act === 'remove') await updateDoc(reqRef(s.id, uid), { status:'removed', muted:false });
+    else if(act === 'muteall'){ const ps = [...s.reqs.entries()].filter(([u, r]) => r.status === 'accepted').map(([u]) => updateDoc(reqRef(s.id, u), { muted:true })); await Promise.all(ps); toast(ps.length ? 'All guests muted' : 'Nobody is on stage'); }
+    else if(act === 'kick'){
+      if(!confirm('Remove this viewer from the live? They will not be able to rejoin.')) return;
+      await setDoc(doc(db,'live_streams',s.id,'kicked',uid), { ts: Date.now() });
+      deleteDoc(reqRef(s.id, uid)).catch(()=>{});
+      [...(s.vuid || new Map()).entries()].filter(e => e[1] === uid).forEach(e => { deleteDoc(doc(db,'live_streams',s.id,'viewers',e[0])).catch(()=>{}); hostDropViewer(e[0]); });
+      updateDoc(doc(db,'live_streams',s.id), { viewers: arrayRemove(uid) }).then(() => syncLiveViewers(s.id)).catch(()=>{});
+      toast('Viewer removed');
+    }
+  }catch(e){ toast(e.message); }
+};
+// ---- follow the host from inside the live ----
+async function liveFollowInit(hostUid){
+  const b = document.getElementById('liveFollow'); if(!b) return;
+  b.classList.remove('on'); b.textContent = 'Follow'; b.dataset.uid = hostUid;
+  try{ const f = await getDoc(doc(db,'users',currentUser.uid,'following',hostUid)); if(f.exists()){ b.classList.add('on'); b.textContent = 'Following'; } }catch(e){}
+}
+window.liveFollow = async function(){
+  const b = document.getElementById('liveFollow'), uid = b && b.dataset.uid; if(!uid || b.classList.contains('on')) return;
+  try{
+    await setDoc(doc(db,'users',currentUser.uid,'following',uid), { since: serverTimestamp() });
+    setDoc(doc(db,'users',uid,'followers',currentUser.uid), { since: serverTimestamp() }).catch(()=>{});
+    updateDoc(doc(db,'users',currentUser.uid), { followingCount: increment(1) }).catch(()=>{});
+    updateDoc(doc(db,'users',uid), { followersCount: increment(1) }).catch(()=>{});
+    try{ addNotification(uid, 'follow', {}); }catch(_){}
+    b.classList.add('on'); b.textContent = 'Following';
+  }catch(e){ toast(e.message); }
 };
 function showLiveRoom(opts){
   const room = document.getElementById('liveRoom'); room.classList.add('show');
@@ -7465,9 +7654,14 @@ function showLiveRoom(opts){
   document.getElementById('liveWait').style.display = opts.host ? 'none' : 'flex';
   document.getElementById('liveSnd').style.display = opts.host ? 'none' : ''; liveShowUnmute(false); liveMicUI(!!opts.host);
   document.getElementById('liveWait').textContent = 'Connecting…';
+  document.getElementById('liveHostBtn').style.display = opts.host ? '' : 'none';
+  document.getElementById('liveFollow').style.display = opts.host ? 'none' : '';
+  document.getElementById('liveGuests').innerHTML = ''; document.getElementById('liveHostPanel').classList.remove('show');
+  const mb = document.getElementById('liveMicBtn'); mb.classList.remove('wait','pulse'); mb.title = opts.host ? 'Mute / unmute your mic' : 'Request to speak';
   document.body.style.overflow = 'hidden';
 }
 function hideLiveRoom(){
+  try{ document.getElementById('liveHostPanel').classList.remove('show'); }catch(e){}
   document.getElementById('liveRoom').classList.remove('show');
   const v = document.getElementById('liveVideo'); v.srcObject = null;
   document.body.style.overflow = '';
@@ -7660,6 +7854,7 @@ async function hostAcceptViewer(vid, data){
   if(liveState.peers.size >= 10){ updateDoc(vref, { rejected:true }).catch(()=>{}); return; }
   const peer = new RTCPeerConnection(RTC_CONFIG);
   liveState.peers.set(vid, peer);
+  liveState.vuid.set(vid, data.uid); liveState.vinfo.set(vid, { uid:data.uid, name:data.name||'User', photo:data.photo||'' }); liveHostPanelDraw();
   hostAddTracks(peer, vid);
   peer.ontrack = ev => hostOnViewerTrack(vid, ev);
   const hostCands = collection(db,'live_streams',liveState.id,'viewers',vid,'hostCands');
@@ -7679,7 +7874,7 @@ async function hostAcceptViewer(vid, data){
 function hostDropViewer(vid){
   if(!liveState || !liveState.peers) return;
   const peer = liveState.peers.get(vid);
-  hostAudioDrop(vid);
+  hostAudioDrop(vid); if(liveState.vuid) liveState.vuid.delete(vid); if(liveState.vinfo) liveState.vinfo.delete(vid); liveHostPanelDraw();
   if(peer){ try{ peer.close(); }catch(e){} liveState.peers.delete(vid); updateLiveViewerCount(); }
 }
 function updateLiveViewerCount(){ /* viewerCount is derived from the viewers[] list, like the Android app */ }
@@ -7690,6 +7885,7 @@ window.joinLive = async function(liveId){
     if(!snap.exists() || snap.data().status !== 'live') return toast('This live has ended.');
     const live = snap.data();
     const hostUid = live.hostUid || live.uid; if(hostUid === currentUser.uid) return toast('This is your own live.');
+    try{ const kk = await getDoc(doc(db,'live_streams',liveId,'kicked',currentUser.uid)); if(kk.exists()) return toast('The host removed you from this live.'); }catch(e){}
     const peer = new RTCPeerConnection(RTC_CONFIG);
     const vid = currentUser.uid + '_' + Date.now().toString(36);
     liveState = { role:'viewer', id: liveId, hostUid, peer, vid, unsubs: [], pendingCands: [], gotTrack: false };
@@ -7708,7 +7904,7 @@ window.joinLive = async function(liveId){
     peer.onicecandidate = e => { if(e.candidate) addDoc(viewerCands, e.candidate.toJSON()).catch(()=>{}); };
     const offer = await peer.createOffer();
     await peer.setLocalDescription(offer);
-    await setDoc(vref, { uid: currentUser.uid, name: currentProfile.displayName || 'User', offer: { type: offer.type, sdp: offer.sdp }, joinedAt: serverTimestamp() });
+    await setDoc(vref, { uid: currentUser.uid, name: currentProfile.displayName || 'User', photo: myPhoto() || '', offer: { type: offer.type, sdp: offer.sdp }, joinedAt: serverTimestamp() });
     updateDoc(doc(db,'live_streams',liveId), { viewers: arrayUnion(currentUser.uid) }).then(() => syncLiveViewers(liveId)).catch(()=>{});
     postLiveMessage(liveId, { senderUid: currentUser.uid, senderName: currentProfile.displayName || 'User', senderPhoto: myPhoto(), text:'joined the live stream', type:'JOIN' }).catch(()=>{});
     liveState.unsubs.push(onSnapshot(vref, async s => {
@@ -7723,6 +7919,8 @@ window.joinLive = async function(liveId){
         }catch(e){ console.error(e); }
       }
     }));
+    liveReqInit(); liveFollowInit(hostUid);
+    liveState.unsubs.push(onSnapshot(doc(db,'live_streams',liveId,'kicked',currentUser.uid), k => { if(k.exists() && liveState && liveState.id === liveId){ toast('The host removed you from the live.'); cleanupLive(); } }));
     liveState.unsubs.push(onSnapshot(doc(db,'live_streams',liveId), s => {
       const d = s.data();
       if(!liveState || liveState.id !== liveId) return;
@@ -7781,7 +7979,7 @@ function resetGiftSendBtn(){
   const g = LIVE_GIFTS.find(x => x.id === giftSel); const h = document.getElementById('lgHint');
   if(h && g) h.textContent = g.icon + ' ' + g.name + ' · ★ ' + g.coins;
 }
-window.__setLive = o => { liveState = o; };
+window.__setLive = o => { liveState = o; }; window.__lvs = () => liveState;
 window.toggleGiftTray = function(){
   const tray = document.getElementById('liveGifts');
   if(tray.classList.toggle('show')){ tray.innerHTML = giftTrayHTML(); resetGiftSendBtn(); }
@@ -7903,7 +8101,7 @@ function cleanupLive(){
   if(s.micTrack){ try{ s.micTrack.stop(); }catch(e){} }
   if(s.actx){ try{ s.actx.close(); }catch(e){} }
   if(s.vEl) s.vEl.forEach(el => { try{ el.srcObject = null; }catch(e){} });
-  if(s.role === 'viewer' && s.vid){ deleteDoc(doc(db,'live_streams',s.id,'viewers',s.vid)).catch(()=>{}); if(currentUser) updateDoc(doc(db,'live_streams',s.id), { viewers: arrayRemove(currentUser.uid) }).then(() => syncLiveViewers(s.id)).catch(()=>{}); }
+  if(s.role === 'viewer' && s.vid){ deleteDoc(reqRef(s.id, currentUser.uid)).catch(()=>{}); deleteDoc(doc(db,'live_streams',s.id,'viewers',s.vid)).catch(()=>{}); if(currentUser) updateDoc(doc(db,'live_streams',s.id), { viewers: arrayRemove(currentUser.uid) }).then(() => syncLiveViewers(s.id)).catch(()=>{}); }
   hideLiveRoom();
 }
 window.endLive = async function(){
