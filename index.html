@@ -2084,6 +2084,7 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
 /* ---------- 6. Large / ultra-wide: stop stretching ---------- */
 @media (min-width:1600px){ :root{ --col-max:720px; --wide-max:1240px; } }
 @media (prefers-reduced-motion:reduce){ *{scroll-behavior:auto!important;} }
+.live-bar .gift.on#liveMicBtn{background:#E53935;box-shadow:0 0 0 3px rgba(229,57,53,.35);}
 .live-unmute{white-space:nowrap;position:absolute;left:50%;top:42%;transform:translateX(-50%);z-index:20;height:50px;padding:0 24px;border:0;border-radius:25px;background:rgba(20,40,31,.85);color:#fff;font-weight:800;font-size:16px;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.4);}
 .live-top .x#liveSnd{margin-right:6px;}
 #profileView .vbadge svg,.pf-name .vbadge svg{width:26px;height:26px;}
@@ -3105,7 +3106,7 @@ html,body{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size
   <div class="live-bar">
     <input type="text" id="liveInput" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendLiveChat()">
     <button class="send" onclick="sendLiveChat()" data-t="send">Send</button>
-    <button class="gift" onclick="sendLiveHeart()">❤</button><button class="gift" id="liveGiftBtn" onclick="toggleGiftTray()">🎁</button>
+    <button class="gift" id="liveMicBtn" onclick="liveMic()">🎙️</button><button class="gift" onclick="sendLiveHeart()">❤</button><button class="gift" id="liveGiftBtn" onclick="toggleGiftTray()">🎁</button>
     <button class="end" id="liveEndBtn" style="display:none;" onclick="endLive()">End</button>
   </div>
 </div>
@@ -7398,6 +7399,58 @@ window.__liveAttach = liveAttachRemote; window.__showLiveRoom = showLiveRoom;
 window.liveUnmute = function(){ const v = document.getElementById('liveVideo'); v.muted = false; v.volume = 1; v.play().catch(()=>{}); liveShowUnmute(false); };
 window.liveToggleSound = function(){ const v = document.getElementById('liveVideo'); if(v.muted){ liveUnmute(); } else { v.muted = true; liveSndIcon(); } };
 document.addEventListener('pointerdown', e => { const r = document.getElementById('liveRoom'); const v = document.getElementById('liveVideo'); if(r && r.classList.contains('show') && e.target.closest('#liveRoom') && v && v.muted && liveState && liveState.role === 'viewer' && liveState.gotTrack && !e.target.closest('#liveSnd')) liveUnmute(); }, true);
+// --- two-way voice: host mixes (mix-minus) so everyone hears the host and every speaking viewer, never themselves ---
+function liveAudioInit(){
+  const s = liveState; const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+  s.actx = new AC(); s.mixGain = s.actx.createGain(); s.vSrc = new Map(); s.vDest = new Map(); s.vEl = new Map();
+  const at = s.stream.getAudioTracks();
+  if(at.length){ s.micSrc = s.actx.createMediaStreamSource(new MediaStream([at[0]])); s.micSrc.connect(s.mixGain); }
+  s.actx.resume().catch(()=>{});
+}
+function hostAddTracks(peer, vid){
+  const s = liveState;
+  s.stream.getVideoTracks().forEach(tr => peer.addTrack(tr, s.stream));
+  if(!s.actx){ s.stream.getAudioTracks().forEach(tr => peer.addTrack(tr, s.stream)); return; }
+  s.actx.resume().catch(()=>{});
+  const dest = s.actx.createMediaStreamDestination();
+  s.mixGain.connect(dest);
+  s.vSrc.forEach(src => { try{ src.connect(dest); }catch(e){} });
+  s.vDest.set(vid, dest);
+  const at = dest.stream.getAudioTracks()[0]; if(at) peer.addTrack(at, dest.stream);
+}
+function hostOnViewerTrack(vid, ev){
+  const s = liveState; if(!s || !s.actx || ev.track.kind !== 'audio' || s.vSrc.has(vid)) return;
+  s.actx.resume().catch(()=>{});
+  const ms = new MediaStream([ev.track]);
+  const el = new Audio(); el.muted = true; el.srcObject = ms; el.play().catch(()=>{}); s.vEl.set(vid, el);   // keeps the remote stream flowing in every browser
+  const src = s.actx.createMediaStreamSource(ms);
+  src.connect(s.actx.destination);                                   // the host hears the viewer
+  s.vDest.forEach((dest, ov) => { if(ov !== vid){ try{ src.connect(dest); }catch(e){} } });   // other viewers hear them too
+  s.vSrc.set(vid, src);
+}
+function hostAudioDrop(vid){
+  const s = liveState; if(!s || !s.vSrc) return;
+  const src = s.vSrc.get(vid); if(src){ try{ src.disconnect(); }catch(e){} s.vSrc.delete(vid); }
+  const dest = s.vDest.get(vid); if(dest){ try{ s.mixGain.disconnect(dest); }catch(e){} s.vDest.delete(vid); }
+  const el = s.vEl.get(vid); if(el){ try{ el.srcObject = null; }catch(e){} s.vEl.delete(vid); }
+}
+function liveMicUI(on){ const b = document.getElementById('liveMicBtn'); if(!b) return; b.classList.toggle('on', !!on); b.textContent = on ? '🎤' : '🎙️'; b.title = on ? 'Mic on — tap to mute' : 'Tap to speak'; }
+window.liveMic = async function(){
+  const s = liveState; if(!s) return;
+  if(s.role === 'host'){
+    const at = s.stream.getAudioTracks(); if(!at.length) return toast('No microphone found.');
+    const on = !at[0].enabled; at.forEach(t => t.enabled = on); liveMicUI(on); toast(on ? 'Mic on' : 'Mic muted'); return;
+  }
+  if(!s.micTrack){
+    try{
+      const ms = await getRawCallMedia('audio'); s.micTrack = ms.getAudioTracks()[0];
+      if(!liveState || liveState !== s){ s.micTrack.stop(); return; }
+      await s.aSender.replaceTrack(s.micTrack); liveMicUI(true); toast('You are on the mic — everyone can hear you');
+    }catch(e){ toast('Microphone permission is needed to speak: ' + (e.message || e)); }
+    return;
+  }
+  const on = !s.micTrack.enabled; s.micTrack.enabled = on; liveMicUI(on); toast(on ? 'You are on the mic' : 'Mic muted');
+};
 function showLiveRoom(opts){
   const room = document.getElementById('liveRoom'); room.classList.add('show');
   document.getElementById('liveAvatar').innerHTML = avatarHTML(opts.photo, opts.name);
@@ -7410,7 +7463,7 @@ function showLiveRoom(opts){
   document.getElementById('liveGifts').classList.remove('show');
   document.getElementById('liveLikes').textContent = '❤ 0'; document.getElementById('liveCoins').textContent = '★ 0';
   document.getElementById('liveWait').style.display = opts.host ? 'none' : 'flex';
-  document.getElementById('liveSnd').style.display = opts.host ? 'none' : ''; liveShowUnmute(false);
+  document.getElementById('liveSnd').style.display = opts.host ? 'none' : ''; liveShowUnmute(false); liveMicUI(!!opts.host);
   document.getElementById('liveWait').textContent = 'Connecting…';
   document.body.style.overflow = 'hidden';
 }
@@ -7588,6 +7641,7 @@ window.startLive = async function(){
     askLiveAlertPermission();
     postLiveMessage(lvId, { senderUid:'system', senderName:'Meskot Live', senderPhoto:'', text:`Welcome to ${title}! Ethiopian Cultural Gifting & Chat is active.`, type:'CHAT' });
     liveState = { role:'host', id: lvId, hostUid: currentUser.uid, stream, peers: new Map(), unsubs: [], hb: null };
+    liveAudioInit();
     showLiveRoom({ host:true, name: currentProfile.displayName, photo: currentProfile.photoURL });
     const v = document.getElementById('liveVideo'); v.srcObject = stream; v.muted = true; v.play().catch(()=>{});
     liveState.hb = setInterval(() => { updateDoc(doc(db,'live_streams',liveState.id), { heartbeat: serverTimestamp() }).catch(()=>{}); }, 20000);
@@ -7606,7 +7660,8 @@ async function hostAcceptViewer(vid, data){
   if(liveState.peers.size >= 10){ updateDoc(vref, { rejected:true }).catch(()=>{}); return; }
   const peer = new RTCPeerConnection(RTC_CONFIG);
   liveState.peers.set(vid, peer);
-  liveState.stream.getTracks().forEach(tr => peer.addTrack(tr, liveState.stream));
+  hostAddTracks(peer, vid);
+  peer.ontrack = ev => hostOnViewerTrack(vid, ev);
   const hostCands = collection(db,'live_streams',liveState.id,'viewers',vid,'hostCands');
   peer.onicecandidate = e => { if(e.candidate) addDoc(hostCands, e.candidate.toJSON()).catch(()=>{}); };
   try{
@@ -7624,6 +7679,7 @@ async function hostAcceptViewer(vid, data){
 function hostDropViewer(vid){
   if(!liveState || !liveState.peers) return;
   const peer = liveState.peers.get(vid);
+  hostAudioDrop(vid);
   if(peer){ try{ peer.close(); }catch(e){} liveState.peers.delete(vid); updateLiveViewerCount(); }
 }
 function updateLiveViewerCount(){ /* viewerCount is derived from the viewers[] list, like the Android app */ }
@@ -7639,7 +7695,8 @@ window.joinLive = async function(liveId){
     liveState = { role:'viewer', id: liveId, hostUid, peer, vid, unsubs: [], pendingCands: [], gotTrack: false };
     showLiveRoom({ host:false, name: live.hostName || live.authorName, photo: live.hostPhoto || live.authorPhoto });
     peer.addTransceiver('video', { direction:'recvonly' });
-    peer.addTransceiver('audio', { direction:'recvonly' });
+    const aTr = peer.addTransceiver('audio', { direction:'sendrecv' });   // sendrecv: the viewer can speak later via replaceTrack (no renegotiation)
+    liveState.aSender = aTr.sender;
     const remote = new MediaStream();
     peer.ontrack = ev => {
       remote.addTrack(ev.track);
@@ -7843,6 +7900,9 @@ function cleanupLive(){
   if(s.peers) s.peers.forEach(p => { try{ p.close(); }catch(e){} });
   if(s.peer){ try{ s.peer.close(); }catch(e){} }
   if(s.stream) s.stream.getTracks().forEach(tr => tr.stop());
+  if(s.micTrack){ try{ s.micTrack.stop(); }catch(e){} }
+  if(s.actx){ try{ s.actx.close(); }catch(e){} }
+  if(s.vEl) s.vEl.forEach(el => { try{ el.srcObject = null; }catch(e){} });
   if(s.role === 'viewer' && s.vid){ deleteDoc(doc(db,'live_streams',s.id,'viewers',s.vid)).catch(()=>{}); if(currentUser) updateDoc(doc(db,'live_streams',s.id), { viewers: arrayRemove(currentUser.uid) }).then(() => syncLiveViewers(s.id)).catch(()=>{}); }
   hideLiveRoom();
 }
